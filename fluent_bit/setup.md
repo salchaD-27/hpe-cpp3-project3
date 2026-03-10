@@ -6,6 +6,7 @@ This guide explains how to run a simple log ingestion pipeline using **Fluent Bi
 
 ## Project Structure
 
+```bash
 hpe-cpp3-project3/
 │
 ├── log_generator.py
@@ -15,6 +16,7 @@ hpe-cpp3-project3/
 └── fluent_bit/
     ├── conf.yaml
     └── parsers.conf
+```
 
 
 ---
