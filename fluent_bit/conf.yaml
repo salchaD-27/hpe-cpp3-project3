@@ -1,0 +1,20 @@
+service:
+  flush: 1
+  log_level: info
+  parsers_file: /fluent-bit/etc/parsers.conf
+  http_server: true
+  http_listen: 0.0.0.0
+  http_port: 2020
+
+pipeline:
+  inputs:
+    - name: tail
+      path: /logs/hpc_logs.json
+      parser: json
+      tag: hpc.logs
+      read_from_head: true
+
+  outputs:
+    - name: stdout
+      match: '*'
+      format: json_lines
