@@ -1,0 +1,8 @@
+{"timestamp": "2026-03-10 08:37:23", "level": "INFO", "service": "compute-node", "message": "Simulated HPC log event"}
+{"timestamp": "2026-03-10 08:37:24", "level": "WARN", "service": "auth", "message": "Simulated HPC log event"}
+{"timestamp": "2026-03-10 08:37:25", "level": "WARN", "service": "compute-node", "message": "Simulated HPC log event"}
+{"timestamp": "2026-03-10 08:37:26", "level": "ERROR", "service": "auth", "message": "Simulated HPC log event"}
+{"timestamp": "2026-03-10 08:37:27", "level": "INFO", "service": "storage", "message": "Simulated HPC log event"}
+{"timestamp": "2026-03-10 08:37:28", "level": "WARN", "service": "storage", "message": "Simulated HPC log event"}
+{"timestamp": "2026-03-10 08:37:29", "level": "INFO", "service": "compute-node", "message": "Simulated HPC log event"}
+{"timestamp": "2026-03-10 08:37:30", "level": "ERROR", "service": "storage", "message": "Simulated HPC log event"}

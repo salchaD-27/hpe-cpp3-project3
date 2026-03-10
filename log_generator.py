@@ -3,8 +3,9 @@ import time
 import random
 
 levels = ["INFO","WARN","ERROR"]
-
 services = ["scheduler","compute-node","storage","auth"]
+
+logfile = "logs/hpc_logs.json"
 
 while True:
     log = {
@@ -14,6 +15,8 @@ while True:
         "message": "Simulated HPC log event"
     }
 
-    print(json.dumps(log), flush=True)
+    with open(logfile, "a") as f:
+        f.write(json.dumps(log) + "\n")
+        f.flush()
 
     time.sleep(1)
