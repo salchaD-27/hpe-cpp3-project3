@@ -81,7 +81,7 @@ VictoriaLogs requires a storage path where log data will be persisted.
 ### Run Command
 
 ```bash
-logstash -f ~/hpe-cpp3-project3/logstash/logstash.conf
+./victoria-logs-prod -storageDataPath=victoria_logs/victoria-logs-data
 ```
 
 ### Startup Output

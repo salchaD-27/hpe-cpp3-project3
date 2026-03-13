@@ -25,15 +25,13 @@ cd kafka_2.13-3.7.0
 ## Generate cluster id
 
 ```bash
-bin/kafka-storage.sh random-uuid
+id="$(bin/kafka-storage.sh random-uuid)"
 ```
 
 ## Format storage
 
 ```bash
-bin/kafka-storage.sh format \
--t <cluster-id> \
--c config/kraft/server.properties
+bin/kafka-storage.sh format -t $id -c config/server.properties 
 ```
 
 ## Start Kafka
