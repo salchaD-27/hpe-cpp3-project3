@@ -1,4 +1,4 @@
-# Large log files - never commit these
+# log files
 *.log
 /data/
 __pycache__/
