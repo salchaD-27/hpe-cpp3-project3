@@ -1,0 +1,10 @@
+{"_msg": "NFS /home response time 2597ms", "_time": "2026-03-15T07:55:06.595323+00:00", "node": "compute-node-019", "service": "nfs", "level": "INFO", "job_id": "job_80083", "cluster": "hpc-cluster-01"}
+{"_msg": "Lustre OST 9 I/O error detected", "_time": "2026-03-15T07:55:06.647636+00:00", "node": "compute-node-004", "service": "lustre", "level": "ERROR", "job_id": "job_27767", "cluster": "hpc-cluster-01"}
+{"_msg": "Login accepted for carol from 10.0.8.188", "_time": "2026-03-15T07:55:06.701351+00:00", "node": "compute-node-015", "service": "sshd", "level": "INFO", "job_id": "job_34761", "cluster": "hpc-cluster-01"}
+{"_msg": "Lustre OST 2 I/O error detected", "_time": "2026-03-15T07:55:06.755941+00:00", "node": "compute-node-011", "service": "lustre", "level": "ERROR", "job_id": "job_97858", "cluster": "hpc-cluster-01"}
+{"_msg": "Job job_95607 started on compute-node-020, CPUs=75, GPUs=2", "_time": "2026-03-15T07:55:06.807423+00:00", "node": "compute-node-020", "service": "slurmd", "level": "INFO", "job_id": "job_20067", "cluster": "hpc-cluster-01"}
+{"_msg": "Job job_55266 exceeded walltime limit, terminating", "_time": "2026-03-15T07:55:06.858164+00:00", "node": "compute-node-013", "service": "slurmd", "level": "WARN", "job_id": "job_31930", "cluster": "hpc-cluster-01"}
+{"_msg": "Job job_48824 failed with exit code 1", "_time": "2026-03-15T07:55:06.909498+00:00", "node": "compute-node-023", "service": "slurmd", "level": "ERROR", "job_id": "job_23762", "cluster": "hpc-cluster-01"}
+{"_msg": "CPU 69 machine check error detected", "_time": "2026-03-15T07:55:06.961957+00:00", "node": "compute-node-014", "service": "kernel", "level": "ERROR", "job_id": "job_95607", "cluster": "hpc-cluster-01"}
+{"_msg": "OOM killer invoked, killed PID 35662 on compute-node-008", "_time": "2026-03-15T07:55:07.012627+00:00", "node": "compute-node-008", "service": "kernel", "level": "WARN", "job_id": "job_60779", "cluster": "hpc-cluster-01"}
+{"_msg": "Job job_80083 completed successfully in 27476s", "_time": "2026-03-15T07:55:07.063323+00:00", "node": "compute-node-002", "service": "slurmd", "level": "INFO", "job_id": "job_79020", "cluster": "hpc-cluster-01"}

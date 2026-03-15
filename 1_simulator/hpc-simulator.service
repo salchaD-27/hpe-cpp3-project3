@@ -1,0 +1,18 @@
+[Unit]
+Description=HPC Log Simulator
+After=network.target kafka.service
+Requires=kafka.service
+
+[Service]
+Type=simple
+User=shivanshu
+WorkingDirectory=/home/shivanshu/victorialogs-eval/simulator
+ExecStart=/home/shivanshu/hpc-venv/bin/python3 \
+          /home/shivanshu/victorialogs-eval/simulator/simulator.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

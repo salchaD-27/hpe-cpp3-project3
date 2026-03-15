@@ -1,0 +1,8 @@
+# Large log files - never commit these
+*.log
+/data/
+__pycache__/
+*.pyc
+hpc-venv/
+benchmarks/raw/
+.DS_Store
