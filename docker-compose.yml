@@ -19,3 +19,35 @@ services:
       -c /fluent-bit/etc/fluent-bit.conf
     depends_on:
       - generator
+      - kafka
+    
+  kafka:
+    image: apache/kafka:3.9.2
+    container_name: kafka
+    ports:
+      - "19092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+  
+  kafka-init:
+    image: apache/kafka:3.9.2
+    depends_on:
+      - kafka
+    entrypoint: ["/bin/bash","-c"]
+    command: |
+      echo "Waiting for Kafka..."
+      sleep 10
+      /opt/kafka/bin/kafka-topics.sh \
+        --create \
+        --if-not-exists \
+        --topic hpc-logs \
+        --bootstrap-server kafka:9092 \
+        --partitions 3 \
+        --replication-factor 1
+      echo "Kafka topic created"
