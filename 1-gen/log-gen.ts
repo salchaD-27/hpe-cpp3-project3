@@ -1,3 +1,9 @@
+// | Method                                       | Typical max logs/sec |
+// | -------------------------------------------- | -------------------- |
+// | appendFileSync (older implementation)        | ~2k                  |
+// | write stream batching                        | 50k+                 |
+// | write stream + worker threads                | 200k+                |
+
 import fs from "fs"
 import path from "path"
 
@@ -5,6 +11,9 @@ const LOG_DIR = "../logs"
 const LOG_FILE = path.join(LOG_DIR, "hpc-cluster.log")
 
 fs.mkdirSync(LOG_DIR, { recursive: true })
+
+// high-throughput stream writer
+const stream = fs.createWriteStream(LOG_FILE, { flags: "a" })
 
 const NODES = Array.from({ length: 24 }, (_, i) =>
   `compute-node-${String(i + 1).padStart(3, "0")}`
@@ -78,21 +87,40 @@ function generate() {
   }
 }
 
-const RATE = 20
+/*
+Logs per second.
+You can safely increase this to:
+1000+
+5000+
+*/
+const RATE = 200
+
 let count = 0
 
 console.log(`Simulator running at ${RATE} logs/sec`)
+console.log("Press Ctrl+C to stop")
 
 setInterval(() => {
-  const log = generate()
 
-  fs.appendFileSync(LOG_FILE, JSON.stringify(log) + "\n")
+  let batch = ""
 
-  count++
-
-  if (count % 100 === 0) {
-    console.log(
-      `[${count.toString().padStart(6)}] [${log.level.padEnd(5)}] ${log.node} | ${log._msg.slice(0, 55)}`
-    )
+  for (let i = 0; i < RATE; i++) {
+    const log = generate()
+    batch += JSON.stringify(log) + "\n"
+    count++
   }
-}, 1000 / RATE)
+
+  stream.write(batch)
+
+  if (count % 1000 === 0) {
+    console.log(`Generated ${count} logs`)
+  }
+
+}, 1000)
+
+// graceful shutdown
+process.on("SIGINT", () => {
+  console.log(`\nStopped. Total logs generated: ${count}`)
+  stream.end()
+  process.exit()
+})
