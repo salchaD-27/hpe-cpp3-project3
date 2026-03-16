@@ -1,7 +1,6 @@
 # HPC Log Simulator
 
-Generates realistic synthetic HPC cluster log events and sends them
-to Apache Kafka at 20 logs per second.
+Generates realistic synthetic HPC cluster log events and sends them to Apache Kafka at 20 logs per second.
 
 ## What It Does
 
@@ -52,7 +51,7 @@ sudo systemctl start hpc-simulator
 sudo systemctl status hpc-simulator --no-pager
 ```
 
-## Verify It Is Working
+## Verify 
 ```bash
 # Check log file is growing
 watch -n 2 wc -l /var/log/hpc-simulator/hpc-cluster.log
