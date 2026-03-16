@@ -1,0 +1,10 @@
+# | Setting          | Purpose                     |
+# | ---------------- | --------------------------- |
+# | pipeline.workers | parallel processing threads |
+# | batch.size       | events processed per cycle  |
+# | queue            | buffering                   |
+
+api.http.host: "0.0.0.0"
+pipeline.workers: 4
+pipeline.batch.size: 125
+pipeline.batch.delay: 50

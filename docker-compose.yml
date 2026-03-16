@@ -63,6 +63,16 @@ services:
         --config segment.bytes=104857600
 
       echo "Kafka topic ready"
+  
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.19.12
+    container_name: logstash
+    volumes:
+      - ./4-logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./4-logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./4-logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+    depends_on:
+      - kafka
 
 volumes:
   kafka-data:
