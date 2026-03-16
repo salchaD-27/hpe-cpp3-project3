@@ -1,52 +1,21 @@
-version: "3.8"
-
+# version: "3.9"
 services:
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    ports:
-      - "2181:2181"
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  generator:
+    build: ./1-gen
+    container_name: log-generator
+    volumes:
+      - ./0-logs:/logs
 
   fluentbit:
-    image: fluent/fluent-bit:2.2
+    image: fluent/fluent-bit:4.2.3
+    container_name: fluentbit
     volumes:
-      - ./logs:/logs
-      - ./fluentbit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./0-logs:/logs
+      - ./2-fluentbit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./2-fluentbit/parser.conf:/fluent-bit/etc/parser.conf
+    command: >
+      /fluent-bit/bin/fluent-bit
+      -c /fluent-bit/etc/fluent-bit.conf
     depends_on:
-      - kafka
-
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.12.0
-    volumes:
-      - ./logstash/pipeline.conf:/usr/share/logstash/pipeline/logstash.conf
-    ports:
-      - "9600:9600"
-    depends_on:
-      - kafka
-
-  victorialogs:
-    image: victoriametrics/victoria-logs
-    ports:
-      - "9428:9428"
-    command:
-      - -storageDataPath=/victoria-logs-data
-
-  grafana:
-    image: grafana/grafana:10.2.6
-    ports:
-      - "3000:3000"
-    depends_on:
-      - victorialogs
+      - generator

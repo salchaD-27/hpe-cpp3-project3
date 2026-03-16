@@ -1,0 +1,13 @@
+{
+  "name": "logs-gen",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "start": "ts-node log-gen.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.0.0"
+  }
+}
