@@ -9,13 +9,13 @@ services:
   fluentbit:
     image: fluent/fluent-bit:4.2.3
     container_name: fluentbit
+    restart: always
     volumes:
       - ./0-logs:/logs
       - ./2-fluentbit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - ./2-fluentbit/parser.conf:/fluent-bit/etc/parser.conf
     command: >
-      /fluent-bit/bin/fluent-bit
-      -c /fluent-bit/etc/fluent-bit.conf
+      sh -c "sleep 20 && /fluent-bit/bin/fluent-bit -c /fluent-bit/etc/fluent-bit.conf"
     depends_on:
       - generator
       - kafka
@@ -73,6 +73,57 @@ services:
       - ./4-logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
     depends_on:
       - kafka
+      - victorialogs
+      # - vlinsert
+
+  # vlstorage:
+  #   image: victoriametrics/victoria-logs:latest
+  #   container_name: vlstorage
+  #   command:
+  #     - -storageNode
+  #     - -storageDataPath=/storage
+  #     - -retentionPeriod=7d
+  #     - -httpListenAddr=:9428
+  #   volumes:
+  #     - ./6-victorialogs/storage-data:/storage
+  #   ports:
+  #     - "9428:9428"
+    
+  # vlinsert:
+  #   image: victoriametrics/victoria-logs:latest
+  #   container_name: vlinsert
+  #   command:
+  #     - -insertNode
+  #     - -storageNode=vlstorage:9428
+  #     - -httpListenAddr=:9429
+  #   ports:
+  #     - "9429:9429"
+  #   depends_on:
+  #     - vlstorage
+
+  # vlselect:
+  #   image: victoriametrics/victoria-logs:latest
+  #   container_name: vlselect
+  #   command:
+  #     - -selectNode
+  #     - -storageNode=vlstorage:9428
+  #     - -httpListenAddr=:9430
+  #   ports:
+  #     - "9430:9430"
+  #   depends_on:
+  #     - vlstorage
+
+  victorialogs:
+    image: victoriametrics/victoria-logs:latest
+    container_name: victorialogs
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=7d"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./6-victorialogs/storage-data:/storage
+    ports:
+      - "9428:9428"
 
 volumes:
   kafka-data:
