@@ -1,0 +1,174 @@
+Kafka Deployment
+Kafka runs inside Docker using KRaft mode (no ZooKeeper required).
+Container image: apache/kafka:3.9.2
+
+Kafka service configuration:
+kafka:
+  image: apache/kafka:3.9.2
+  container_name: kafka
+  ports:
+    - "19092:9092"
+  environment:
+    KAFKA_NODE_ID: 1
+    KAFKA_PROCESS_ROLES: broker,controller
+    KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+    KAFKA_LOG_DIRS: /var/lib/kafka/data
+  volumes:
+    - kafka-data:/var/lib/kafka/data
+
+
+
+Kafka Storage
+Kafka stores messages as an append-only commit log.
+Persistent storage is mounted via Docker volume: /var/lib/kafka/data
+Example disk layout:
+kafka-data/
+logs-0/
+   00000000000000000000.log
+   00000000000000000000.index
+   00000000000000000000.timeindex
+logs-1/
+logs-2/
+logs-3/
+logs-4/
+logs-5/
+
+Each directory corresponds to a partition.
+Each partition contains multiple log segments.
+
+
+
+Kafka Topic Configuration
+The pipeline uses the topic: logs
+
+Topic properties:
+Property	Value	Purpose
+partitions	6	parallel ingestion
+replication-factor	1	single-node setup
+retention.ms	86400000	retain logs for 24 hours
+segment.bytes	104857600	rotate segments every 100MB
+
+Topic creation is automated using an init container.
+Example command executed during startup:
+kafka-topics.sh \
+--create \
+--topic logs \
+--bootstrap-server kafka:9092 \
+--partitions 6 \
+--replication-factor 1 \
+--config retention.ms=86400000 \
+--config segment.bytes=104857600
+Partition Architecture
+
+The topic is divided into 6 partitions.
+logs
+ ├── logs-0
+ ├── logs-1
+ ├── logs-2
+ ├── logs-3
+ ├── logs-4
+ └── logs-5
+
+Benefits of partitions:
+Benefit	Explanation
+parallel writes	producers distribute messages
+parallel reads	multiple consumers can process simultaneously
+higher throughput	Kafka writes partitions independently
+
+
+Segment Management
+Kafka stores messages in log segments.
+Segment configuration:
+segment.bytes = 104857600
+Segment lifecycle:
+messages append
+      ↓
+segment reaches 100MB
+      ↓
+segment closed
+      ↓
+new segment created
+Retention cleanup removes old segments after:
+retention.ms = 86400000
+Kafka Producer Optimization
+Logs are produced to Kafka by Fluent Bit.
+Producer configuration is optimized for high throughput.
+
+
+
+
+Fluent Bit Kafka output:
+[OUTPUT]
+Name kafka
+Match *
+Brokers kafka:9092
+Topics logs
+Format json
+rdkafka.compression.codec lz4
+rdkafka.batch.num.messages 1000
+rdkafka.queue.buffering.max.messages 100000
+rdkafka.linger.ms 20
+
+Optimization features:
+Setting	Effect
+compression (lz4)	reduces storage and network
+batching	sends messages in groups
+linger.ms	allows efficient batching
+
+Typical throughput improvement:
+Mode	Logs/sec
+default	~10k
+optimized	100k+
+Kafka Internal Topics
+
+Kafka automatically creates internal topics such as:
+__consumer_offsets
+
+Purpose:
+Function	Description
+offset tracking	remembers consumer progress
+fault tolerance	allows consumer restart
+consumer groups	enables parallel consumption
+Kafka Monitoring Commands
+
+List topics: kafka-topics.sh --list
+Describe topic: kafka-topics.sh --describe --topic logs
+View topic configuration:
+kafka-configs.sh \
+--entity-type topics \
+--entity-name logs \
+--describe
+
+List consumer groups:
+kafka-consumer-groups.sh --list
+
+Debugging Kafka Messages
+Consume messages directly from Kafka:
+kafka-console-consumer.sh \
+--bootstrap-server localhost:9092 \
+--topic logs \
+--from-beginning
+
+This confirms that Fluent Bit is successfully producing logs.
+Kafka Performance Characteristics
+Kafka can handle extremely high ingestion rates.
+Typical log pipeline throughput:
+Component	Throughput
+Fluent Bit	100k logs/sec
+Kafka broker	500k+ logs/sec
+Logstash	50k–200k logs/sec
+Kafka is rarely the bottleneck in log pipelines.
+
+
+
+Persistence & Recovery
+Kafka data is persisted via Docker volume: kafka-data
+
+Benefits:
+Feature	Explanation
+durability	logs survive container restart
+state recovery	topics remain intact
+offset retention	consumer state preserved
