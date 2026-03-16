@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "kafkajs": "^2.2.4",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}
