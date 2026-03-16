@@ -1,8 +1,6 @@
 # Logstash — Pipeline Processor
 
-Logstash reads log events from Kafka, removes internal fields
-that conflict with VictoriaLogs, and forwards clean JSON to
-VictoriaLogs for storage.
+Logstash reads log events from Kafka, removes internal fields that conflict with VictoriaLogs, and forwards clean JSON to VictoriaLogs for storage.
 
 ## Role in Pipeline
 ```
@@ -39,7 +37,7 @@ sudo tee /etc/logstash/jvm.options.d/heap.options << 'JVMEOF'
 JVMEOF
 ```
 
-## Pipeline Configuration Explained
+## Pipeline Configuration 
 ```ruby
 input {
   kafka {
@@ -77,15 +75,13 @@ output {
 
 ## Critical Bug Fixed — Duplicate _time Field
 
-VictoriaLogs was returning HTTP 400 errors because Logstash was
-adding its own @timestamp which merged with the simulator _time
-field to create an array:
+VictoriaLogs was returning HTTP 400 errors because Logstash was adding its own @timestamp which merged with the simulator _time field to create an array:
 ```
 _time: ["2026-03-15T06:13:03Z", "2026-03-15T06:13:03.939Z"]
 ```
 
-VictoriaLogs cannot parse an array as a timestamp. Fix: always
-remove @timestamp in the filter block.
+VictoriaLogs cannot parse an array as a timestamp. 
+Fix: always remove @timestamp in the filter block.
 
 ## Deploy and Start
 ```bash
