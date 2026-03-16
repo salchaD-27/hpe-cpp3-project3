@@ -1,7 +1,6 @@
 # Fluent Bit — Log Collector
 
-Fluent Bit watches the simulator log file using inotify and forwards
-each log line to Apache Kafka in real time.
+Fluent Bit watches the simulator log file using inotify and forwards each log line to Apache Kafka in real time.
 
 ## Role in Pipeline
 ```
@@ -32,7 +31,7 @@ source ~/.bashrc
 fluent-bit --version
 ```
 
-## Configuration File Explained
+## Configuration File 
 ```ini
 [SERVICE]
     Flush            5        # Send to Kafka every 5 seconds
@@ -64,7 +63,7 @@ sudo systemctl start fluent-bit
 sudo systemctl status fluent-bit --no-pager
 ```
 
-## Verify It Is Working
+## Verify 
 ```bash
 # Check for errors
 sudo journalctl -u fluent-bit --no-pager -n 20
