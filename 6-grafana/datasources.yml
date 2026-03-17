@@ -1,3 +1,9 @@
-name: VictoriaLogs
-type: victoriametrics-logs-datasource
-url: http://victorialogs:9428
+apiVersion: 1
+
+datasources:
+  - name: VictoriaLogs
+    type: victoriametrics-logs-datasource
+    access: proxy
+    url: http://victorialogs:9428
+    isDefault: true
+    editable: true
