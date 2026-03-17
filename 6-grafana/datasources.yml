@@ -1,0 +1,3 @@
+name: VictoriaLogs
+type: victoriametrics-logs-datasource
+url: http://victorialogs:9428
