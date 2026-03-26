@@ -1,14 +1,24 @@
+cat > ~/victorialogs-eval/1_simulator/README.md << 'EOF'
 # HPC Log Simulator
 
-Generates realistic synthetic HPC cluster log events and sends them to Apache Kafka at 20 logs per second.
+Generates realistic synthetic HPC cluster log events and writes
+them to a log file. Fluent Bit reads the file and forwards to Kafka.
+
+## Pipeline Role
+```
+simulator.py --> /var/log/hpc-simulator/hpc-cluster.log --> Fluent Bit --> Kafka
+```
+
+The simulator has NO direct Kafka dependency.
+Fluent Bit is the sole Kafka producer.
 
 ## What It Does
 
 - Simulates 24 compute nodes (compute-node-001 to compute-node-024)
 - Simulates 8 HPC services: slurmd, sshd, kernel, mpi, lustre, ib_core, nfs, systemd
 - Generates 16 realistic log templates (job start/fail, OOM kill, InfiniBand errors, etc.)
-- Sends each log directly to Kafka topic `hpc-logs`
-- Also writes each log to `/var/log/hpc-simulator/hpc-cluster.log` for Fluent Bit
+- Writes logs in batches to `/var/log/hpc-simulator/hpc-cluster.log`
+- Rate: 20 logs/second (configurable via RATE constant)
 
 ## Sample Log Event
 ```json
@@ -24,17 +34,21 @@ Generates realistic synthetic HPC cluster log events and sends them to Apache Ka
 ```
 
 ## Prerequisites
+
+No third-party packages required. Uses Python standard library only.
 ```bash
-# Create Python virtual environment
-python3 -m venv ~/hpc-venv
-source ~/hpc-venv/bin/activate
-pip install kafka-python
+# Python 3.6+ required (uses f-strings and datetime.timezone)
+python3 --version
+
+# Create log directory
+sudo mkdir -p /var/log/hpc-simulator
+sudo chmod 777 /var/log/hpc-simulator
 ```
 
 ## Run Directly (for testing)
 ```bash
-source ~/hpc-venv/bin/activate
 python3 simulator.py
+# Press Ctrl+C to stop
 ```
 
 ## Run as Systemd Service (recommended)
@@ -51,12 +65,16 @@ sudo systemctl start hpc-simulator
 sudo systemctl status hpc-simulator --no-pager
 ```
 
-## Verify 
+## Verify It Is Working
 ```bash
-# Check log file is growing
-watch -n 2 wc -l /var/log/hpc-simulator/hpc-cluster.log
+# Check log file is growing (number should increase every second)
+sleep 5 && wc -l /var/log/hpc-simulator/hpc-cluster.log
+sleep 5 && wc -l /var/log/hpc-simulator/hpc-cluster.log
 
-# Check Kafka is receiving messages
+# Check last 3 log lines
+tail -3 /var/log/hpc-simulator/hpc-cluster.log
+
+# Check Kafka is receiving messages via Fluent Bit
 /opt/kafka/bin/kafka-console-consumer.sh \
   --bootstrap-server localhost:9092 \
   --topic hpc-logs --max-messages 3 2>/dev/null
@@ -64,9 +82,32 @@ watch -n 2 wc -l /var/log/hpc-simulator/hpc-cluster.log
 
 ## Why Systemd Service Over Direct Script
 
-| | Direct Script | Systemd Service |
-|---|---|---|
-| Survives terminal close | ❌ | ✅ |
-| Auto-starts on boot | ❌ | ✅ |
-| Restarts on crash | ❌ | ✅ |
-| Consistent Python env | ❌ | ✅ |
+|                        | Direct Script | Systemd Service |
+|------------------------|---------------|-----------------|
+| Survives terminal close | ❌            | ✅              |
+| Auto-starts on boot     | ❌            | ✅              |
+| Restarts on crash       | ❌            | ✅              |
+| Consistent Python env   | ❌            | ✅              |
+
+## Important — No Direct Kafka Dependency
+
+The simulator writes ONLY to the log file.
+Fluent Bit is the sole Kafka producer.
+
+**Why this matters:** Having the simulator send directly to Kafka
+while Fluent Bit also reads the same log file creates two producers
+on the same Kafka topic. Every log message arrives twice causing:
+- Duplicate records in VictoriaLogs
+- 2x expected ingestion rate (detectable via metrics)
+- Inconsistent message ordering
+
+## Scaling the Rate
+
+Change the `RATE` constant in `simulator.py` for benchmarking:
+```python
+RATE = 20      # default — 20 logs/sec
+RATE = 200     # medium load test
+RATE = 1000    # high load test
+RATE = 5000    # stress test
+```
+EOF
