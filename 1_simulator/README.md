@@ -1,8 +1,7 @@
-cat > ~/victorialogs-eval/1_simulator/README.md << 'EOF'
+
 # HPC Log Simulator
 
-Generates realistic synthetic HPC cluster log events and writes
-them to a log file. Fluent Bit reads the file and forwards to Kafka.
+Generates realistic synthetic HPC cluster log events and writes them to a log file. Fluent Bit reads the file and forwards to Kafka.
 
 ## Pipeline Role
 ```
@@ -37,7 +36,7 @@ Fluent Bit is the sole Kafka producer.
 
 No third-party packages required. Uses Python standard library only.
 ```bash
-# Python 3.6+ required (uses f-strings and datetime.timezone)
+# Python 3.6+ required 
 python3 --version
 
 # Create log directory
@@ -94,9 +93,8 @@ tail -3 /var/log/hpc-simulator/hpc-cluster.log
 The simulator writes ONLY to the log file.
 Fluent Bit is the sole Kafka producer.
 
-**Why this matters:** Having the simulator send directly to Kafka
-while Fluent Bit also reads the same log file creates two producers
-on the same Kafka topic. Every log message arrives twice causing:
+**Why this matters:** Having the simulator send directly to Kafka while Fluent Bit also reads the same log file creates two producers on the same Kafka topic. 
+Every log message arrives twice causing:
 - Duplicate records in VictoriaLogs
 - 2x expected ingestion rate (detectable via metrics)
 - Inconsistent message ordering
@@ -110,4 +108,3 @@ RATE = 200     # medium load test
 RATE = 1000    # high load test
 RATE = 5000    # stress test
 ```
-EOF
