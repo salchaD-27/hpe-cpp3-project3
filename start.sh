@@ -72,8 +72,9 @@ section "CLEAN START"
 log "Stopping and removing existing containers and volumes..."
 docker compose down -v --remove-orphans 2>&1 | grep -E "Removed|Stopped|Network|Volume" || true
 
-log "Clearing old log file..."
-rm -f ./0-logs/hpc-cluster.log
+
+log "Clearing old log files..."
+rm -f ./0-logs/*.log
 mkdir -p ./0-logs
 success "Clean slate ready"
 
@@ -296,7 +297,8 @@ fi
 section "PIPELINE SUMMARY"
 
 echo -e "
-  ${BOLD}Generator${NC}     →  writing to  ./0-logs/hpc-cluster.log
+
+  ${BOLD}Generator${NC}     →  writing to  ./0-logs/*.log (multi-file streams)
   ${BOLD}Fluent Bit${NC}    →  tailing log, parsing JSON, forwarding to Kafka
   ${BOLD}Kafka${NC}         →  topic: logs  |  http://localhost:19092
   ${BOLD}Logstash${NC}      →  consuming Kafka, enriching, posting to VictoriaLogs
