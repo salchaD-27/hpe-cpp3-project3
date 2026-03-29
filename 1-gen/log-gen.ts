@@ -1,34 +1,38 @@
-// | Method                                       | Typical max logs/sec |
-// | -------------------------------------------- | -------------------- |
-// | appendFileSync (older implementation)        | ~2k                  |
-// | write stream batching                        | 50k+                 |
-// | write stream + worker threads                | 200k+                |
+// High-throughput HPC log generator with streams + multi-file output
+// Typical max logs/sec: 50k+ with batching
 
 import fs from "fs"
 import path from "path"
 
 const LOG_DIR = "../logs"
-const LOG_FILE = path.join(LOG_DIR, "hpc-cluster.log")
-
 fs.mkdirSync(LOG_DIR, { recursive: true })
 
-// high-throughput stream writer
-const stream = fs.createWriteStream(LOG_FILE, { flags: "a" })
+// File mapping by service (5 files)
+const FILE_MAP: Record<string, string> = {
+  "slurmd": "slurm.log",
+  "kernel": "kernel.log",
+  "sshd": "sshd.log",
+  "systemd": "system.log",
+  "mpi": "system.log",
+  "lustre": "storage.log",
+  "nfs": "storage.log",
+  "ib_core": "storage.log"
+}
+
+// Lazy stream writers
+const writers: Record<string, fs.WriteStream> = {}
+
+function getWriter(service: string): fs.WriteStream {
+  const file = path.join(LOG_DIR, FILE_MAP[service] || "unknown.log")
+  if (!writers[file]) {
+    writers[file] = fs.createWriteStream(file, { flags: "a" })
+  }
+  return writers[file]
+}
 
 const NODES = Array.from({ length: 24 }, (_, i) =>
   `compute-node-${String(i + 1).padStart(3, "0")}`
 )
-
-const SERVICES = [
-  "slurmd",
-  "sshd",
-  "kernel",
-  "mpi",
-  "lustre",
-  "ib_core",
-  "nfs",
-  "systemd"
-]
 
 const JOBS = Array.from({ length: 30 }, () =>
   `job_${Math.floor(Math.random() * 90000 + 10000)}`
@@ -46,7 +50,9 @@ const TEMPLATES: Template[] = [
   { level: "WARN", service: "slurmd", tmpl: "Job {job} exceeded walltime limit, terminating" },
   { level: "ERROR", service: "slurmd", tmpl: "Job {job} failed with exit code {code}" },
   { level: "WARN", service: "kernel", tmpl: "OOM killer invoked, killed PID {pid} on {node}" },
-  { level: "ERROR", service: "kernel", tmpl: "CPU {cpu_id} machine check error detected" }
+  { level: "ERROR", service: "kernel", tmpl: "CPU {cpu_id} machine check error detected" },
+  { level: "INFO", service: "sshd", tmpl: "Accepted publickey for user from {node} port {port}" },
+  { level: "WARN", service: "systemd", tmpl: "Unit {service} entered failed state" }
 ]
 
 function rand(min: number, max: number) {
@@ -58,12 +64,17 @@ function pick<T>(arr: T[]): T {
 }
 
 function format(template: string, values: Record<string, any>) {
-  return template.replace(/\{(\w+)\}/g, (_, k) => values[k])
+  return template.replace(/\{(\w+)\}/g, (_, k) => String(values[k] || ''))
 }
 
 function generate() {
   const t = pick(TEMPLATES)
   const node = pick(NODES)
+
+  const stream = t.service === 'slurmd' ? 'slurm' :
+                 t.service === 'kernel' ? 'system' :
+                 t.service === 'sshd' ? 'access' :
+                 t.service === 'systemd' ? 'system' : 'hpc'
 
   const values = {
     job: pick(JOBS),
@@ -73,7 +84,10 @@ function generate() {
     dur: rand(60, 86400),
     code: pick([1, 2, 127, 139]),
     pid: rand(1000, 65535),
-    cpu_id: rand(0, 127)
+    cpu_id: rand(0, 127),
+    port: rand(20000, 65000),
+    service: pick(['mpi-rank-0.service', 'lustre-client.service']),
+    stream
   }
 
   return {
@@ -83,44 +97,33 @@ function generate() {
     service: t.service,
     level: t.level,
     job_id: pick(JOBS),
-    cluster: "hpc-cluster-01"
+    cluster: "hpc-cluster-01",
+    stream
   }
 }
 
-/*
-Logs per second.
-You can safely increase this to:
-1000+
-5000+
-*/
 const RATE = 200
-
 let count = 0
 
-console.log(`Simulator running at ${RATE} logs/sec`)
+console.log(`Simulator running at ${RATE} logs/sec across 5 files`)
 console.log("Press Ctrl+C to stop")
 
 setInterval(() => {
-
-  let batch = ""
-
   for (let i = 0; i < RATE; i++) {
     const log = generate()
-    batch += JSON.stringify(log) + "\n"
+    const writer = getWriter(log.service)
+    writer.write(JSON.stringify(log) + "\n")
     count++
   }
 
-  stream.write(batch)
-
   if (count % 1000 === 0) {
-    console.log(`Generated ${count} logs`)
+    console.log(`Generated ${count} logs across ${Object.keys(writers).length} files: ${Object.keys(writers).join(', ')}`)
   }
-
 }, 1000)
 
-// graceful shutdown
 process.on("SIGINT", () => {
-  console.log(`\nStopped. Total logs generated: ${count}`)
-  stream.end()
+  console.log(`\nStopped. Total logs generated: ${count} across ${Object.keys(writers).length} files`)
+  Object.values(writers).forEach(w => w.end())
   process.exit()
 })
+
