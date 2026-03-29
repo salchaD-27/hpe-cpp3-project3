@@ -10,19 +10,14 @@ import json
 import time
 import random
 import os
+import sys
 from datetime import datetime, timezone
 
-# ─── FILE OUTPUT ──────
-LOG_DIR  = '/var/log/hpc-simulator'
-LOG_FILE = f'{LOG_DIR}/hpc-cluster.log'
+# ─── HPC CLUSTER DEFINITION ────
 
-os.makedirs(LOG_DIR, exist_ok=True)
-log_stream = open(LOG_FILE, 'a', buffering=1)
-
-# ─── HPC CLUSTER DEFINITION ──────
 NODES = [f"compute-node-{i:03d}" for i in range(1, 25)]
 
-SERVICES = ["slurmd","sshd","kernel","mpi","lustre","ib_core","nfs","systemd"]
+SERVICES = ["slurmd", "sshd", "kernel", "mpi", "lustre", "ib_core", "nfs", "systemd"]
 
 JOBS = [f"job_{random.randint(10000,99999)}" for _ in range(30)]
 
@@ -45,7 +40,17 @@ TEMPLATES = [
     ("INFO",  "systemd", "Service {svc} started successfully"),
 ]
 
-# ─── LOG GENERATOR ───
+# ─── FILE OUTPUT (Fluent Bit reads these) ────
+
+LOG_DIR = '/var/log/hpc-simulator'
+os.makedirs(LOG_DIR, exist_ok=True)
+
+log_streams = {
+    svc: open(f'{LOG_DIR}/{svc}.log', 'a', buffering=1)
+    for svc in SERVICES
+}
+
+# ─── LOG GENERATOR ────
 def generate():
     level, service, tmpl = random.choice(TEMPLATES)
     node = random.choice(NODES)
@@ -64,7 +69,7 @@ def generate():
         pct     = random.randint(75, 99),
         ranks   = random.randint(8, 512),
         ip      = f"10.0.{random.randint(0,9)}.{random.randint(1,254)}",
-        user    = random.choice(["alice","bob","carol","dave"]),
+        user    = random.choice(["alice", "bob", "carol", "dave"]),
         ms      = random.randint(100, 5000),
         svc     = random.choice(SERVICES),
     )
@@ -78,28 +83,52 @@ def generate():
         "cluster": "hpc-cluster-01",
     }
 
-# ─── MAIN LOOP — batch write
-RATE  = 20    # logs per second (increase to 200, 1000, 5000 for benchmarking)
-BATCH = RATE  # write once per second in a batch
+# TEST MODE
+if '--test' in sys.argv:
+    record = generate()
+    print("Generated test record:")
+    print(json.dumps(record, indent=2))
 
-print(f"Simulator running at {RATE} logs/sec → {LOG_FILE}")
+    svc = record['service']
+    log_streams[svc].write(json.dumps(record) + '\n')
+    log_streams[svc].flush()
+
+    print(f"\nWritten to: {LOG_DIR}/{svc}.log")
+    print("Wait 3 seconds then check Kafka...")
+
+    for stream in log_streams.values():
+        stream.close()
+    sys.exit(0)
+
+# ─── MAIN LOOP — batch write ────
+RATE  = 20   # logs per second (change to 200, 1000, 5000 for benchmarking)
+BATCH = RATE # write once per second in a batch
+
+print(f"Simulator running at {RATE} logs/sec → {LOG_DIR}/{{service}}.log")
+print("Fluent Bit is sole Kafka producer (no direct Kafka dependency)")
 print("Press Ctrl+C to stop")
 
 count = 0
 try:
     while True:
-        #one write per second
-        batch = ""
+        batch_by_service = {svc: "" for svc in SERVICES}
+
         for _ in range(BATCH):
-            batch += json.dumps(generate()) + "\n"
+            record = generate()
+            batch_by_service[record['service']] += json.dumps(record) + '\n'
             count += 1
 
-        log_stream.write(batch)
+        # Write each service batch to its own file — one write() call per service
+        for svc, batch in batch_by_service.items():
+            if batch:
+                log_streams[svc].write(batch)
 
         if count % 1000 == 0:
             print(f"Generated {count} logs")
+
         time.sleep(1.0)
 
 except KeyboardInterrupt:
     print(f"\nStopped. Total logs generated: {count}")
-    log_stream.close()
+    for stream in log_streams.values():
+        stream.close()
