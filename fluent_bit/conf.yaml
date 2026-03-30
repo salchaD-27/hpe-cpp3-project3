@@ -12,11 +12,11 @@ pipeline:
       path: /logs/hpc_logs.json
       parser: json
       #tag: hpc.logs
-      #read_from_head: true
+      read_from_head: true
 
   outputs:
     - name: kafka
       match: '*'
-      Brokers: localhost:9092
+      Brokers: 172.29.0.10:9092
       topics: logs
       # Timestamp_Key: @timestamp
