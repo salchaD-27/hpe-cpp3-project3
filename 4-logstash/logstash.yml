@@ -1,16 +1,7 @@
-# | Setting          | Purpose                     |
-# | ---------------- | --------------------------- |
-# | pipeline.workers | parallel processing threads |
-# | batch.size       | events processed per cycle  |
-# | queue            | buffering                   |
-
-# http.host: "0.0.0.0"
-# http.port: 9600
-# pipeline.workers: 2
-# pipeline.batch.size: 500
-# pipeline.batch.delay: 50
-# log.level: info
-# xpack.monitoring.enabled: false
-
+# Basic Logstash configuration
 http.host: "0.0.0.0"
-pipeline.ecs_compatibility: disabled
+config.reload.automatic: false
+queue.type: memory
+pipeline.workers: 1
+pipeline.batch.size: 125
+pipeline.batch.delay: 50

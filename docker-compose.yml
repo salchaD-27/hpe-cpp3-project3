@@ -1,10 +1,9 @@
 services:
-
   generator:
-    build: ./1-gen
+    build: ./0-logs-generation
     container_name: log-generator
     volumes:
-      - ./0-logs:/logs
+      - ./1-logs-storage:/logs
     restart: unless-stopped
 
   kafka:
@@ -22,10 +21,6 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
-      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"    
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"        
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"    
     volumes:
       - kafka-data:/var/lib/kafka/data
     healthcheck:
@@ -42,7 +37,7 @@ services:
     ports:
       - "2020:2020"
     volumes:
-      - ./0-logs:/logs:ro
+      - ./1-logs-storage:/logs:ro
       - ./2-fluentbit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
       - ./2-fluentbit/parser.conf:/fluent-bit/etc/parsers/parser.conf:ro
     depends_on:
