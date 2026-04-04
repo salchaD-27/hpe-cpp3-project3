@@ -1,65 +1,10 @@
-{"timestamp": "2026-03-30 08:31:07", "level": "INFO", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:08", "level": "ERROR", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:09", "level": "ERROR", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:10", "level": "WARN", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:11", "level": "ERROR", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:12", "level": "INFO", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:13", "level": "INFO", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:14", "level": "INFO", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:15", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:16", "level": "ERROR", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:17", "level": "ERROR", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:18", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:19", "level": "INFO", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:20", "level": "WARN", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:21", "level": "WARN", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:22", "level": "WARN", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:23", "level": "WARN", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:24", "level": "WARN", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:25", "level": "WARN", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:26", "level": "ERROR", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:27", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:28", "level": "INFO", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:29", "level": "WARN", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:30", "level": "WARN", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:31", "level": "WARN", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:32", "level": "ERROR", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:33", "level": "INFO", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:34", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:35", "level": "WARN", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:36", "level": "WARN", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:37", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:38", "level": "ERROR", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:39", "level": "ERROR", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:40", "level": "INFO", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:41", "level": "ERROR", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:42", "level": "INFO", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:43", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:44", "level": "INFO", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:45", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:46", "level": "INFO", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:47", "level": "INFO", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:48", "level": "WARN", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:49", "level": "WARN", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:50", "level": "WARN", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:51", "level": "INFO", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:52", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:53", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:54", "level": "WARN", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:55", "level": "INFO", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:56", "level": "INFO", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:57", "level": "INFO", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:58", "level": "WARN", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:31:59", "level": "ERROR", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:00", "level": "WARN", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:01", "level": "WARN", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:02", "level": "WARN", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:03", "level": "ERROR", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:04", "level": "INFO", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:05", "level": "INFO", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:06", "level": "WARN", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:07", "level": "WARN", "service": "compute-node", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:08", "level": "INFO", "service": "auth", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:09", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:10", "level": "WARN", "service": "storage", "message": "Simulated HPC log event"}
-{"timestamp": "2026-03-30 08:32:11", "level": "ERROR", "service": "scheduler", "message": "Simulated HPC log event"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.411] INFO\tcom.hpe.cmu.server.rest.RESTCMUService\t172.23.0.103 Swagger-Codegen/1.0.0/python \"GET /cmu/v1/nodes?fields=name&fields=type&fields=managed&fields=attributes.SU_LEADER_ROLE&where=&allowsEmpty=True\" 200 0ms (queued 0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.439] INFO\tcom.hpe.cmu.server.rest.resource.AbstractResource\tFound 1/11 hits for search query 'leader1' (0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.439] INFO\tcom.hpe.cmu.server.rest.RESTCMUService\t172.23.0.103 Swagger-Codegen/1.0.0/python \"GET /cmu/v1/nodes?fields=name&fields=aliases&fields=network.ipAddress&where=name%3Dleader1&allowsEmpty=True\" 200 0ms (queued 0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.454] INFO\tcom.hpe.cmu.server.rest.resource.AbstractResource\tFound 1/11 hits for search query 'leader1' (0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.454] INFO\tcom.hpe.cmu.server.rest.RESTCMUService\t172.23.0.103 Swagger-Codegen/1.0.0/python \"GET /cmu/v1/nodes?fields=name&fields=aliases&fields=network.ipAddress&where=name%3Dleader1&allowsEmpty=True\" 200 0ms (queued 0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.483] INFO\tcom.hpe.cmu.server.rest.RESTCMUService\t172.23.0.103 Swagger-Codegen/1.0.0/python \"GET /cmu/v1/nodes?fields=name&fields=aliases&fields=network.ipAddress&where=name%3Dleader2&allowsEmpty=True\" 200 0ms (queued 0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.499] INFO\tcom.hpe.cmu.server.rest.RESTCMUService\t172.23.0.103 Swagger-Codegen/1.0.0/python \"GET /cmu/v1/nodes?fields=name&fields=aliases&fields=network.ipAddress&where=name%3Dleader2&allowsEmpty=True\" 200 0ms (queued 0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.528] INFO\tcom.hpe.cmu.server.rest.RESTCMUService\t172.23.0.103 Swagger-Codegen/1.0.0/python \"GET /cmu/v1/nodes?fields=name&fields=aliases&fields=network.ipAddress&where=name%3Dleader3&allowsEmpty=True\" 200 0ms (queued 0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.542] INFO\tcom.hpe.cmu.server.rest.RESTCMUService\t172.23.0.103 Swagger-Codegen/1.0.0/python \"GET /cmu/v1/nodes?fields=name&fields=aliases&fields=network.ipAddress&where=name%3Dleader3&allowsEmpty=True\" 200 0ms (queued 0ms)", "SeverityText": "info"}
+{"Resource": {"host.name": "padma", "service.name": "cmuserver-0"}, "Attributes": {"hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"}, "Body": "[2026-02-02 04:41:54.393] INFO\tcom.hpe.cmu.server.rest.RESTCMUService\t172.23.0.103 Swagger-Codegen/1.0.0/python \"GET /cmu/v1/nodes?fields=name&fields=type&fields=managed&fields=attributes.SU_LEADER_ROLE&where=&allowsEmpty=True\" 200 1ms (queued 0ms)", "SeverityText": "info"}
