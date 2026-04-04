@@ -1,3 +1,10 @@
 victoria_logs/victoria-logs-data
 
 kafka/data/
+
+generator/cleaned_logs.json
+generator/hpcmlog.json
+generator/monitoring_service.json
+generator/syslog.json
+
+hpe-cpp3-project3/logs/hpc_logs.json
