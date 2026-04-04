@@ -15,6 +15,11 @@ pipeline:
       read_from_head: true
 
   outputs:
+
+    - name: stdout
+      match: '*'
+      format: json
+
     - name: kafka
       match: '*'
       Brokers: 172.29.0.10:9092
