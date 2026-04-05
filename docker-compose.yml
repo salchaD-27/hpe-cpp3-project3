@@ -85,6 +85,34 @@ services:
     depends_on:
       - victorialogs
 
+  vmalert:
+    image: victoriametrics/vmalert:latest
+    container_name: vmalert
+    ports:
+      - "8880:8880"
+    command:
+      - "-datasource.url=http://victorialogs:9428"
+      - "-datasource.queryStep=30s"
+      - "-notifier.url=http://alertmanager:9093"
+      - "-rule=/etc/alerts/*.yml"
+      - "-evaluationInterval=30s"
+      - "-httpListenAddr=:8880"
+    volumes:
+      - ./7-alerting/alerts.yml:/etc/alerts/alerts.yml:ro
+    depends_on:
+      - victorialogs
+      - alertmanager
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    ports:
+      - "9094:9093"
+    volumes:
+      - ./7-alerting/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+
 volumes:
   kafka-data:
   grafana-data:

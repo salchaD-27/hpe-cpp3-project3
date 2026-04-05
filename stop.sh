@@ -41,13 +41,13 @@ success "All containers stopped"
 if [ "$PURGE" = true ]; then
   section "PURGING DATA"
 
-  warn "Removing all volumes (Kafka data, Grafana data)..."
+  warn "Removing all volumes..."
   docker compose down -v
   success "Volumes removed"
 
-  warn "Removing log file..."
-  rm -f ./0-logs/hpc-cluster.log
-  success "Log file removed"
+  warn "Removing log files..."
+  rm -f ./1-logs-storage/*.log
+  success "Log files removed"
 
   warn "Removing VictoriaLogs storage..."
   rm -rf ./5-victorialogs/storage-data/*
@@ -60,7 +60,7 @@ else
   • Kafka volume        — kafka-data
   • Grafana volume      — grafana-data
   • VictoriaLogs data   — ./5-victorialogs/storage-data/
-  • Log file            — ./0-logs/hpc-cluster.log
+  • Log files           — ./1-logs-storage/*.log
 
   ${YELLOW}To fully wipe all data:${NC}
   ./stop.sh --purge
@@ -68,7 +68,7 @@ else
 fi
 
 ###############################################################################
-# SUMMARY
+# STATUS
 ###############################################################################
 section "STATUS"
 

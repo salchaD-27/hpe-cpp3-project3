@@ -64,6 +64,23 @@ if ! docker info &>/dev/null; then
 fi
 success "Docker daemon running"
 
+# Check required config files
+for f in \
+  "2-fluentbit/fluent-bit.conf" \
+  "2-fluentbit/parser.conf" \
+  "4-logstash/logstash.conf" \
+  "4-logstash/logstash.yml" \
+  "6-grafana/datasources.yml" \
+  "7-alerting/alerts.yml" \
+  "7-alerting/alertmanager.yml"; do
+  if [ -f "$f" ]; then
+    success "Found $f"
+  else
+    error "Missing $f"
+    exit 1
+  fi
+done
+
 ###############################################################################
 # CLEAN START
 ###############################################################################
@@ -72,10 +89,9 @@ section "CLEAN START"
 log "Stopping and removing existing containers and volumes..."
 docker compose down -v --remove-orphans 2>&1 | grep -E "Removed|Stopped|Network|Volume" || true
 
-
 log "Clearing old log files..."
-rm -f ./0-logs/*.log
-mkdir -p ./0-logs
+rm -f ./1-logs-storage/*.log
+mkdir -p ./1-logs-storage
 success "Clean slate ready"
 
 ###############################################################################
@@ -105,7 +121,6 @@ wait_for "Kafka broker" \
   "docker exec kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092" \
   30 3
 
-# verify topic auto-creation works
 log "Verifying Kafka topic 'logs'..."
 sleep 3
 docker exec kafka /opt/kafka/bin/kafka-topics.sh \
@@ -140,12 +155,20 @@ log "Starting Logstash..."
 docker compose up -d logstash
 success "Logstash started"
 
+log "Starting Alertmanager..."
+docker compose up -d alertmanager
+success "Alertmanager started"
+
+log "Starting vmalert..."
+docker compose up -d vmalert
+success "vmalert started"
+
 log "Starting Grafana..."
 docker compose up -d grafana
 success "Grafana started"
 
 ###############################################################################
-# WAIT FOR PIPELINE WARMUP
+# PIPELINE WARMUP
 ###############################################################################
 section "PIPELINE WARMUP (60s)"
 
@@ -156,7 +179,7 @@ done
 echo ""
 
 ###############################################################################
-# DEBUG: CONTAINER STATUS
+# CONTAINER STATUS
 ###############################################################################
 section "CONTAINER STATUS"
 
@@ -166,7 +189,7 @@ docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}" 2>/dev/nul
 docker compose ps
 
 ###############################################################################
-# DEBUG: FLUENT BIT
+# FLUENT BIT DIAGNOSTICS
 ###############################################################################
 section "FLUENT BIT DIAGNOSTICS"
 
@@ -187,7 +210,7 @@ else
 fi
 
 ###############################################################################
-# DEBUG: KAFKA
+# KAFKA DIAGNOSTICS
 ###############################################################################
 section "KAFKA DIAGNOSTICS"
 
@@ -215,7 +238,7 @@ for group in $(docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \
 done
 
 ###############################################################################
-# DEBUG: LOGSTASH
+# LOGSTASH DIAGNOSTICS
 ###############################################################################
 section "LOGSTASH DIAGNOSTICS"
 
@@ -228,7 +251,7 @@ LS_STARTED=$(docker logs logstash 2>&1 | grep -c "Pipeline started" || echo 0)
 echo -e "  Pipeline started  : ${BOLD}$LS_STARTED${NC}"
 echo -e "  ERROR count       : ${BOLD}$LS_ERRORS${NC}"
 echo -e "  HTTP 400 count    : ${BOLD}$LS_400${NC}"
-echo -e "  RubyFloat warns   : ${BOLD}$LS_RUBY${NC} (cosmetic — from old backlog messages)"
+echo -e "  RubyFloat warns   : ${BOLD}$LS_RUBY${NC}"
 
 if [ "$LS_STARTED" -gt 0 ]; then
   success "Logstash pipeline running"
@@ -236,12 +259,8 @@ else
   error "Logstash pipeline did not start — run: docker logs logstash"
 fi
 
-if [ "$LS_400" -gt 0 ]; then
-  warn "Logstash has HTTP 400 errors sending to VictoriaLogs"
-fi
-
 ###############################################################################
-# DEBUG: VICTORIALOGS
+# VICTORIALOGS DIAGNOSTICS
 ###############################################################################
 section "VICTORIALOGS DIAGNOSTICS"
 
@@ -259,17 +278,59 @@ for line in sys.stdin:
     if line:
         try:
             d = json.loads(line)
-            print(f\"  [{d.get('_time','?')}] [{d.get('level','?')}] {d.get('node','?')} — {d.get('_msg','?')}\")
+            print(f\"  [{d.get('_time','?')}] [{d.get('level','?')}] {d.get('service_name','?')} — {d.get('_msg','?')[:80]}\")
         except:
             pass
 " 2>/dev/null || echo "$VL_RESULT" | head -3 | sed 's/^/  /'
 else
   warn "No data in VictoriaLogs yet — pipeline may still be warming up"
-  log "Try manually: curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=3'"
 fi
 
 ###############################################################################
-# DEBUG: GRAFANA
+# ALERTMANAGER DIAGNOSTICS
+###############################################################################
+section "ALERTMANAGER DIAGNOSTICS"
+
+wait_for "Alertmanager HTTP" \
+  "curl -sf http://localhost:9094/-/healthy" \
+  15 2
+
+curl -sf http://localhost:9094/api/v2/status
+curl -sf "http://localhost:9094/api/v2/alerts"
+
+AM_STATUS=$(curl -sf http://localhost:9093/api/v2/status 2>/dev/null | \
+  python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('cluster',{}).get('status','unknown'))" \
+  2>/dev/null || echo "unknown")
+echo -e "  Alertmanager cluster status : ${BOLD}$AM_STATUS${NC}"
+
+ACTIVE_ALERTS=$(curl -sf "http://localhost:9093/api/v2/alerts" 2>/dev/null | \
+  python3 -c "import sys,json; alerts=json.load(sys.stdin); print(len(alerts))" \
+  2>/dev/null || echo "0")
+echo -e "  Active alerts               : ${BOLD}$ACTIVE_ALERTS${NC}"
+success "Alertmanager running"
+
+###############################################################################
+# VMALERT DIAGNOSTICS
+###############################################################################
+section "VMALERT DIAGNOSTICS"
+
+wait_for "vmalert HTTP" \
+  "curl -sf http://localhost:8880/-/healthy" \
+  15 2
+
+VMALERT_GROUPS=$(curl -sf "http://localhost:8880/api/v1/groups" 2>/dev/null | \
+  python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d.get('data',{}).get('groups',[])))" \
+  2>/dev/null || echo "0")
+echo -e "  Alert rule groups loaded : ${BOLD}$VMALERT_GROUPS${NC}"
+
+VMALERT_ALERTS=$(curl -sf "http://localhost:8880/api/v1/alerts" 2>/dev/null | \
+  python3 -c "import sys,json; d=json.load(sys.stdin); alerts=d.get('data',{}).get('alerts',[]); firing=[a for a in alerts if a.get('state')=='firing']; print(f'{len(firing)} firing / {len(alerts)} total')" \
+  2>/dev/null || echo "N/A")
+echo -e "  Alerts                   : ${BOLD}$VMALERT_ALERTS${NC}"
+success "vmalert running"
+
+###############################################################################
+# GRAFANA DIAGNOSTICS
 ###############################################################################
 section "GRAFANA DIAGNOSTICS"
 
@@ -297,16 +358,23 @@ fi
 section "PIPELINE SUMMARY"
 
 echo -e "
-
-  ${BOLD}Generator${NC}     →  writing to  ./0-logs/*.log (multi-file streams)
-  ${BOLD}Fluent Bit${NC}    →  tailing log, parsing JSON, forwarding to Kafka
-  ${BOLD}Kafka${NC}         →  topic: logs  |  http://localhost:19092
-  ${BOLD}Logstash${NC}      →  consuming Kafka, enriching, posting to VictoriaLogs
-  ${BOLD}VictoriaLogs${NC}  →  storing logs  |  http://localhost:9428
-  ${BOLD}Grafana${NC}       →  dashboards    |  http://localhost:3000  (admin/admin)
+  ${BOLD}Generator${NC}      →  writing to  ./1-logs-storage/*.log
+  ${BOLD}Fluent Bit${NC}     →  tailing logs, parsing JSON, forwarding to Kafka
+  ${BOLD}Kafka${NC}          →  topic: logs  |  http://localhost:19092
+  ${BOLD}Logstash${NC}       →  consuming Kafka, enriching, posting to VictoriaLogs
+  ${BOLD}VictoriaLogs${NC}   →  storing logs  |  http://localhost:9428
+  ${BOLD}vmalert${NC}        →  evaluating alert rules  |  http://localhost:8880
+  ${BOLD}Alertmanager${NC}   →  routing alerts  |  http://localhost:9093
+  ${BOLD}Grafana${NC}        →  dashboards  |  http://localhost:3000  (admin/admin)
 
   ${BOLD}${GREEN}Query logs:${NC}
   curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=5'
+
+  ${BOLD}${GREEN}Check firing alerts:${NC}
+  curl -s 'http://localhost:8880/api/v1/alerts' | python3 -m json.tool
+
+  ${BOLD}${GREEN}Check Alertmanager:${NC}
+  curl -s 'http://localhost:9093/api/v2/alerts'
 
   ${BOLD}${GREEN}Consumer lag:${NC}
   docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \\
