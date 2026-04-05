@@ -3,4 +3,4 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-CMD ["npx", "ts-node", "log-gen.ts"]
+CMD ["npx", "ts-node", "1-logs-generation-simulation.ts"]

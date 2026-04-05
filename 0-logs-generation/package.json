@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "start": "ts-node log-gen.ts"
+"start": "ts-node 1-logs-generation-simulation.ts"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

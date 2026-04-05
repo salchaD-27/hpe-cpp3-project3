@@ -62,7 +62,7 @@ services:
     container_name: victorialogs
     command:
       - "-storageDataPath=/storage"
-      - "-retentionPeriod=7d"
+      - "-retentionPeriod=1y"
       - "-httpListenAddr=:9428"
     volumes:
       - ./5-victorialogs/storage-data:/storage
