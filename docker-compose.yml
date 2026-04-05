@@ -3,7 +3,7 @@ services:
     build: ./0-logs-generation
     container_name: log-generator
     volumes:
-      - ./1-logs-storage:/logs
+      - ./1-logs-storage:/1-logs-storage
     restart: unless-stopped
 
   kafka:
