@@ -8,7 +8,11 @@ route:
   repeat_interval: 1h
   receiver: default
 
+# receivers:
+#   - name: default
+#     webhook_configs:
+#       - url: "http://localhost:5001/alerts"  # swap for slack/email/pagerduty
 receivers:
   - name: default
     webhook_configs:
-      - url: "http://localhost:5001/alerts"  # swap for slack/email/pagerduty
+      - url: "http://host.docker.internal:5001/alerts"

@@ -1,0 +1,393 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": { "list": [] },
+  "description": "HPC Pipeline — Full Log Monitoring with Filters & Drilldown",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "📊 Health Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 1,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "justifyMode": "center", "textMode": "auto", "orientation": "auto" },
+      "title": "Total Logs",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} | stats count() as total", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 10 }, { "color": "red", "value": 50 }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 2,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "justifyMode": "center", "textMode": "auto", "orientation": "auto" },
+      "title": "🔴 Errors",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:ERROR | stats count() as errors", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 20 }, { "color": "orange", "value": 100 }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "id": 3,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "justifyMode": "center", "textMode": "auto", "orientation": "auto" },
+      "title": "🟡 Warnings",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:WARN | stats count() as warnings", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "id": 4,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "justifyMode": "center", "textMode": "auto", "orientation": "auto" },
+      "title": "🟢 Info",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:INFO | stats count() as info", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "id": 5,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "justifyMode": "center", "textMode": "auto", "orientation": "auto" },
+      "title": "💀 OOM Events",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} \"OOM killer\" | stats count() as oom", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] }, "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "id": 6,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "justifyMode": "center", "textMode": "auto", "orientation": "auto" },
+      "title": "🔌 Unique Services",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} | stats uniq(service_name) as services", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 101,
+      "title": "📈 Volume & Trends",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": {
+        "defaults": { "custom": { "lineWidth": 2, "fillOpacity": 10, "spanNulls": false }, "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "errors" }, "properties": [{ "id": "color", "value": { "fixedColor": "#F2495C", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "warnings" }, "properties": [{ "id": "color", "value": { "fixedColor": "#FF9830", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "info" }, "properties": [{ "id": "color", "value": { "fixedColor": "#73BF69", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 10,
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "title": "Log Rate by Level",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:ERROR | stats count() as errors", "queryType": "range", "legendFormat": "errors", "refId": "A" },
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:WARN | stats count() as warnings", "queryType": "range", "legendFormat": "warnings", "refId": "B" },
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:INFO | stats count() as info", "queryType": "range", "legendFormat": "info", "refId": "C" }
+      ]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "custom": { "lineWidth": 2, "fillOpacity": 10, "spanNulls": false }, "unit": "short" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 11,
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "title": "Log Rate by Stream",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:hpcmlog | stats count() as hpcmlog", "queryType": "range", "legendFormat": "hpcmlog", "refId": "A" },
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:monitoring | stats count() as monitoring", "queryType": "range", "legendFormat": "monitoring", "refId": "B" },
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:syslog | stats count() as syslog", "queryType": "range", "legendFormat": "syslog", "refId": "C" }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 102,
+      "title": "🏆 Top Offenders & Breakdowns",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 5 }, { "color": "red", "value": 20 }] } } },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 15 },
+      "id": 20,
+      "options": { "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"] }, "displayMode": "gradient", "valueMode": "color" },
+      "title": "Top Services by Errors",
+      "type": "bargauge",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:ERROR | stats count() by service_name", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "purple", "value": 50 }] } } },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 15 },
+      "id": 21,
+      "options": { "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"] }, "displayMode": "gradient", "valueMode": "color" },
+      "title": "Top Hosts by Volume",
+      "type": "bargauge",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} | stats count() by host_name", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } } },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 15 },
+      "id": 22,
+      "options": { "pieType": "donut", "tooltip": { "mode": "single" }, "legend": { "displayMode": "list", "placement": "right" } },
+      "title": "Volume by Stream",
+      "type": "piechart",
+      "targets": [
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:hpcmlog | stats count() as hpcmlog", "queryType": "range", "legendFormat": "hpcmlog", "refId": "A" },
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:monitoring | stats count() as monitoring", "queryType": "range", "legendFormat": "monitoring", "refId": "B" },
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:syslog | stats count() as syslog", "queryType": "range", "legendFormat": "syslog", "refId": "C" }
+      ]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } } },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 15 },
+      "id": 23,
+      "options": { "pieType": "pie", "tooltip": { "mode": "single" }, "legend": { "displayMode": "list", "placement": "right" } },
+      "title": "Level Distribution",
+      "type": "piechart",
+      "targets": [
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:ERROR | stats count() as ERROR", "queryType": "range", "legendFormat": "ERROR", "refId": "A" },
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:WARN | stats count() as WARN", "queryType": "range", "legendFormat": "WARN", "refId": "B" },
+        { "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:INFO | stats count() as INFO", "queryType": "range", "legendFormat": "INFO", "refId": "C" }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "id": 103,
+      "title": "🔍 Filtered Log Explorer",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 24 },
+      "id": 30,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
+      "title": "Live Logs — Filtered by Stream / Level / Service / Host / Search",
+      "type": "logs",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} ${level_filter} ${service_filter} ${host_filter} ${search_filter}", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 38 },
+      "id": 104,
+      "title": "🚨 Errors & Critical Events",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 39 },
+      "id": 40,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
+      "title": "Error Logs",
+      "type": "logs",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:ERROR", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 39 },
+      "id": 41,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
+      "title": "OOM & Critical Events",
+      "type": "logs",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "\"OOM killer\" OR \"machine check error\" OR \"fatal\" OR \"panic\"", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 49 },
+      "id": 105,
+      "title": "📂 Per Stream Deep Dive",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 10, "w": 8, "x": 0, "y": 50 },
+      "id": 50,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
+      "title": "hpcmlog Stream",
+      "type": "logs",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:hpcmlog ${level_filter} ${service_filter} ${host_filter}", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 10, "w": 8, "x": 8, "y": 50 },
+      "id": 51,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
+      "title": "monitoring Stream",
+      "type": "logs",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:monitoring ${level_filter} ${service_filter} ${host_filter}", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 10, "w": 8, "x": 16, "y": 50 },
+      "id": 52,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
+      "title": "syslog Stream",
+      "type": "logs",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "vl_stream:syslog ${level_filter} ${service_filter} ${host_filter}", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 60 },
+      "id": 106,
+      "title": "📋 Field Stats & Distribution",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] } } },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 61 },
+      "id": 60,
+      "options": { "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"] }, "displayMode": "gradient", "valueMode": "color" },
+      "title": "Log Count by Service",
+      "type": "bargauge",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} | stats count() by service_name", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "teal", "value": null }] } } },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 61 },
+      "id": 61,
+      "options": { "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"] }, "displayMode": "gradient", "valueMode": "color" },
+      "title": "Log Count by Host",
+      "type": "bargauge",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} | stats count() by host_name", "queryType": "range", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 5 }, { "color": "red", "value": 20 }] } } },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 61 },
+      "id": 62,
+      "options": { "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"] }, "displayMode": "gradient", "valueMode": "color" },
+      "title": "Errors by Host",
+      "type": "bargauge",
+      "targets": [{ "datasource": { "type": "victoriametrics-logs-datasource", "uid": "PD775F2863313E6C7" }, "expr": "${stream_filter} level:ERROR | stats count() by host_name", "queryType": "range", "refId": "A" }]
+    }
+  ],
+
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["hpc", "victorialogs", "pipeline", "monitoring"],
+
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 2,
+        "includeAll": false,
+        "name": "DS_VICTORIALOGS",
+        "options": [],
+        "query": "victoriametrics-logs-datasource",
+        "refresh": 1,
+        "type": "datasource",
+        "label": "VictoriaLogs"
+      },
+      {
+        "current": { "selected": true, "text": "All Streams", "value": "*" },
+        "hide": 0,
+        "includeAll": false,
+        "name": "stream_filter",
+        "label": "Stream",
+        "options": [
+          { "selected": true, "text": "All Streams", "value": "*" },
+          { "selected": false, "text": "hpcmlog", "value": "vl_stream:hpcmlog" },
+          { "selected": false, "text": "monitoring", "value": "vl_stream:monitoring" },
+          { "selected": false, "text": "syslog", "value": "vl_stream:syslog" }
+        ],
+        "query": "* : All Streams, vl_stream:hpcmlog : hpcmlog, vl_stream:monitoring : monitoring, vl_stream:syslog : syslog",
+        "type": "custom"
+      },
+      {
+        "current": { "selected": true, "text": "All Levels", "value": "" },
+        "hide": 0,
+        "includeAll": false,
+        "name": "level_filter",
+        "label": "Level",
+        "options": [
+          { "selected": true, "text": "All Levels", "value": "" },
+          { "selected": false, "text": "ERROR", "value": "level:ERROR" },
+          { "selected": false, "text": "WARN", "value": "level:WARN" },
+          { "selected": false, "text": "INFO", "value": "level:INFO" }
+        ],
+        "query": " : All Levels, level:ERROR : ERROR, level:WARN : WARN, level:INFO : INFO",
+        "type": "custom"
+      },
+      {
+        "current": { "selected": true, "text": "All Services", "value": "" },
+        "hide": 0,
+        "includeAll": false,
+        "name": "service_filter",
+        "label": "Service",
+        "options": [
+          { "selected": true, "text": "All Services", "value": "" },
+          { "selected": false, "text": "cli", "value": "service_name:cli" },
+          { "selected": false, "text": "glusterd", "value": "service_name:glusterd" },
+          { "selected": false, "text": "cmd_history", "value": "service_name:cmd_history" },
+          { "selected": false, "text": "unknown", "value": "service_name:unknown" }
+        ],
+        "query": " : All Services, service_name:cli : cli, service_name:glusterd : glusterd, service_name:cmd_history : cmd_history, service_name:unknown : unknown",
+        "type": "custom"
+      },
+      {
+        "current": { "selected": true, "text": "All Hosts", "value": "" },
+        "hide": 0,
+        "includeAll": false,
+        "name": "host_filter",
+        "label": "Host",
+        "options": [
+          { "selected": true, "text": "All Hosts", "value": "" },
+          { "selected": false, "text": "leader1", "value": "host_name:leader1" },
+          { "selected": false, "text": "leader2", "value": "host_name:leader2" },
+          { "selected": false, "text": "worker1", "value": "host_name:worker1" },
+          { "selected": false, "text": "worker2", "value": "host_name:worker2" }
+        ],
+        "query": " : All Hosts, host_name:leader1 : leader1, host_name:leader2 : leader2, host_name:worker1 : worker1, host_name:worker2 : worker2",
+        "type": "custom"
+      },
+      {
+        "current": { "selected": true, "text": "", "value": "" },
+        "hide": 0,
+        "name": "search_filter",
+        "label": "Search",
+        "query": "",
+        "type": "textbox",
+        "description": "Free-text search — e.g. OOM killer, error, timeout"
+      }
+    ]
+  },
+
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "HPC Pipeline — Log Monitoring",
+  "uid": "hpc-pipeline-logs",
+  "version": 1
+}
