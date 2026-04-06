@@ -1,7 +1,19 @@
 import json
+import os
 
-input_file = "hpcmlog.json"
-output_file = "cleaned_logs.json"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# hpcmlog.json
+input_file = os.path.join(BASE_DIR, "sample/hpcmlog.json")
+output_file = os.path.join(BASE_DIR, "data/cleaned_logs_hpcm.json")
+
+# monitoring_service.json
+#input_file = os.path.join(BASE_DIR, "sample/monitoring_service.json")
+#output_file = os.path.join(BASE_DIR, "data/cleaned_logs1.json")
+
+# syslog.json
+#input_file = os.path.join(BASE_DIR, "sample/syslog.json")
+#output_file = os.path.join(BASE_DIR, "data/cleaned_logs2.json")s
 
 def extract_required_fields(log_data):
     extracted_logs = []

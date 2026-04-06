@@ -4,15 +4,14 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Copy all required files
-COPY log_forwarder.py .
-COPY cleaned_logs.json .
+# Copy full project
+COPY . .
 
-# Create logs directory (Fluent Bit will read from here)
-RUN mkdir -p /logs
+# Create output directory (Fluent Bit will read from here)
+RUN mkdir -p /app/output
 
-# Ensure Python output is unbuffered (important for real-time logs)
+# Ensure real-time logging
 ENV PYTHONUNBUFFERED=1
 
-# Default command → run forwarder
-CMD ["python", "log_forwarder.py"]
+# Default command (can be overridden)
+CMD ["python", "-m", "core.run_generate"]

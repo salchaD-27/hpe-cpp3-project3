@@ -2,11 +2,11 @@ import json
 import time
 import os
 
-INPUT_FILE = "cleaned_logs.json"   # JSONL or JSON array
-OUTPUT_FILE = "/logs/hpc_logs.json"
-DELAY = 0.1   # seconds between logs (tune for throughput)
+# INPUT_FILE = ""   # JSONL or JSON array
+# OUTPUT_FILE = "/logs/hpc_logs.json"
+# DELAY = 0.1   # seconds between logs (tune for throughput)
 
-def stream_logs():
+def stream_logs(INPUT_FILE, OUTPUT_FILE, DELAY):
     # Ensure output directory exists
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
