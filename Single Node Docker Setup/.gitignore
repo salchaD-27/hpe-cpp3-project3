@@ -1,4 +1,27 @@
-# Python
+# ----------------------
+
+# 📝 Logs
+
+# ----------------------
+
+logs/*
+!logs/generated/
+!logs/generated/**
+
+# ----------------------
+
+# 📦 Data (ignore runtime data)
+
+# ----------------------
+
+data/*
+!data/.gitkeep
+
+# ----------------------
+
+# 🐍 Python
+
+# ----------------------
 
 **pycache**/
 *.py[cod]
@@ -8,44 +31,51 @@
 venv/
 env/
 
-# Logs
+# ----------------------
 
-*.log
-logs/
+# 🐳 Docker / Env
 
-# Docker
+# ----------------------
 
 .env
 .env.*
 docker-compose.override.yml
-volumes/
-data/
+*.pid
 
-# Kafka / pipeline data
+# ----------------------
 
-kafka-logs/
-zookeeper/
+# 🧠 IDE / Editor
 
-# Grafana
-
-grafana-storage/
-
-# IDE
+# ----------------------
 
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# OS
+# ----------------------
+
+# 🖥 OS files
+
+# ----------------------
 
 .DS_Store
 Thumbs.db
 
-# Secrets
+# ----------------------
+
+# 🔐 Secrets
+
+# ----------------------
 
 *.key
 *.pem
 *.crt
 
-# Keep example env
+# ----------------------
 
-!.env.example
+# 📊 Grafana runtime storage
+
+# ----------------------
+
+grafana-storage/
