@@ -4,7 +4,7 @@ services:
     build: ./generator
     container_name: log-generator
     volumes:
-      - ./logs:/logs
+      - ./logs:/app/output
     restart: unless-stopped
     networks:
       observability:
@@ -12,7 +12,8 @@ services:
 
   kafka:
     image: apache/kafka:3.9.2
-    container_name: kafka
+    container_name: kafka-broker
+    # topics: ${TAG}
     hostname: kafka
     ports:
       - "19092:9092"
@@ -41,6 +42,29 @@ services:
     networks:
       observability:
         ipv4_address: 172.29.0.10
+
+  kafka_tail:
+    image: apache/kafka:3.9.2
+    container_name: kafka
+    command:
+      - /bin/sh
+      - -c
+      - |
+        until /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server 172.29.0.10:9092 >/dev/null 2>&1; do
+          echo "Waiting for Kafka broker..."
+          sleep 2
+        done
+        exec /opt/kafka/bin/kafka-console-consumer.sh \
+          --bootstrap-server 172.29.0.10:9092 \
+          --topic logs \
+          --property print.timestamp=true
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      observability:
+        ipv4_address: 172.29.0.11
 
   fluentbit:
     image: fluent/fluent-bit:4.2.3

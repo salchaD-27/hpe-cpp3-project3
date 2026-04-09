@@ -1,5 +1,7 @@
 service:
   flush: 1
+  refresh_interval: 1
+  #skip_long_lines: on
   log_level: info
   parsers_file: /fluent-bit/etc/parsers.conf
   http_server: true
@@ -9,9 +11,21 @@ service:
 pipeline:
   inputs:
     - name: tail
-      path: /logs/hpc_logs.json
+      path: /logs/hpcm.json
       parser: json
-      #tag: hpc.logs
+      tag: hpc.logs
+      read_from_head: true
+
+    - name: tail
+      path: /logs/monitoring.json
+      parser: json
+      tag: monitoring.logs
+      read_from_head: true
+
+    - name: tail
+      path: /logs/syslog.json
+      parser: json
+      tag: syslog.logs
       read_from_head: true
 
   outputs:
@@ -22,6 +36,6 @@ pipeline:
 
     - name: kafka
       match: '*'
-      Brokers: 172.29.0.10:9092
+      brokers: 172.29.0.10:9092
       topics: logs
       # Timestamp_Key: @timestamp
