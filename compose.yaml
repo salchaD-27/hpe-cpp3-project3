@@ -57,7 +57,7 @@ services:
         exec /opt/kafka/bin/kafka-console-consumer.sh \
           --bootstrap-server 172.29.0.10:9092 \
           --topic logs \
-          --property print.timestamp=true
+          --property print.timestamp=true | sed -E 's/^CreateTime:[0-9]+[[:space:]]+//'
     depends_on:
       kafka:
         condition: service_healthy

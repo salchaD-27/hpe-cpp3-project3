@@ -32,7 +32,7 @@ pipeline:
 
     - name: stdout
       match: '*'
-      format: json
+      format: json_lines
 
     - name: kafka
       match: '*'
