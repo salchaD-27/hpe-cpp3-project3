@@ -91,7 +91,9 @@ docker compose down -v --remove-orphans 2>&1 | grep -E "Removed|Stopped|Network|
 
 log "Clearing old log files..."
 rm -f ./1-logs-storage/*.log
+rm -f ./1-logs-storage/error-logs/*.log 2>/dev/null || true
 mkdir -p ./1-logs-storage
+mkdir -p ./1-logs-storage/error-logs
 success "Clean slate ready"
 
 ###############################################################################
@@ -99,7 +101,7 @@ success "Clean slate ready"
 ###############################################################################
 section "BUILDING IMAGES"
 
-log "Building log generator image..."
+log "Building log generator image (includes both normal and error generators)..."
 docker compose build generator 2>&1 | grep -E "Step|Successfully|ERROR|error" || true
 success "Build complete"
 
@@ -143,9 +145,9 @@ success "VictoriaLogs accepting requests"
 ###############################################################################
 section "STARTING REMAINING SERVICES"
 
-log "Starting log generator..."
+log "Starting log generator (both normal and error logs)..."
 docker compose up -d generator
-success "Log generator started"
+success "Log generator started (generating both normal and error logs)"
 
 log "Starting Fluent Bit..."
 docker compose up -d fluentbit
@@ -259,6 +261,12 @@ else
   error "Logstash pipeline did not start — run: docker logs logstash"
 fi
 
+# Check DLQ status
+DLQ_SIZE=$(curl -sf http://localhost:9600/_node/stats 2>/dev/null | \
+  python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('pipelines',{}).get('main',{}).get('dead_letter_queue',{}).get('queue_size_in_bytes',0))" \
+  2>/dev/null || echo "0")
+echo -e "  DLQ queue size    : ${BOLD}$DLQ_SIZE bytes${NC}"
+
 ###############################################################################
 # VICTORIALOGS DIAGNOSTICS
 ###############################################################################
@@ -266,7 +274,7 @@ section "VICTORIALOGS DIAGNOSTICS"
 
 log "Querying VictoriaLogs for recent data..."
 VL_RESULT=$(curl -sf \
-  "http://localhost:9428/select/logsql/query?query=ingest_stage:logstash&start=1h&limit=3" \
+  "http://localhost:9428/select/logsql/query?query=*&start=1h&limit=3" \
   2>/dev/null || echo "")
 
 if [ -n "$VL_RESULT" ]; then
@@ -278,12 +286,34 @@ for line in sys.stdin:
     if line:
         try:
             d = json.loads(line)
-            print(f\"  [{d.get('_time','?')}] [{d.get('level','?')}] {d.get('service_name','?')} — {d.get('_msg','?')[:80]}\")
+            stream = d.get('_stream', '{}')[:40]
+            print(f\"  [{d.get('_time','?')}] [{d.get('vl_stream','?')}] {d.get('_msg','?')[:60]}\")
         except:
             pass
 " 2>/dev/null || echo "$VL_RESULT" | head -3 | sed 's/^/  /'
+  
+  # Count logs by type
+  TOTAL_LOGS=$(curl -sf "http://localhost:9428/select/logsql/query?query=*%20%7C%20stats%20count()" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('count(*)',0))" 2>/dev/null || echo "?")
+  echo -e "\n  ${BOLD}Total logs in VictoriaLogs: $TOTAL_LOGS${NC}"
 else
   warn "No data in VictoriaLogs yet — pipeline may still be warming up"
+fi
+
+###############################################################################
+# ERROR LOGS DIAGNOSTICS
+###############################################################################
+section "ERROR LOGS DIAGNOSTICS"
+
+log "Checking error log generation..."
+ERROR_LOG_COUNT=$(docker exec generator ls -1 /1-logs-storage/error-logs/*.log 2>/dev/null | wc -l || echo "0")
+echo -e "  Error log files   : ${BOLD}$ERROR_LOG_COUNT${NC}"
+
+if [ "$ERROR_LOG_COUNT" -gt 0 ]; then
+  warn "Error logs are being generated — check DLQ for captured failures"
+  for err_file in $(docker exec generator ls -1 /1-logs-storage/error-logs/*.log 2>/dev/null | head -3); do
+    err_count=$(docker exec generator wc -l "$err_file" 2>/dev/null | cut -d' ' -f1)
+    echo -e "    $(basename "$err_file"): $err_count entries"
+  done
 fi
 
 ###############################################################################
@@ -294,9 +324,6 @@ section "ALERTMANAGER DIAGNOSTICS"
 wait_for "Alertmanager HTTP" \
   "curl -sf http://localhost:9094/-/healthy" \
   15 2
-
-curl -sf http://localhost:9094/api/v2/status
-curl -sf "http://localhost:9094/api/v2/alerts"
 
 AM_STATUS=$(curl -sf http://localhost:9093/api/v2/status 2>/dev/null | \
   python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('cluster',{}).get('status','unknown'))" \
@@ -358,7 +385,8 @@ fi
 section "PIPELINE SUMMARY"
 
 echo -e "
-  ${BOLD}Generator${NC}      →  writing to  ./1-logs-storage/*.log
+  ${BOLD}Generator${NC}      →  writing to  ./1-logs-storage/*.log (normal)
+                           →  writing to  ./1-logs-storage/error-logs/*.log (errors)
   ${BOLD}Fluent Bit${NC}     →  tailing logs, parsing JSON, forwarding to Kafka
   ${BOLD}Kafka${NC}          →  topic: logs  |  http://localhost:19092
   ${BOLD}Logstash${NC}       →  consuming Kafka, enriching, posting to VictoriaLogs
@@ -370,6 +398,12 @@ echo -e "
   ${BOLD}${GREEN}Query logs:${NC}
   curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=5'
 
+  ${BOLD}${GREEN}Check error logs (malformed):${NC}
+  docker exec generator cat /1-logs-storage/error-logs/malformed-json.log | head -5
+
+  ${BOLD}${GREEN}Check DLQ size:${NC}
+  curl -s http://localhost:9600/_node/stats | jq '.pipelines.main.dead_letter_queue.queue_size_in_bytes'
+
   ${BOLD}${GREEN}Check firing alerts:${NC}
   curl -s 'http://localhost:8880/api/v1/alerts' | python3 -m json.tool
 
@@ -378,7 +412,7 @@ echo -e "
 
   ${BOLD}${GREEN}Consumer lag:${NC}
   docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \\
-    --bootstrap-server localhost:9092 --describe --group <group_id>
+    --bootstrap-server localhost:9092 --describe --group logstash-vl7
 
   ${BOLD}${GREEN}Live Fluent Bit metrics:${NC}
   curl -s http://localhost:2020/api/v1/metrics

@@ -1,13 +1,22 @@
 {
-  "name": "logs-gen",
+  "name": "logs-generation",
   "version": "1.0.0",
+  "description": "Dual log generator for normal and error logs",
   "type": "commonjs",
   "scripts": {
-"start": "ts-node 1-logs-generation-simulation.ts"
+    "build": "tsc",
+    "start:normal": "ts-node src/1-logs-generation-simulation.ts",
+    "start:error": "ts-node src/2-error-logs-generation-simulation.ts",
+    "start:both": "concurrently \"npm run start:normal\" \"npm run start:error\"",
+    "dev:normal": "ts-node src/1-logs-generation-simulation.ts",
+    "dev:error": "ts-node src/2-error-logs-generation-simulation.ts"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
     "ts-node": "^10.9.2",
     "@types/node": "^20.0.0"
+  },
+  "dependencies": {
+    "concurrently": "^8.0.0"
   }
 }

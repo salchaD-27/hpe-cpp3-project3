@@ -45,13 +45,21 @@ if [ "$PURGE" = true ]; then
   docker compose down -v
   success "Volumes removed"
 
-  warn "Removing log files..."
+  warn "Removing normal log files..."
   rm -f ./1-logs-storage/*.log
-  success "Log files removed"
+  success "Normal log files removed"
+
+  warn "Removing error log files..."
+  rm -rf ./1-logs-storage/error-logs
+  success "Error log files removed"
 
   warn "Removing VictoriaLogs storage..."
   rm -rf ./5-victorialogs/storage-data/*
   success "VictoriaLogs storage cleared"
+
+  warn "Removing Logstash DLQ..."
+  rm -rf ./4-logstash/dlq/*
+  success "Logstash DLQ cleared"
 
   success "Full purge complete — next start will begin fresh"
 else
@@ -60,9 +68,11 @@ else
   • Kafka volume        — kafka-data
   • Grafana volume      — grafana-data
   • VictoriaLogs data   — ./5-victorialogs/storage-data/
-  • Log files           — ./1-logs-storage/*.log
+  • Normal log files    — ./1-logs-storage/*.log
+  • Error log files     — ./1-logs-storage/error-logs/
+  • Logstash DLQ        — ./4-logstash/dlq/
 
-  ${YELLOW}To fully wipe all data:${NC}
+  ${YELLOW}To fully wipe all data (including error logs and DLQ):${NC}
   ./stop.sh --purge
   "
 fi
