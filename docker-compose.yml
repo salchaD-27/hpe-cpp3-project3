@@ -6,6 +6,7 @@ services:
       - ./1-logs-storage:/1-logs-storage
       - ./0-logs-generation/1-logs-parsed:/app/1-logs-parsed
     environment:
+      - GENERATOR_MODE=${GENERATOR_MODE:-normal}
       - NORMAL_LOG_DIR=/1-logs-storage
       - ERROR_LOG_DIR=/1-logs-storage/error-logs
       - ERROR_INTERVAL_SECONDS=10
@@ -47,6 +48,7 @@ services:
       - ./1-logs-storage:/logs:ro
       - ./2-fluentbit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
       - ./2-fluentbit/parser.conf:/fluent-bit/etc/parsers/parser.conf:ro
+      - ./1-logs-storage/error-logs:/logs/error-logs:ro
     depends_on:
       kafka:
         condition: service_healthy

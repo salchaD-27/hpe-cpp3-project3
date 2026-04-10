@@ -14,6 +14,26 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 ###############################################################################
+# PARSE ARGUMENTS
+###############################################################################
+DLQ_MODE=false
+for arg in "$@"; do
+  case $arg in
+    --dlq)
+      DLQ_MODE=true
+      shift
+      ;;
+    --help)
+      echo "Usage: ./start.sh [OPTIONS]"
+      echo "Options:"
+      echo "  --dlq    Enable DLQ mode (generates error logs to test DLQ)"
+      echo "  --help   Show this help message"
+      exit 0
+      ;;
+  esac
+done
+
+###############################################################################
 # HELPERS
 ###############################################################################
 log()     { echo -e "${BLUE}[$(date '+%H:%M:%S')]${NC} $*"; }
@@ -93,7 +113,15 @@ log "Clearing old log files..."
 rm -f ./1-logs-storage/*.log
 rm -f ./1-logs-storage/error-logs/*.log 2>/dev/null || true
 mkdir -p ./1-logs-storage
-mkdir -p ./1-logs-storage/error-logs
+
+if [ "$DLQ_MODE" = true ]; then
+  log "DLQ mode enabled - creating error-logs directory"
+  mkdir -p ./1-logs-storage/error-logs
+else
+  log "Normal mode - cleaning error-logs directory"
+  rm -rf ./1-logs-storage/error-logs 2>/dev/null || true
+fi
+
 success "Clean slate ready"
 
 ###############################################################################
@@ -101,7 +129,11 @@ success "Clean slate ready"
 ###############################################################################
 section "BUILDING IMAGES"
 
-log "Building log generator image (includes both normal and error generators)..."
+if [ "$DLQ_MODE" = true ]; then
+  log "Building log generator image (includes both normal and error generators for DLQ testing)..."
+else
+  log "Building log generator image (normal logs only)..."
+fi
 docker compose build generator 2>&1 | grep -E "Step|Successfully|ERROR|error" || true
 success "Build complete"
 
@@ -145,9 +177,17 @@ success "VictoriaLogs accepting requests"
 ###############################################################################
 section "STARTING REMAINING SERVICES"
 
-log "Starting log generator (both normal and error logs)..."
+if [ "$DLQ_MODE" = true ]; then
+  log "Starting log generator (DLQ mode - generating both normal AND error logs)..."
+  # Set environment variable to enable error generator
+  export GENERATOR_MODE="dlq"
+else
+  log "Starting log generator (normal mode - generating only valid logs)..."
+  export GENERATOR_MODE="normal"
+fi
+
 docker compose up -d generator
-success "Log generator started (generating both normal and error logs)"
+success "Log generator started ($([ "$DLQ_MODE" = true ] && echo "DLQ mode" || echo "Normal mode"))"
 
 log "Starting Fluent Bit..."
 docker compose up -d fluentbit
@@ -300,20 +340,26 @@ else
 fi
 
 ###############################################################################
-# ERROR LOGS DIAGNOSTICS
+# ERROR LOGS DIAGNOSTICS (only in DLQ mode)
 ###############################################################################
-section "ERROR LOGS DIAGNOSTICS"
+if [ "$DLQ_MODE" = true ]; then
+  section "ERROR LOGS DIAGNOSTICS"
 
-log "Checking error log generation..."
-ERROR_LOG_COUNT=$(docker exec generator ls -1 /1-logs-storage/error-logs/*.log 2>/dev/null | wc -l || echo "0")
-echo -e "  Error log files   : ${BOLD}$ERROR_LOG_COUNT${NC}"
-
-if [ "$ERROR_LOG_COUNT" -gt 0 ]; then
-  warn "Error logs are being generated — check DLQ for captured failures"
-  for err_file in $(docker exec generator ls -1 /1-logs-storage/error-logs/*.log 2>/dev/null | head -3); do
-    err_count=$(docker exec generator wc -l "$err_file" 2>/dev/null | cut -d' ' -f1)
-    echo -e "    $(basename "$err_file"): $err_count entries"
-  done
+  log "Checking error log generation..."
+  if [ -d "./1-logs-storage/error-logs" ]; then
+    ERROR_LOG_COUNT=$(ls -1 ./1-logs-storage/error-logs/*.log 2>/dev/null | wc -l || echo "0")
+    echo -e "  Error log files   : ${BOLD}$ERROR_LOG_COUNT${NC}"
+    
+    if [ "$ERROR_LOG_COUNT" -gt 0 ]; then
+      warn "Error logs are being generated — check parse_error stream in VictoriaLogs"
+      for err_file in $(ls -1 ./1-logs-storage/error-logs/*.log 2>/dev/null | head -3); do
+        err_count=$(wc -l "$err_file" 2>/dev/null | cut -d' ' -f1)
+        echo -e "    $(basename "$err_file"): $err_count entries"
+      done
+    fi
+  else
+    echo -e "  Error log files   : ${BOLD}0 (DLQ mode may not be fully enabled)${NC}"
+  fi
 fi
 
 ###############################################################################
@@ -384,9 +430,10 @@ fi
 ###############################################################################
 section "PIPELINE SUMMARY"
 
-echo -e "
+if [ "$DLQ_MODE" = true ]; then
+  echo -e "
   ${BOLD}Generator${NC}      →  writing to  ./1-logs-storage/*.log (normal)
-                           →  writing to  ./1-logs-storage/error-logs/*.log (errors)
+                           →  writing to  ./1-logs-storage/error-logs/*.log (DLQ TEST LOGS)
   ${BOLD}Fluent Bit${NC}     →  tailing logs, parsing JSON, forwarding to Kafka
   ${BOLD}Kafka${NC}          →  topic: logs  |  http://localhost:19092
   ${BOLD}Logstash${NC}       →  consuming Kafka, enriching, posting to VictoriaLogs
@@ -395,11 +442,13 @@ echo -e "
   ${BOLD}Alertmanager${NC}   →  routing alerts  |  http://localhost:9093
   ${BOLD}Grafana${NC}        →  dashboards  |  http://localhost:3000  (admin/admin)
 
+  ${BOLD}${YELLOW}⚠️ DLQ MODE ACTIVE — Error logs are being generated to test DLQ${NC}
+
   ${BOLD}${GREEN}Query logs:${NC}
   curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=5'
 
-  ${BOLD}${GREEN}Check error logs (malformed):${NC}
-  docker exec generator cat /1-logs-storage/error-logs/malformed-json.log | head -5
+  ${BOLD}${GREEN}Check parse_error stream (malformed logs):${NC}
+  curl -s 'http://localhost:9428/select/logsql/query?query=vl_stream:parse_error&limit=5'
 
   ${BOLD}${GREEN}Check DLQ size:${NC}
   curl -s http://localhost:9600/_node/stats | jq '.pipelines.main.dead_letter_queue.queue_size_in_bytes'
@@ -417,5 +466,36 @@ echo -e "
   ${BOLD}${GREEN}Live Fluent Bit metrics:${NC}
   curl -s http://localhost:2020/api/v1/metrics
 "
+else
+  echo -e "
+  ${BOLD}Generator${NC}      →  writing to  ./1-logs-storage/*.log (normal logs only)
+  ${BOLD}Fluent Bit${NC}     →  tailing logs, parsing JSON, forwarding to Kafka
+  ${BOLD}Kafka${NC}          →  topic: logs  |  http://localhost:19092
+  ${BOLD}Logstash${NC}       →  consuming Kafka, enriching, posting to VictoriaLogs
+  ${BOLD}VictoriaLogs${NC}   →  storing logs  |  http://localhost:9428
+  ${BOLD}vmalert${NC}        →  evaluating alert rules  |  http://localhost:8880
+  ${BOLD}Alertmanager${NC}   →  routing alerts  |  http://localhost:9093
+  ${BOLD}Grafana${NC}        →  dashboards  |  http://localhost:3000  (admin/admin)
+
+  ${BOLD}${GREEN}Query logs:${NC}
+  curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=5'
+
+  ${BOLD}${GREEN}Check DLQ size:${NC}
+  curl -s http://localhost:9600/_node/stats | jq '.pipelines.main.dead_letter_queue.queue_size_in_bytes'
+
+  ${BOLD}${GREEN}Check firing alerts:${NC}
+  curl -s 'http://localhost:8880/api/v1/alerts' | python3 -m json.tool
+
+  ${BOLD}${GREEN}Check Alertmanager:${NC}
+  curl -s 'http://localhost:9093/api/v2/alerts'
+
+  ${BOLD}${GREEN}Consumer lag:${NC}
+  docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \\
+    --bootstrap-server localhost:9092 --describe --group logstash-vl7
+
+  ${BOLD}${GREEN}Live Fluent Bit metrics:${NC}
+  curl -s http://localhost:2020/api/v1/metrics
+"
+fi
 
 success "Pipeline startup complete 🚀"
