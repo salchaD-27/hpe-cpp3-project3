@@ -11,7 +11,11 @@ route:
 receivers:
 - name: 'slack-notifications'
   slack_configs:
+<<<<<<< HEAD
   - api_url: 'https://hooks.slack.com/services/SLACK_WEBHOOK_URL'
+=======
+  - api_url: '${SLACK_WEBHOOK_URL}'
+>>>>>>> d1dfaed (alerting+grafana improvs)
     channel: '#alerts'
     title: '{{ .GroupLabels.alertname }}'
     text: |-
@@ -29,6 +33,3 @@ receivers:
 #   - name: default
 #     webhook_configs:
 #       - url: "http://host.docker.internal:5001/alerts"
-
-# https://api.slack.com/apps/A0AS5RCCE82/incoming-webhooks?success=1
-# https://app.slack.com/client/T0ASJLFV73K/C0AS3NG8N8N?entry_point=redirect_flow&teamClassificationType=social

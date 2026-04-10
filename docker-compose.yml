@@ -120,6 +120,8 @@ services:
       - "9094:9093"
     volumes:
       - ./7-alerting/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    environment:
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--web.listen-address=:9093"
