@@ -30,3 +30,12 @@ groups:
           description: "WARN logs detected in last evaluation window"
         labels:
           severity: warning
+          
+      - alert: ImmediateError
+        expr: 'ingest_stage:logstash AND level:ERROR | stats count() as total'
+        for: 0s
+        annotations:
+          summary: "Immediate error detected"
+          description: "ERROR logs detected in current evaluation"
+        labels:
+          severity: critical

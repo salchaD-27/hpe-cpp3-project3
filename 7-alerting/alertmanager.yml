@@ -2,17 +2,33 @@ global:
   resolve_timeout: 5m
 
 route:
-  group_by: ["alertname", "severity"]
-  group_wait: 30s
-  group_interval: 5m
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
   repeat_interval: 1h
-  receiver: default
+  receiver: 'slack-notifications'
+
+receivers:
+- name: 'slack-notifications'
+  slack_configs:
+  - api_url: 'https://hooks.slack.com/services/SLACK_WEBHOOK_URL'
+    channel: '#alerts'
+    title: '{{ .GroupLabels.alertname }}'
+    text: |-
+      *Alert:* {{ .CommonLabels.alertname }}
+      *Severity:* {{ .CommonLabels.severity }}
+      *Description:* {{ .CommonAnnotations.description }}
+      *Value:* {{ .CommonLabels.stats_result }}
+    color: 'danger'
 
 # receivers:
 #   - name: default
 #     webhook_configs:
 #       - url: "http://localhost:5001/alerts"  # swap for slack/email/pagerduty
-receivers:
-  - name: default
-    webhook_configs:
-      - url: "http://host.docker.internal:5001/alerts"
+# receivers:
+#   - name: default
+#     webhook_configs:
+#       - url: "http://host.docker.internal:5001/alerts"
+
+# https://api.slack.com/apps/A0AS5RCCE82/incoming-webhooks?success=1
+# https://app.slack.com/client/T0ASJLFV73K/C0AS3NG8N8N?entry_point=redirect_flow&teamClassificationType=social

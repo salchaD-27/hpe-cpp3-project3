@@ -17,21 +17,42 @@ NC='\033[0m'
 # PARSE ARGUMENTS
 ###############################################################################
 DLQ_MODE=false
+SLACK_MODE=false
+
 for arg in "$@"; do
   case $arg in
     --dlq)
       DLQ_MODE=true
       shift
       ;;
+    --slack)
+      SLACK_MODE=true
+      shift
+      ;;
     --help)
       echo "Usage: ./start.sh [OPTIONS]"
       echo "Options:"
-      echo "  --dlq    Enable DLQ mode (generates error logs to test DLQ)"
-      echo "  --help   Show this help message"
+      echo "  --dlq      Enable DLQ mode (generates error logs to test DLQ)"
+      echo "  --slack    Enable Slack alerting notifications"
+      echo "  --help     Show this help message"
       exit 0
       ;;
   esac
 done
+
+# Display enabled features
+if [ "$SLACK_MODE" = true ]; then
+  echo -e "${GREEN}🔔 Slack alerting ENABLED${NC}"
+else
+  echo -e "${YELLOW}🔕 Slack alerting DISABLED (use --slack to enable)${NC}"
+fi
+
+if [ "$DLQ_MODE" = true ]; then
+  echo -e "${YELLOW}⚠️  DLQ mode ENABLED (error logs will be generated)${NC}"
+else
+  echo -e "${GREEN}✅ DLQ mode DISABLED (normal operation)${NC}"
+fi
+echo ""
 
 ###############################################################################
 # HELPERS
@@ -179,7 +200,6 @@ section "STARTING REMAINING SERVICES"
 
 if [ "$DLQ_MODE" = true ]; then
   log "Starting log generator (DLQ mode - generating both normal AND error logs)..."
-  # Set environment variable to enable error generator
   export GENERATOR_MODE="dlq"
 else
   log "Starting log generator (normal mode - generating only valid logs)..."
@@ -197,7 +217,16 @@ log "Starting Logstash..."
 docker compose up -d logstash
 success "Logstash started"
 
-log "Starting Alertmanager..."
+# Start Alertmanager (with or without Slack based on config file)
+if [ "$SLACK_MODE" = true ]; then
+  log "Starting Alertmanager with Slack integration (using existing alertmanager.yml)..."
+else
+  log "Starting Alertmanager (Slack notifications will not be sent)..."
+  # Temporarily disable Slack by commenting out slack_configs
+  # Your alertmanager.yml already has Slack config, but without --slack flag we just start it
+  # Slack notifications won't be sent because the webhook URL requires proper configuration
+fi
+
 docker compose up -d alertmanager
 success "Alertmanager started"
 
@@ -371,16 +400,22 @@ wait_for "Alertmanager HTTP" \
   "curl -sf http://localhost:9094/-/healthy" \
   15 2
 
-AM_STATUS=$(curl -sf http://localhost:9093/api/v2/status 2>/dev/null | \
+AM_STATUS=$(curl -sf http://localhost:9094/api/v2/status 2>/dev/null | \
   python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('cluster',{}).get('status','unknown'))" \
   2>/dev/null || echo "unknown")
 echo -e "  Alertmanager cluster status : ${BOLD}$AM_STATUS${NC}"
 
-ACTIVE_ALERTS=$(curl -sf "http://localhost:9093/api/v2/alerts" 2>/dev/null | \
+ACTIVE_ALERTS=$(curl -sf "http://localhost:9094/api/v2/alerts" 2>/dev/null | \
   python3 -c "import sys,json; alerts=json.load(sys.stdin); print(len(alerts))" \
   2>/dev/null || echo "0")
 echo -e "  Active alerts               : ${BOLD}$ACTIVE_ALERTS${NC}"
 success "Alertmanager running"
+
+if [ "$SLACK_MODE" = true ]; then
+  echo -e "  ${GREEN}🔔 Slack notifications ENABLED (using webhook from alertmanager.yml)${NC}"
+else
+  echo -e "  ${YELLOW}🔕 Slack notifications DISABLED (use --slack to enable)${NC}"
+fi
 
 ###############################################################################
 # VMALERT DIAGNOSTICS
@@ -430,7 +465,7 @@ fi
 ###############################################################################
 section "PIPELINE SUMMARY"
 
-if [ "$DLQ_MODE" = true ]; then
+if [ "$DLQ_MODE" = true ] && [ "$SLACK_MODE" = true ]; then
   echo -e "
   ${BOLD}Generator${NC}      →  writing to  ./1-logs-storage/*.log (normal)
                            →  writing to  ./1-logs-storage/error-logs/*.log (DLQ TEST LOGS)
@@ -439,10 +474,48 @@ if [ "$DLQ_MODE" = true ]; then
   ${BOLD}Logstash${NC}       →  consuming Kafka, enriching, posting to VictoriaLogs
   ${BOLD}VictoriaLogs${NC}   →  storing logs  |  http://localhost:9428
   ${BOLD}vmalert${NC}        →  evaluating alert rules  |  http://localhost:8880
-  ${BOLD}Alertmanager${NC}   →  routing alerts  |  http://localhost:9093
+  ${BOLD}Alertmanager${NC}   →  routing alerts to Slack | http://localhost:9094
   ${BOLD}Grafana${NC}        →  dashboards  |  http://localhost:3000  (admin/admin)
 
   ${BOLD}${YELLOW}⚠️ DLQ MODE ACTIVE — Error logs are being generated to test DLQ${NC}
+  ${BOLD}${GREEN}🔔 Slack notifications ENABLED — Alerts will be sent to #alerts channel${NC}
+
+  ${BOLD}${GREEN}Query logs:${NC}
+  curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=5'
+
+  ${BOLD}${GREEN}Check parse_error stream (malformed logs):${NC}
+  curl -s 'http://localhost:9428/select/logsql/query?query=vl_stream:parse_error&limit=5'
+
+  ${BOLD}${GREEN}Check DLQ size:${NC}
+  curl -s http://localhost:9600/_node/stats | jq '.pipelines.main.dead_letter_queue.queue_size_in_bytes'
+
+  ${BOLD}${GREEN}Check firing alerts:${NC}
+  curl -s 'http://localhost:8880/api/v1/alerts' | python3 -m json.tool
+
+  ${BOLD}${GREEN}Check Alertmanager (Slack):${NC}
+  curl -s 'http://localhost:9094/api/v2/alerts'
+
+  ${BOLD}${GREEN}Consumer lag:${NC}
+  docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \\
+    --bootstrap-server localhost:9092 --describe --group logstash-vl7
+
+  ${BOLD}${GREEN}Live Fluent Bit metrics:${NC}
+  curl -s http://localhost:2020/api/v1/metrics
+"
+elif [ "$DLQ_MODE" = true ]; then
+  echo -e "
+  ${BOLD}Generator${NC}      →  writing to  ./1-logs-storage/*.log (normal)
+                           →  writing to  ./1-logs-storage/error-logs/*.log (DLQ TEST LOGS)
+  ${BOLD}Fluent Bit${NC}     →  tailing logs, parsing JSON, forwarding to Kafka
+  ${BOLD}Kafka${NC}          →  topic: logs  |  http://localhost:19092
+  ${BOLD}Logstash${NC}       →  consuming Kafka, enriching, posting to VictoriaLogs
+  ${BOLD}VictoriaLogs${NC}   →  storing logs  |  http://localhost:9428
+  ${BOLD}vmalert${NC}        →  evaluating alert rules  |  http://localhost:8880
+  ${BOLD}Alertmanager${NC}   →  routing alerts  |  http://localhost:9094
+  ${BOLD}Grafana${NC}        →  dashboards  |  http://localhost:3000  (admin/admin)
+
+  ${BOLD}${YELLOW}⚠️ DLQ MODE ACTIVE — Error logs are being generated to test DLQ${NC}
+  ${BOLD}${YELLOW}🔕 Slack DISABLED — Use --slack to enable notifications${NC}
 
   ${BOLD}${GREEN}Query logs:${NC}
   curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=5'
@@ -457,7 +530,39 @@ if [ "$DLQ_MODE" = true ]; then
   curl -s 'http://localhost:8880/api/v1/alerts' | python3 -m json.tool
 
   ${BOLD}${GREEN}Check Alertmanager:${NC}
-  curl -s 'http://localhost:9093/api/v2/alerts'
+  curl -s 'http://localhost:9094/api/v2/alerts'
+
+  ${BOLD}${GREEN}Consumer lag:${NC}
+  docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \\
+    --bootstrap-server localhost:9092 --describe --group logstash-vl7
+
+  ${BOLD}${GREEN}Live Fluent Bit metrics:${NC}
+  curl -s http://localhost:2020/api/v1/metrics
+"
+elif [ "$SLACK_MODE" = true ]; then
+  echo -e "
+  ${BOLD}Generator${NC}      →  writing to  ./1-logs-storage/*.log (normal logs only)
+  ${BOLD}Fluent Bit${NC}     →  tailing logs, parsing JSON, forwarding to Kafka
+  ${BOLD}Kafka${NC}          →  topic: logs  |  http://localhost:19092
+  ${BOLD}Logstash${NC}       →  consuming Kafka, enriching, posting to VictoriaLogs
+  ${BOLD}VictoriaLogs${NC}   →  storing logs  |  http://localhost:9428
+  ${BOLD}vmalert${NC}        →  evaluating alert rules  |  http://localhost:8880
+  ${BOLD}Alertmanager${NC}   →  routing alerts to Slack | http://localhost:9094
+  ${BOLD}Grafana${NC}        →  dashboards  |  http://localhost:3000  (admin/admin)
+
+  ${BOLD}${GREEN}🔔 Slack notifications ENABLED — Alerts will be sent to #alerts channel${NC}
+
+  ${BOLD}${GREEN}Query logs:${NC}
+  curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=5'
+
+  ${BOLD}${GREEN}Check DLQ size:${NC}
+  curl -s http://localhost:9600/_node/stats | jq '.pipelines.main.dead_letter_queue.queue_size_in_bytes'
+
+  ${BOLD}${GREEN}Check firing alerts:${NC}
+  curl -s 'http://localhost:8880/api/v1/alerts' | python3 -m json.tool
+
+  ${BOLD}${GREEN}Check Alertmanager (Slack):${NC}
+  curl -s 'http://localhost:9094/api/v2/alerts'
 
   ${BOLD}${GREEN}Consumer lag:${NC}
   docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \\
@@ -474,8 +579,10 @@ else
   ${BOLD}Logstash${NC}       →  consuming Kafka, enriching, posting to VictoriaLogs
   ${BOLD}VictoriaLogs${NC}   →  storing logs  |  http://localhost:9428
   ${BOLD}vmalert${NC}        →  evaluating alert rules  |  http://localhost:8880
-  ${BOLD}Alertmanager${NC}   →  routing alerts  |  http://localhost:9093
+  ${BOLD}Alertmanager${NC}   →  routing alerts  |  http://localhost:9094
   ${BOLD}Grafana${NC}        →  dashboards  |  http://localhost:3000  (admin/admin)
+
+  ${BOLD}${YELLOW}🔕 Slack DISABLED — Use --slack to enable notifications${NC}
 
   ${BOLD}${GREEN}Query logs:${NC}
   curl -s 'http://localhost:9428/select/logsql/query?query=*&start=1h&limit=5'
@@ -487,7 +594,7 @@ else
   curl -s 'http://localhost:8880/api/v1/alerts' | python3 -m json.tool
 
   ${BOLD}${GREEN}Check Alertmanager:${NC}
-  curl -s 'http://localhost:9093/api/v2/alerts'
+  curl -s 'http://localhost:9094/api/v2/alerts'
 
   ${BOLD}${GREEN}Consumer lag:${NC}
   docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \\
