@@ -11,11 +11,7 @@ route:
 receivers:
 - name: 'slack-notifications'
   slack_configs:
-<<<<<<< HEAD
-  - api_url: 'https://hooks.slack.com/services/SLACK_WEBHOOK_URL'
-=======
   - api_url: '${SLACK_WEBHOOK_URL}'
->>>>>>> d1dfaed (alerting+grafana improvs)
     channel: '#alerts'
     title: '{{ .GroupLabels.alertname }}'
     text: |-
