@@ -1,0 +1,31 @@
+# =============================================================================
+# Logstash Settings
+# =============================================================================
+
+node.name: hpc-logstash-node
+
+# Pipeline
+pipeline.workers: 2
+pipeline.batch.size: 125
+pipeline.batch.delay: 50
+pipeline.ecs_compatibility: disabled
+
+# Hot reload (picks up pipeline changes without restart)
+config.reload.automatic: true
+config.reload.interval: 10s
+
+# Dead Letter Queue — catches events that fail after all retries
+dead_letter_queue.enable: true
+dead_letter_queue.max_bytes: 1gb
+dead_letter_queue.storage_policy: drop_older
+path.dead_letter_queue: /usr/share/logstash/data/dlq
+
+# API
+api.http.host: 0.0.0.0
+api.http.port: 9600
+
+# Logging
+log.level: info
+
+# Required for running as root inside Docker
+allow_superuser: true
