@@ -20,7 +20,7 @@ route:
 receivers:
   - name: slack
     slack_configs:
-      - api_url: "https://hooks.slack.com/services/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"
+      - api_url: "$SLACK_WEBHOOK_URL"
         channel: "#all-hpc-logs"
         send_resolved: true
         title: ":rotating_light: [{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}"
@@ -31,7 +31,7 @@ receivers:
 
   - name: slack-critical
     slack_configs:
-      - api_url: "https://hooks.slack.com/services/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"
+      - api_url: "$SLACK_WEBHOOK_URL"
         channel: "#all-hpc-logs"
         send_resolved: true
         color: "danger"
@@ -43,7 +43,7 @@ receivers:
 
   - name: slack-warning
     slack_configs:
-      - api_url: "https://hooks.slack.com/services/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"
+      - api_url: "$SLACK_WEBHOOK_URL"
         channel: "#all-hpc-logs"
         send_resolved: true
         color: "warning"
