@@ -1,0 +1,5 @@
+logs/
+generated-logs/
+victoria_logs/
+kafka/
+generated-logs/
