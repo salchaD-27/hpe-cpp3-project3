@@ -141,6 +141,7 @@ services:
       GF_INSTALL_PLUGINS: victoriametrics-logs-datasource
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
     depends_on:
       - victorialogs
@@ -182,6 +183,8 @@ services:
       - "9093:9093"
     volumes:
       - ./alerting/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    environment:
+    - SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX/YYY/ZZZ
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--storage.path=/alertmanager"
