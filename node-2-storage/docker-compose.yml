@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  vlstorage:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-2-vlstorage
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=1y"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8002:9428"
+    restart: unless-stopped

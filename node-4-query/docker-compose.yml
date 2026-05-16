@@ -1,0 +1,49 @@
+# node-4-query/docker-compose.yml
+version: '3.8'
+
+services:
+  # FIXED: Use victoria-logs image with select mode
+  vlselect:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-4-vlselect
+    command:
+      - "-storageNode=host.docker.internal:8002"
+      - "-storageNode=host.docker.internal:8003"
+      - "-httpListenAddr=:9429"
+      - "-select"
+    ports:
+      - "8004:9429"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: node-4-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: victoriametrics-logs-datasource
+    volumes:
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+    ports:
+      - "3001:3000"
+    depends_on:
+      - vlselect
+    restart: unless-stopped
+
+  vmalert:
+    image: victoriametrics/vmalert:latest
+    container_name: node-4-vmalert
+    command:
+      - "-datasource.url=http://host.docker.internal:8005"
+      - "-datasource.queryStep=30s"
+      - "-rule=/etc/alerts/alerts.yml"
+      - "-evaluationInterval=30s"
+      - "-httpListenAddr=:8880"
+    volumes:
+      - ./alerts.yml:/etc/alerts/alerts.yml:ro
+    ports:
+      - "8881:8880"
+    depends_on:
+      - grafana
+    restart: unless-stopped
