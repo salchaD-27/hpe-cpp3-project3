@@ -19,7 +19,11 @@ services:
       - "-storageNode=host.docker.internal:8002"
       - "-storageNode=host.docker.internal:8003"
       - "-httpListenAddr=:9429"
-      - "-select"
+      - "-insert.disable=true"
     ports:
       - "8006:9429"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     restart: unless-stopped

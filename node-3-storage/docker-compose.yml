@@ -12,4 +12,8 @@ services:
       - ./storage:/storage
     ports:
       - "8003:9428"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     restart: unless-stopped

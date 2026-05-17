@@ -2,22 +2,11 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy source code
-COPY log-gen.ts .
-COPY logs-original ./logs-original
-
-# Build TypeScript
-RUN npm run build
+# Copy only the JavaScript generator
+COPY log-gen.js .
 
 # Create logs directory
 RUN mkdir -p /logs-generated
 
 # Run the generator
-CMD ["npm", "start"]
+CMD ["node", "log-gen.js"]
