@@ -1,8 +1,4 @@
-# node-4-query/docker-compose.yml
-version: '3.8'
-
 services:
-  # FIXED: Use victoria-logs image with select mode
   vlselect:
     image: victoriametrics/victoria-logs:v1.49.0
     container_name: node-4-vlselect
@@ -13,10 +9,6 @@ services:
       - "-insert.disable=true"
     ports:
       - "8004:9429"
-    deploy:
-      resources:
-        limits:
-          memory: 512M
     restart: unless-stopped
 
   grafana:
@@ -28,7 +20,7 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_INSTALL_PLUGINS: victoriametrics-logs-datasource
     volumes:
-      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
     ports:
       - "3001:3000"
     depends_on:
@@ -44,6 +36,8 @@ services:
       - "-rule=/etc/alerts/alerts.yml"
       - "-evaluationInterval=30s"
       - "-httpListenAddr=:8880"
+      - "-notifier.url=http://alertmanager:9093/api/v2/alerts"
+      - "-notifier.tlsInsecureSkipVerify=true"
     volumes:
       - ./alerts.yml:/etc/alerts/alerts.yml:ro
     ports:
