@@ -1,0 +1,395 @@
+➜  multi-node-simulation git:(main) ✗ ./stop.sh --pur
+ge && ./start.sh && ./test.sh
+
+[17:37:53] Stopping Multi-Node VictoriaLogs Pipeline
+[WARN] PURGE MODE ENABLED - All data will be deleted!
+
+
+=== STOPPING PIPELINE ===
+[17:37:53] Stopping Orchestrator node (Node 5)
+[OK] Orchestrator node (Node 5) stopped
+[17:37:53] Stopping Query node (Node 4)
+[OK] Query node (Node 4) stopped
+[17:37:55] Stopping Ingestion node (Node 1)
+[OK] Ingestion node (Node 1) stopped
+[17:38:07] Stopping Storage node 1 (Node 2)
+[OK] Storage node 1 (Node 2) stopped
+[17:38:07] Stopping Storage node 2 (Node 3)
+[OK] Storage node 2 (Node 3) stopped
+
+=== FORCE CLEANUP ===
+[17:38:08] Removing all node containers
+[OK] All node containers removed
+[17:38:08] Removing networks
+[OK] Networks removed
+
+=== PURGING DATA ===
+[WARN] This will delete ALL pipeline data!
+[17:38:08] Removing volumes
+node-1-ingest_kafka-data
+[OK] Volumes removed
+[17:38:08] Cleaning log files
+[OK] Log files cleaned
+[17:38:08] Cleaning VictoriaLogs storage
+[OK] VictoriaLogs storage cleaned
+[17:38:08] Cleaning Logstash DLQ
+[OK] DLQ cleaned
+
+=== FINAL STATUS ===
+[OK] All containers stopped
+
+[OK] Full purge completed - Fresh start ready
+
+[OK] Pipeline stopped
+
+
+[17:38:08] Starting Multi-Node VictoriaLogs Pipeline
+
+
+=== PORT VERIFICATION ===
+[OK] Port 8001 available
+[OK] Port 8002 available
+[OK] Port 8003 available
+[OK] Port 8004 available
+[OK] Port 8005 available
+[OK] Port 8006 available
+[OK] Port 8081 available
+[OK] Port 8881 available
+[OK] Port 3001 available
+[OK] Port 9094 available
+[OK] Port 9601 available
+
+=== BUILDING LOG GENERATOR ===
+[17:38:08] Building log generator image
+[OK] Log generator image built
+
+=== STARTING STORAGE NODES (Node 2 & 3) ===
+[17:38:11] Starting Node 2 (Storage Node 1)
+[OK] Node 2 started
+[17:38:11] Starting Node 3 (Storage Node 2)
+[OK] Node 3 started
+[17:38:12] Waiting for storage nodes
+[OK] storage nodes ready
+
+=== STARTING INGESTION NODE (Node 1) ===
+[17:38:12] Starting Node 1 (Ingestion Pipeline)
+[17:38:24] Waiting for Kafka
+[OK] Kafka ready
+[17:38:26] Waiting for Logstash
+[OK] Logstash ready
+[17:38:32] Waiting for vlinsert
+[OK] vlinsert ready
+[OK] Node 1 fully operational
+
+=== STARTING QUERY NODE (Node 4) ===
+[17:38:32] Starting Node 4 (Query + Alerting)
+[17:38:34] Waiting for vlselect
+[OK] vlselect ready
+[17:38:34] Waiting for Grafana
+[OK] Grafana ready
+[17:38:48] Waiting for vmalert
+[OK] vmalert ready
+[OK] Node 4 fully operational
+
+=== STARTING ORCHESTRATOR NODE (Node 5) ===
+[17:38:48] Starting Node 5 (Load Balancer + Backup)
+[17:38:49] Waiting for Nginx
+[OK] Nginx ready
+[17:38:49] Waiting for Backup vlselect
+[OK] Backup vlselect ready
+[OK] Node 5 fully operational
+[17:38:49] Waiting for pipeline to stabilize
+
+=== PIPELINE STATUS ===
+Containers:
+  NAMES                  STATUS
+  node-5-nginx           Up 30 seconds
+  node-5-vlselect        Up 30 seconds
+  node-4-grafana         Up 45 seconds
+  node-4-vmalert         Up 45 seconds
+  node-4-vlselect        Up 46 seconds
+  node-1-vlinsert        Up 55 seconds
+  node-1-fluentbit       Up About a minute
+  node-1-logstash        Up 55 seconds
+  node-1-kafka           Up About a minute (healthy)
+  node-1-log-generator   Up About a minute
+  node-3-vlstorage       Up About a minute
+  node-2-vlstorage       Up About a minute
+
+Storage Distribution:
+  Node 2 (Storage 1): 953 logs
+  Node 3 (Storage 2): 0 logs
+  Total Storage:        953 logs
+  Load Balancer:        953 logs
+  Data Consistency:     PASSED
+
+Pipeline Metrics:
+  Fluent Bit Records:   981
+  Logstash Events Out:  981
+  Logstash Throughput:  14.93 events/sec
+
+=== ACCESS POINTS ===
+Grafana Dashboard:
+  Grafana UI:           http://localhost:3001 (admin/admin)
+  VictoriaLogs Datasource: http://localhost:8005
+
+Alerting:
+  vmalert UI:           http://localhost:8881
+  vmalert API:          http://localhost:8881/api/v1/alerts
+
+Direct Storage Access:
+  Node 2 (Storage 1): http://localhost:8002
+  Node 3 (Storage 2): http://localhost:8003
+  Load Balancer:        http://localhost:8005
+
+Pipeline Monitoring:
+  Fluent Bit Metrics:   http://localhost:8081/api/v1/metrics
+  Logstash API:         http://localhost:9601/_node/stats
+  Kafka:                http://localhost:9094
+
+=== DEMO COMMANDS ===
+
+# Check total logs
+curl -s 'http://localhost:8005/select/logsql/query?query=*%20%7C%20count()' | jq
+
+# Check storage distribution
+curl -s 'http://localhost:8002/select/logsql/query?query=*%20%7C%20count()'
+curl -s 'http://localhost:8003/select/logsql/query?query=*%20%7C%20count()'
+
+# View recent error logs
+curl -s 'http://localhost:8005/select/logsql/query?query=level:ERROR%20%7C%20limit%2010' | jq .
+
+# Check vmalert alerts
+curl -s 'http://localhost:8881/api/v1/alerts' | jq '.data.alerts[] | {name: .name, state: .state}'
+
+[OK] Pipeline startup complete
+
+
+[17:39:20] Stopping Multi-Node VictoriaLogs Pipeline
+[WARN] PURGE MODE ENABLED - All data will be deleted!
+
+
+=== STOPPING PIPELINE ===
+[17:39:20] Stopping Orchestrator node (Node 5)
+[OK] Orchestrator node (Node 5) stopped
+[17:39:21] Stopping Query node (Node 4)
+[OK] Query node (Node 4) stopped
+[17:39:23] Stopping Ingestion node (Node 1)
+[OK] Ingestion node (Node 1) stopped
+[17:39:35] Stopping Storage node 1 (Node 2)
+[OK] Storage node 1 (Node 2) stopped
+[17:39:35] Stopping Storage node 2 (Node 3)
+[OK] Storage node 2 (Node 3) stopped
+
+=== FORCE CLEANUP ===
+[17:39:36] Removing all node containers
+[OK] All node containers removed
+[17:39:36] Removing networks
+[OK] Networks removed
+
+=== PURGING DATA ===
+[WARN] This will delete ALL pipeline data!
+[17:39:36] Removing volumes
+node-1-ingest_kafka-data
+[OK] Volumes removed
+[17:39:36] Cleaning log files
+[OK] Log files cleaned
+[17:39:36] Cleaning VictoriaLogs storage
+[OK] VictoriaLogs storage cleaned
+[17:39:36] Cleaning Logstash DLQ
+[OK] DLQ cleaned
+
+=== FINAL STATUS ===
+[OK] All containers stopped
+
+[OK] Full purge completed - Fresh start ready
+
+[OK] Pipeline stopped
+
+
+[17:39:36] Starting Multi-Node VictoriaLogs Pipeline
+
+
+=== PORT VERIFICATION ===
+[OK] Port 8001 available
+[OK] Port 8002 available
+[OK] Port 8003 available
+[OK] Port 8004 available
+[OK] Port 8005 available
+[OK] Port 8006 available
+[OK] Port 8081 available
+[OK] Port 8881 available
+[OK] Port 3001 available
+[OK] Port 9094 available
+[OK] Port 9601 available
+
+=== BUILDING LOG GENERATOR ===
+[17:39:36] Building log generator image
+[OK] Log generator image built
+
+=== STARTING STORAGE NODES (Node 2 & 3) ===
+[17:39:38] Starting Node 2 (Storage Node 1)
+[OK] Node 2 started
+[17:39:39] Starting Node 3 (Storage Node 2)
+[OK] Node 3 started
+[17:39:39] Waiting for storage nodes
+[OK] storage nodes ready
+
+=== STARTING INGESTION NODE (Node 1) ===
+[17:39:39] Starting Node 1 (Ingestion Pipeline)
+[17:39:52] Waiting for Kafka
+[OK] Kafka ready
+[17:39:53] Waiting for Logstash
+[OK] Logstash ready
+[17:40:00] Waiting for vlinsert
+[OK] vlinsert ready
+[OK] Node 1 fully operational
+
+=== STARTING QUERY NODE (Node 4) ===
+[17:40:00] Starting Node 4 (Query + Alerting)
+[17:40:01] Waiting for vlselect
+[OK] vlselect ready
+[17:40:01] Waiting for Grafana
+[OK] Grafana ready
+[17:40:16] Waiting for vmalert
+[OK] vmalert ready
+[OK] Node 4 fully operational
+
+=== STARTING ORCHESTRATOR NODE (Node 5) ===
+[17:40:16] Starting Node 5 (Load Balancer + Backup)
+[17:40:17] Waiting for Nginx
+[OK] Nginx ready
+[17:40:19] Waiting for Backup vlselect
+[OK] Backup vlselect ready
+[OK] Node 5 fully operational
+[17:40:19] Waiting for pipeline to stabilize
+
+=== PIPELINE STATUS ===
+Containers:
+  NAMES                  STATUS
+  node-5-nginx           Up 32 seconds
+  node-5-vlselect        Up 32 seconds
+  node-4-vmalert         Up 47 seconds
+  node-4-grafana         Up 47 seconds
+  node-4-vlselect        Up 48 seconds
+  node-1-vlinsert        Up 57 seconds
+  node-1-fluentbit       Up About a minute
+  node-1-logstash        Up 57 seconds
+  node-1-kafka           Up About a minute (healthy)
+  node-1-log-generator   Up About a minute
+  node-3-vlstorage       Up About a minute
+  node-2-vlstorage       Up About a minute
+
+Storage Distribution:
+  Node 2 (Storage 1): 989 logs
+  Node 3 (Storage 2): 1 logs
+  Total Storage:        990 logs
+  Load Balancer:        990 logs
+  Data Consistency:     PASSED
+
+Pipeline Metrics:
+  Fluent Bit Records:   1017
+  Logstash Events Out:  1017
+  Logstash Throughput:  14.74 events/sec
+
+=== ACCESS POINTS ===
+Grafana Dashboard:
+  Grafana UI:           http://localhost:3001 (admin/admin)
+  VictoriaLogs Datasource: http://localhost:8005
+
+Alerting:
+  vmalert UI:           http://localhost:8881
+  vmalert API:          http://localhost:8881/api/v1/alerts
+
+Direct Storage Access:
+  Node 2 (Storage 1): http://localhost:8002
+  Node 3 (Storage 2): http://localhost:8003
+  Load Balancer:        http://localhost:8005
+
+Pipeline Monitoring:
+  Fluent Bit Metrics:   http://localhost:8081/api/v1/metrics
+  Logstash API:         http://localhost:9601/_node/stats
+  Kafka:                http://localhost:9094
+
+=== DEMO COMMANDS ===
+
+# Check total logs
+curl -s 'http://localhost:8005/select/logsql/query?query=*%20%7C%20count()' | jq
+
+# Check storage distribution
+curl -s 'http://localhost:8002/select/logsql/query?query=*%20%7C%20count()'
+curl -s 'http://localhost:8003/select/logsql/query?query=*%20%7C%20count()'
+
+# View recent error logs
+curl -s 'http://localhost:8005/select/logsql/query?query=level:ERROR%20%7C%20limit%2010' | jq .
+
+# Check vmalert alerts
+curl -s 'http://localhost:8881/api/v1/alerts' | jq '.data.alerts[] | {name: .name, state: .state}'
+
+[OK] Pipeline startup complete
+
+
+=== Container Health Check ===
+[PASS] All 12 containers running
+[INFO] Running containers:
+  NAMES                  STATUS
+  node-5-nginx           Up About a minute
+  node-5-vlselect        Up About a minute
+  node-4-vmalert         Up About a minute
+  node-4-grafana         Up About a minute
+  node-4-vlselect        Up About a minute
+  node-1-vlinsert        Up About a minute
+  node-1-fluentbit       Up 2 minutes
+  node-1-logstash        Up About a minute
+  node-1-kafka           Up 2 minutes (healthy)
+  node-1-log-generator   Up 2 minutes
+  node-3-vlstorage       Up 2 minutes
+  node-2-vlstorage       Up 2 minutes
+
+=== Write Path - Log Generation ===
+[PASS] Log files have content
+[INFO]   hpcmlog.jsonl: 168046 bytes
+[INFO]   monitoring_service.jsonl: 173523 bytes
+[INFO]   syslog.jsonl: 161860 bytes
+
+=== Write Path - Fluent Bit to Kafka ===
+[PASS] Fluent Bit reading logs (1836 records)
+[PASS] Kafka has messages
+
+=== Write Path - Logstash Processing ===
+[PASS] Logstash processing (1908 events)
+
+=== Storage Nodes - Write Distribution ===
+[PASS] Storage Node 1 has 1462 logs
+[PASS] Storage Node 2 has 418 logs
+[INFO] Distribution: 1462 : 418
+
+=== Read Path - Query Layer ===
+[PASS] Load balancer returns correct total (1880)
+[PASS] Direct query to Node 4 works
+
+=== Failover Testing ===
+node-4-vlselect
+node-4-vlselect
+[PASS] Failover works (backup vlselect took over)
+
+=== Services Accessibility ===
+[PASS] Grafana accessible
+[PASS] vmalert running
+[PASS] alertmanager running
+
+=== TEST SUMMARY ===
+Passed: 13
+Failed: 0
+Total:  13
+
+ALL TESTS PASSED - Multi-node pipeline is fully operational!
+
+Access Points:
+  Grafana:      http://localhost:3001 (admin/admin)
+  vmalert:      http://localhost:8881
+  Load Balancer: http://localhost:8005
+  Storage 1:    http://localhost:8002
+  Storage 2:    http://localhost:8003
+  Fluent Bit:   http://localhost:8081/metrics
+  Logstash:     http://localhost:9601/_node/stats

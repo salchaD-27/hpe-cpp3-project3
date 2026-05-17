@@ -3,11 +3,11 @@ groups:
     interval: 30s
     type: vlogs
     rules:
-      - alert: LogFlowStopped
-        expr: '* | stats count()'
-        for: 2m
+      - alert: HasErrors
+        expr: '* | count()'
+        for: 0s
         annotations:
-          summary: "No logs flowing"
-          description: "No logs have been received in the last 2 minutes"
+          summary: "Logs detected"
+          description: "Logs are flowing: {{ $value }}"
         labels:
-          severity: warning
+          severity: info

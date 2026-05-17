@@ -36,12 +36,32 @@ services:
       - "-rule=/etc/alerts/alerts.yml"
       - "-evaluationInterval=30s"
       - "-httpListenAddr=:8880"
-      - "-notifier.url=http://alertmanager:9093/api/v2/alerts"
-      - "-notifier.tlsInsecureSkipVerify=true"
+      - "-notifier.url=http://alertmanager:9093"
     volumes:
       - ./alerts.yml:/etc/alerts/alerts.yml:ro
     ports:
       - "8881:8880"
     depends_on:
-      - grafana
+      - alertmanager
     restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--web.listen-address=:9093"
+    ports:
+      - "9095:9093" # host port 9095 -> container 9093
+    restart: unless-stopped
+
+    # Disable clustering to avoid gossip port conflicts in a single-node simulation
+
+
+
+
+
+
+
