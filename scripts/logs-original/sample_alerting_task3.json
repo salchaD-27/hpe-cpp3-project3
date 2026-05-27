@@ -1,0 +1,143 @@
+{
+  "hits": {
+  "total": {
+    "value": 10,
+    "relation": "gte"
+  },
+  "max_score": 1,
+  "hits": [
+    {
+      "_index": "syslog-2026.02.01",
+      "_id": "test1",
+      "_score": 1,
+      "_source": {
+        "Timestamp": 1769987576.090682,
+        "@version": "1",
+        "@timestamp": "2026-02-01T23:12:56.689957656Z",
+        "Resource": {
+          "process_id": "1",
+          "service.name": "systemd",
+          "host.name": "leader3"
+        },
+        "Body": "Started Monitoring Statistics Exporter.",
+        "Severity": "info",
+        "Attributes": {
+          "facility": "3",
+          "type": "log_syslog",
+          "priority": "30"
+        }
+      }
+    },
+    {
+      "_index": "syslog-2026.02.01",
+      "_id": "test2",
+      "_score": 1,
+      "_source": {
+        "Timestamp": 1769987576.090682,
+        "@version": "1",
+        "@timestamp": "2026-02-01T23:12:56.689957656Z",
+        "Resource": {
+          "process_id": "1",
+          "service.name": "systemd",
+          "host.name": "leader3"
+        },
+        "Body": "Started Disk Status Exporter.",
+        "Severity": "info",
+        "Attributes": {
+          "facility": "3",
+          "type": "log_syslog",
+          "priority": "30"
+        }
+      }
+    },
+    {
+      "_index": "syslog-2026.02.01",
+      "_id": "test3",
+      "_score": 1,
+      "_source": {
+        "Timestamp": 1769987576.090682,
+        "@version": "1",
+        "@timestamp": "2026-02-01T23:12:56.689957656Z",
+        "Resource": {
+          "process_id": "1",
+          "service.name": "systemd",
+          "host.name": "leader3"
+        },
+        "Body": "Started Session c61184 of User root.",
+        "Severity": "info",
+        "Attributes": {
+          "facility": "3",
+          "type": "log_syslog",
+          "priority": "30"
+        }
+      }
+    },
+    {
+      "_index": "syslog-2026.02.01",
+      "_id": "test4",
+      "_score": 1,
+      "_source": {
+        "Timestamp": 1769987576.090682,
+        "@version": "1",
+        "@timestamp": "2026-02-01T23:12:56.689957656Z",
+        "Resource": {
+          "process_id": "1",
+          "service.name": "systemd",
+          "host.name": "leader3"
+        },
+        "Body": "Stopping Monitoring Statistics Exporter.",
+        "Severity": "info",
+        "Attributes": {
+          "facility": "3",
+          "type": "log_syslog",
+          "priority": "30"
+        }
+      }
+    },
+    {
+      "_index": "syslog-2026.02.01",
+      "_id": "test5",
+      "_score": 1,
+      "_source": {
+        "Timestamp": 1769987576.090682,
+        "@version": "1",
+        "@timestamp": "2026-02-01T23:12:56.689957656Z",
+        "Resource": {
+          "process_id": "1",
+          "service.name": "systemd",
+          "host.name": "leader3"
+        },
+        "Body": "Reloaded Monitoring Statistics Exporter.",
+        "Severity": "info",
+        "Attributes": {
+          "facility": "3",
+          "type": "log_syslog",
+          "priority": "30"
+        }
+      }
+    },
+    {
+      "_index": "syslog-2026.02.01",
+      "_id": "test6",
+      "_score": 1,
+      "_source": {
+        "Timestamp": 1769987576.090682,
+        "@version": "1",
+        "@timestamp": "2026-02-01T23:12:56.689957656Z",
+        "Resource": {
+          "process_id": "1",
+          "service.name": "systemd",
+          "host.name": "leader3"
+        },
+        "Body": "Failed to start Monitoring Statistics Exporter.",
+        "Severity": "info",
+        "Attributes": {
+          "facility": "3",
+          "type": "log_syslog",
+          "priority": "30"
+        }
+      }
+    }
+    ]
+  }
+}

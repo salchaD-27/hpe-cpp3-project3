@@ -17,9 +17,10 @@ OUTPUT_DIR = "/generated-logs"
 RATE       = 20          # logs per second per file
 
 LOG_FILES = [
-    ("hpcmlog.json",            "hpcmlog.jsonl"),
-    ("monitoring_service.json", "monitoring_service.jsonl"),
-    ("syslog.json",             "syslog.jsonl"),
+    # ("hpcmlog.json",            "hpcmlog.jsonl"),
+    # ("monitoring_service.json", "monitoring_service.jsonl"),
+    # ("syslog.json",             "syslog.jsonl"),
+    ("sample_alerting_task3.json",             "sample_alerting_task3.jsonl"),
 ]
 
 # ---------------------------------------------------------------------------
