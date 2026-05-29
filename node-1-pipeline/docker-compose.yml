@@ -1,0 +1,271 @@
+# =============================================================================
+# Node 1 — Pipeline Node
+# Runs: Simulator, Fluent Bit, Kafka, Logstash, Grafana, VictoriaMetrics,
+#        vmalert, Alertmanager, Kafka UI
+#
+# All services join multi-node-net so they can reach Node 2-5 by container name.
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Log Simulator
+  # ---------------------------------------------------------------------------
+  simulator:
+    image: python:3.12-slim
+    container_name: node-1-simulator
+    volumes:
+      - ./1-simulator:/scripts:ro
+      - ./1-simulator/logs-original:/scripts/logs-original:ro
+      - ./1-simulator/logs-generated:/generated-logs
+    command: python /scripts/simulator.py
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+    depends_on:
+      - fluent-bit
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  # ---------------------------------------------------------------------------
+  # Fluent Bit
+  # Tails JSONL files → Kafka topic hpc-logs
+  # ---------------------------------------------------------------------------
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:4.0.2
+    container_name: node-1-fluent-bit
+    ports:
+      - "2020:2020"
+    volumes:
+      - ./2-fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./2-fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
+      - ./1-simulator/logs-generated:/generated-logs
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Kafka (KRaft — no ZooKeeper)
+  # Single broker with external listener for tooling access from host.
+  # ---------------------------------------------------------------------------
+  kafka:
+    image: apache/kafka:4.0.2
+    container_name: node-1-kafka
+    hostname: node-1-kafka
+    ports:
+      - "9094:9094"    # External / host access (Kafka UI, debugging)
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      # Internal listener  → used by Fluent Bit and Logstash (same network)
+      # External listener  → used by Kafka UI and host tooling
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://node-1-kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@node-1-kafka:9093
+
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_NUM_PARTITIONS: 6
+      KAFKA_LOG_RETENTION_HOURS: 24
+
+      # Replication factor 1 — single broker, must be 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms256m"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "/opt/kafka/bin/kafka-topics.sh", "--list", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+
+  # ---------------------------------------------------------------------------
+  # Logstash
+  # Consumes from Kafka → transforms → ships to Node 2 (vlinsert)
+  # ---------------------------------------------------------------------------
+  logstash:
+    image: docker.elastic.co/logstash/logstash:9.2.8
+    container_name: node-1-logstash
+    user: root
+    volumes:
+      - ./4-logstash/hpc-pipeline.conf:/usr/share/logstash/pipeline/hpc-pipeline.conf:ro
+      - ./4-logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - logstash-dlq:/usr/share/logstash/data/dlq
+    ports:
+      - "9601:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms256m"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+      - multi-node-net
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+
+  # ---------------------------------------------------------------------------
+  # VictoriaMetrics
+  # Stores alert-state metrics written by vmalert (ALERTS{} series).
+  # ---------------------------------------------------------------------------
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.115.0
+    container_name: node-1-victoriametrics
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=3"
+      - "-httpListenAddr=:8428"
+      - "-promscrape.config=/etc/vm/scrape.yml"      # scrape Alertmanager
+      - "-promscrape.config.strictParse=false"        # tolerate unknown fields
+    volumes:
+      - victoriametrics-data:/storage
+      - ./8-victoriametrics/scrape.yml:/etc/vm/scrape.yml:ro  
+    ports:
+      - "8428:8428"
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+
+  # ---------------------------------------------------------------------------
+  # Grafana
+  # Datasource 1: VictoriaLogs (via Node 5 vlselect — container name on shared net)
+  # Datasource 2: VictoriaMetrics (local, same network)
+  # ---------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: node-1-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: victoriametrics-logs-datasource
+    volumes:
+      - ./6-grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - victoriametrics
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+      - multi-node-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # vmalert
+  # Evaluates rules against Node 5 (vlselect) — uses container name, not host.docker.internal
+  # Writes ALERTS{} metrics to local VictoriaMetrics
+  # Sends firing alerts to local Alertmanager
+  # ---------------------------------------------------------------------------
+  vmalert:
+    image: victoriametrics/vmalert:latest
+    container_name: node-1-vmalert
+    ports:
+      - "8881:8880"
+    command:
+      - "-datasource.url=http://node-5-vlselect:9428"
+      - "-datasource.queryStep=30s"
+      - "-notifier.url=http://node-1-alertmanager:9093"
+      - "-remoteWrite.url=http://node-1-victoriametrics:8428"
+      - "-remoteRead.url=http://node-1-victoriametrics:8428"
+      - "-rule=/etc/alerts/alerts.yml"
+      - "-evaluationInterval=30s"
+      - "-httpListenAddr=:8880"
+    volumes:
+      - ./7-vmalert/alerts.yml:/etc/alerts/alerts.yml:ro
+    depends_on:
+      - alertmanager
+      - victoriametrics
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+      - multi-node-net
+
+  # ---------------------------------------------------------------------------
+  # Alertmanager
+  # Routes alerts to Slack (warning + critical), inhibits warning when critical fires.
+  # ---------------------------------------------------------------------------
+  alertmanager:
+    image: prom/alertmanager:v0.31.1
+    container_name: node-1-alertmanager
+    ports:
+      - "9095:9093"
+    volumes:
+      - ./7-vmalert/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+
+  # ---------------------------------------------------------------------------
+  # Kafka UI
+  # ---------------------------------------------------------------------------
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: node-1-kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: hpc-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: node-1-kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pipeline-net
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  generated-logs:     # shared between simulator (write) and fluent-bit (read)
+  kafka-data:
+  logstash-dlq:
+  victoriametrics-data:
+  grafana-data:
+
+# =============================================================================
+# Networks
+# Node-1 services also need the shared inter-node network to reach node-2..5.
+# They join BOTH: pipeline-net (internal, no external DNS needed) and
+# multi-node-net (shared with nodes 2-5, for cross-node container DNS).
+# =============================================================================
+networks:
+  pipeline-net:
+    driver: bridge
+  multi-node-net:
+    external: true

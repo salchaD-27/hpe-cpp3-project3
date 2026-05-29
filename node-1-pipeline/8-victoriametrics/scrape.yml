@@ -1,0 +1,15 @@
+scrape_configs:
+  # Scrape Alertmanager 
+  - job_name: alertmanager
+    static_configs:
+      - targets: ["node-1-alertmanager:9093"]
+
+  # Scrape vmalert 
+  - job_name: vmalert
+    static_configs:
+      - targets: ["node-1-vmalert:8880"]
+
+  # Scrape VictoriaMetrics itself 
+  - job_name: victoriametrics
+    static_configs:
+      - targets: ["node-1-victoriametrics:8428"]

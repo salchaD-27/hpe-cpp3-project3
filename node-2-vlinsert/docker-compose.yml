@@ -1,0 +1,24 @@
+# =============================================================================
+# Node 2 — vlinsert (Write Gateway)
+# Accepts log writes from Logstash, fans out to Node 3 & 4 (vlstorage).
+# =============================================================================
+
+services:
+  vlinsert:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-2-vlinsert
+    command:
+      - "-storageNode=node-3-vlstorage:9428"
+      - "-storageNode=node-4-vlstorage:9428"
+      - "-httpListenAddr=:9428"
+      - "-select.disable=true"
+    ports:
+      - "8001:9428"
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    name: multi-node-net
+    external: true

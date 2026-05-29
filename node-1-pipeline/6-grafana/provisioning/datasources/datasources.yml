@@ -1,0 +1,29 @@
+apiVersion: 1
+
+datasources:
+  # VictoriaLogs — queries go to Node 5 (vlselect) by container name on multi-node-net
+  - name: VictoriaLogs
+    type: victoriametrics-logs-datasource
+    access: proxy
+    url: http://node-5-vlselect:9428
+    isDefault: true
+    editable: true
+
+  # VictoriaMetrics — stores alert-state metrics from vmalert (same node, pipeline-net)
+  - name: VictoriaMetrics
+    type: prometheus
+    access: proxy
+    url: http://node-1-victoriametrics:8428
+    isDefault: false
+    editable: true
+
+  # Alertmanager — native metrics endpoint for silences, inhibitions, and alert routing state.
+  - name: Alertmanager
+    uid: alertmanager-native
+    type: prometheus
+    access: proxy
+    url: http://node-1-alertmanager:9093
+    isDefault: false
+    editable: true
+    jsonData:
+      timeInterval: "30s"

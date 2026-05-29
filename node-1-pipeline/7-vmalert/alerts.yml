@@ -1,0 +1,32 @@
+groups:
+  - name: hpc-alerts
+    interval: 30s
+    type: vlogs
+    rules:
+
+      - alert: HighErrorRate
+        expr: 'ingest_stage:logstash AND level:ERROR | stats count() as total'
+        for: 1m
+        annotations:
+          summary: "High error rate detected"
+          description: "ERROR logs detected in last evaluation window"
+        labels:
+          severity: warning
+
+      - alert: OOMKillerInvoked
+        expr: 'vl_stream:hpcmlog AND "OOM killer" | stats count() as total'
+        for: 0m
+        annotations:
+          summary: "OOM killer invoked on HPC node"
+          description: "OOM killer was triggered on a compute node"
+        labels:
+          severity: critical
+
+      - alert: HighWarnRate
+        expr: 'ingest_stage:logstash AND level:WARN | stats count() as total'
+        for: 2m
+        annotations:
+          summary: "High warning rate"
+          description: "WARN logs detected in last evaluation window"
+        labels:
+          severity: warning

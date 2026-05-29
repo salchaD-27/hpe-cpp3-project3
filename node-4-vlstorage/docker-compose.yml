@@ -1,0 +1,26 @@
+# =============================================================================
+# Node 4 — vlstorage (Storage Node 2 of 2)
+# Mirror of Node 3. vlinsert distributes log shards across both.
+# Storage is bind-mounted so data survives container restarts.
+# =============================================================================
+
+services:
+  vlstorage:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-4-vlstorage
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=1y"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8003:9428"
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    name: multi-node-net
+    external: true
