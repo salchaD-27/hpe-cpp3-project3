@@ -161,11 +161,11 @@ services:
       - "-datasource.url=http://victorialogs:9428"
       - "-datasource.queryStep=30s"
       - "-notifier.url=http://alertmanager:9093"
-      - "-rule=/etc/alerts/alerts.yml"
+      - "-rule=/etc/alerts/*.yml"
       - "-evaluationInterval=30s"
       - "-httpListenAddr=:8880"
     volumes:
-      - ./alerting/alerts.yml:/etc/alerts/alerts.yml:ro
+      - ./alerting/vmalert:/etc/alerts:ro
     depends_on:
       - victorialogs
       - alertmanager

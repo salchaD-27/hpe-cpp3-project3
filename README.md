@@ -80,7 +80,9 @@ Kafka runs in **KRaft mode** (no ZooKeeper dependency) as a combined broker + co
 
 ## Alerting
 
-**vmalert** evaluates rules from `alerting/alerts.yml` against VictoriaLogs using LogsQL every **30 seconds** (`-evaluationInterval=30s`, `-datasource.queryStep=30s`).
+**vmalert** evaluates rules from `alerting/alerts*.yml` against VictoriaLogs using LogsQL every **30 seconds** (`-evaluationInterval=30s`, `-datasource.queryStep=30s`).
+
+You can split rules across multiple files such as `alerting/alerts.yml`, `alerting/alerts-syslog.yml`, and `alerting/alerts-monitoring.yml`.
 
 Fired alerts are forwarded to **Alertmanager** at `http://alertmanager:9093`, which routes them to configured receivers (Slack, email, webhook) defined in `alerting/alertmanager.yml`.
 
@@ -114,6 +116,7 @@ hpc-log-pipeline/
 ├── .env
 ├── alerting/
 │   ├── alerts.yml              # vmalert rule definitions
+│   ├── alerts-*.yml            # optional extra vmalert rule files
 │   └── alertmanager.yml        # alert routing config
 ├── configs/
 │   ├── fluent-bit/
