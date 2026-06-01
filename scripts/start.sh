@@ -410,7 +410,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$REPO_ROOT"
+
 
 # Colors for output
 RED='\033[0;31m'
@@ -454,21 +456,27 @@ check_ports() {
 build_log_gen() {
     header "BUILDING LOG GENERATOR"
     log "Building log generator image"
-    cd node-1-pipeline/1-log-gen
-    docker build -t log-generator:latest . >/dev/null 2>&1
+    cd "$REPO_ROOT/node-1-pipeline/1-generator"
+    # generator.py runs directly in the pipeline container; this build is optional.
+    # Keep the build step only if the directory contains a Dockerfile.
+    if [ -f Dockerfile ]; then
+        docker build -t log-generator:latest . >/dev/null 2>&1
+        ok "Log generator image built"
+    else
+        warn "No Dockerfile in node-1-pipeline/1-generator — skipping image build"
+    fi
     cd "$SCRIPT_DIR"
-    ok "Log generator image built"
 }
 
 start_storage() {
     header "STARTING STORAGE NODES (Node 3 & 4)"
     
     log "Starting Node 3 (vlstorage 1)"
-    cd node-3-vlstorage && docker compose up -d >/dev/null 2>&1 && cd "$SCRIPT_DIR"
+    (cd "$REPO_ROOT/node-3-vlstorage" && docker compose up -d) >/dev/null 2>&1
     ok "Node 3 started"
 
     log "Starting Node 4 (vlstorage 2)"
-    cd node-4-vlstorage && docker compose up -d >/dev/null 2>&1 && cd "$SCRIPT_DIR"
+    (cd "$REPO_ROOT/node-4-vlstorage" && docker compose up -d) >/dev/null 2>&1
     ok "Node 4 started"
 
     wait_for "storage nodes" \
@@ -478,21 +486,21 @@ start_storage() {
 
 start_write_gateway() {
     header "STARTING WRITE GATEWAY (Node 2 — vlinsert)"
-    cd node-2-vlinsert && docker compose up -d >/dev/null 2>&1 && cd "$SCRIPT_DIR"
+    (cd "$REPO_ROOT/node-2-vlinsert" && docker compose up -d) >/dev/null 2>&1
     wait_for "vlinsert" "curl -sf http://localhost:8001/metrics >/dev/null" 15 2
     ok "Node 2 fully operational"
 }
 
 start_query() {
     header "STARTING QUERY NODE (Node 5 — vlselect)"
-    cd node-5-vlselect && docker compose up -d >/dev/null 2>&1 && cd "$SCRIPT_DIR"
+    (cd "$REPO_ROOT/node-5-vlselect" && docker compose up -d) >/dev/null 2>&1
     wait_for "vlselect" "curl -sf http://localhost:8004/metrics >/dev/null" 15 2
     ok "Node 5 fully operational"
 }
 
 start_pipeline() {
     header "STARTING PIPELINE NODE (Node 1)"
-    cd node-1-pipeline && docker compose up -d >/dev/null 2>&1 && cd "$SCRIPT_DIR"
+    (cd "$REPO_ROOT/node-1-pipeline" && docker compose up -d) >/dev/null 2>&1
 
     # Wait for Kafka (use container name, not localhost)
     wait_for "Kafka" \
@@ -550,18 +558,20 @@ show_status() {
 show_access() {
     header "ACCESS POINTS"
     cat << 'EOF'
-  Grafana UI:           http://localhost:3001 (admin/admin)
-  vmalert UI:           http://localhost:8881
-  Alertmanager UI:      http://localhost:9095
+    Grafana UI:           http://localhost:3001  (admin / admin)
+    Kafka UI:             http://localhost:8080
+    vmalert UI:           http://localhost:8881
+    Alertmanager UI:      http://localhost:9095
+    VictoriaMetrics:      http://localhost:8428
 
-  Write API (vlinsert): http://localhost:8001
-  Query API (vlselect): http://localhost:8004
-  Storage Node 3:       http://localhost:8002
-  Storage Node 4:       http://localhost:8003
+    Write API (vlinsert): http://localhost:8001
+    Query API (vlselect): http://localhost:8004
+    Storage Node 3:       http://localhost:8002
+    Storage Node 4:       http://localhost:8003
 
-  Fluent Bit Metrics:   http://localhost:8081/api/v1/metrics
-  Logstash API:         http://localhost:9601/_node/stats
-  Kafka (external):     localhost:9094
+    Fluent Bit metrics:   http://localhost:2020/api/v1/metrics
+    Logstash API:         http://localhost:9601/_node/stats
+    Kafka (external):     localhost:9094
 EOF
 }
 
