@@ -1,0 +1,241 @@
+VictoriaLogs MultiNode Setup Internal Architecture
+
+- The One Binary, Multiple Roles Architecture
+    This is the most important thing to understand about VictoriaLogs cluster mode: there is exactly one binary — victoria-logs-prod. It is the same executable whether it's running as vlstorage on node-3, as vlinsert on node-2, or as vlselect on node-5.
+    The binary determines its role at startup through a decision tree:
+    Start victoria-logs-prod
+            ↓
+    Is -storageNode specified?
+            ├── NO → Run as vlstorage
+            │         - Enable /insert/* HTTP endpoints (accept from clients)
+            │         - Enable /internal/insert (accept from vlinsert)
+            │         - Enable /select/* HTTP endpoints (accept direct queries)
+            │         - Enable /internal/select/* (accept from vlselect)
+            │         - Open storageDataPath and begin serving
+            │
+            └── YES → Run as vlinsert AND/OR vlselect
+                    ↓
+                    Is -insert.disable set?
+                    ├── NO → Enable insert routing
+                    │         - Accept /insert/* from clients
+                    │         - Forward to -storageNode targets via /internal/insert
+                    │         - Do NOT store locally
+                    │
+                    └── YES → Disable insert endpoints
+                    ↓
+                    Is -select.disable set?
+                    ├── NO → Enable select routing  
+                    │         - Accept /select/* from clients
+                    │         - Fan out to -storageNode targets via /internal/select/*
+                    │         - Merge results and return
+                    │
+                    └── YES → Disable select endpoints
+
+    In our cluster:
+    node-3 and node-4 have no -storageNode → act as vlstorage (store data locally)
+    node-2 has -storageNode=node-3:8002 -storageNode=node-4:8003 → acts as both vlinsert and vlselect router
+    node-5 has -storageNode=node-3:8002 -storageNode=node-4:8003 → acts as vlselect router
+    The distinction between node-2 and node-5 is enforced by your nginx configuration and the port mapping, not by different binaries.
+
+
+
+- All Internal HTTP Endpoints
+    VictoriaLogs exposes different HTTP endpoints depending on role:
+    Endpoints on vlstorage (node-3, node-4)
+        POST /insert/jsonline — accepts NDJSON from external clients (Logstash, curl, etc.). vlstorage can accept this directly; it doesn't need to go through vlinsert. In your cluster you route through vlinsert for distribution, but you CAN bypass it.
+        POST /internal/insert?version=v1 — accepts binary-encoded log records from vlinsert. This is the cluster-internal protocol. Not JSON. Not human readable. Binary serialized Go structs. Uses ZSTD compression over the wire.
+        GET /select/logsql/query — accepts LogsQL queries from external clients. vlstorage answers these against its own local data only.
+        GET /internal/select/logsql/query — accepts fan-out queries from vlselect. The response format is identical to the external endpoint, but the path signals to vlstorage that this is a cluster-internal query, enabling certain optimizations.
+        GET /metrics — Prometheus format self-metrics.
+        GET /health — returns HTTP 200 with empty body if healthy.
+        GET /flags — returns all active CLI flags and their values. Useful for debugging.
+    Endpoints on vlinsert (node-2)
+        POST /insert/jsonline — accepts NDJSON from external clients (Logstash). Parses, determines target storage node via consistent hashing, forwards to /internal/insert on target storage node.
+        POST /insert/elasticsearch/bulk — accepts Elasticsearch bulk API format. This is compatibility for tools that speak Elasticsearch.
+        POST /insert/loki/api/v1/push — accepts Loki push API format. Compatibility for Promtail, Grafana Alloy.
+        GET /metrics — self-metrics including rows forwarded, errors, latency per storage node.
+        GET /health — returns 200 if healthy.
+    Endpoints on vlselect (node-5)
+        GET /select/logsql/query — accepts LogsQL from Grafana/vmalert, fans out to all storage nodes, merges results.
+        GET /select/logsql/stats_query — aggregation queries used by vmalert for alert rule evaluation.
+        GET /select/logsql/stats_query_range — time-range aggregation used by Grafana time series panels.
+        GET /select/logsql/hits — log count histogram over time range.
+        GET /select/logsql/field_names — returns all unique field names present in logs. Used by Grafana UI to show available fields.
+        GET /select/logsql/field_values — returns all unique values for a specific field.
+        GET /metrics — self-metrics including queries served, fan-out latency, per-storage-node response times.
+
+
+
+- The Internal Binary Protocol Between vlinsert and vlstorage
+    When vlinsert forwards a log record to vlstorage, it does NOT send JSON. It uses an internal binary protocol that is significantly more efficient:
+        Fields are serialized as (field_name_id, value) pairs where field_name_id is a 2-byte integer from a shared dictionary rather than the full field name string
+        The timestamp is stored as a delta from the previous record's timestamp (saves bytes when records arrive close together)
+        The _msg text is stored as-is (UTF-8)
+        All other string values are stored with LZ4 or ZSTD compression applied to the batch
+        The entire request body is ZSTD-compressed before transmission over the network
+    This is why you see Content-Encoding: zstd in the internal HTTP headers when you sniff the traffic between nodes. The compression happens at both the field level (within a batch) and at the transport level (per HTTP request).
+
+
+
+- Go Runtime Internals — Why Memory Usage Is So Low
+    VictoriaLogs is written in Go. The ~100-200 MB RSS you see is not artificially low — it reflects real design choices:
+    No JVM heap: Elasticsearch/Logstash requires pre-allocating JVM heap (-Xmx8g reserves 8GB of virtual memory even if you only use 100MB). Go's GC manages heap dynamically, allocating and releasing memory as needed with no pre-allocation.
+    OS page cache reliance: VictoriaLogs does not implement its own block cache for stored data. Instead, it relies on the Linux kernel's page cache. When vlstorage reads level.bin from disk for a query, the kernel caches those disk blocks in RAM. Subsequent queries hitting the same partition find the data already in the page cache and don't touch disk. This is why Go applications typically show lower RSS than their actual memory usage — the page cache is not counted in process RSS.
+    Goroutine-based concurrency: Go's goroutines are extremely lightweight (2-8 KB stack initially, growing as needed). vlstorage can handle thousands of concurrent insert and query operations with goroutines that cost far less than OS threads. A JVM application would need OS threads for concurrency, each consuming megabytes.
+    Column-oriented memory access: During queries, vlstorage only loads the specific columns needed into memory. A query for level:ERROR loads level.bin into memory, scans it, identifies matching row indices, then loads _msg.bin and _time.bin for only those rows. Other columns (host_name, service_name, attributes) are never paged into RAM. In a row-oriented system, every row would be loaded into memory even if only one field is queried.
+
+
+
+- Write Path
+    Step 0: Log generation (node-1)
+        The log-gen.js reads from the original JSON files in logs-original/ (hpcmlog.json, monitoring_service.json, syslog.json) and writes JSONL output to logs-generated/. The log generator adds @timestamp as the current wall-clock time, replacing the original event timestamps. This is why your logs have timestamps from "today" even though the original hpcmlog.json events are from months ago.
+    Step 1: Fluent Bit tails files (node-1)
+        Fluent Bit watches logs-generated/*.jsonl using Linux inotify (or macOS kqueue). When new bytes appear at the end of a file, Fluent Bit reads them in chunks. The json_parser in your parsers.conf parses each line as a JSON object, extracting @timestamp as the event time. The record_modifier filter removes the raw @timestamp field from the record to prevent the RubyFloat issue in Logstash.
+        Fluent Bit buffers records in memory (Mem_Buf_Limit 100MB) and flushes to Kafka every Flush 1 second.
+    Step 2: Kafka buffering (node-1)
+        Fluent Bit publishes to topic hpc-logs (or logs depending on your exact config). Kafka stores the message in its commit log on the kafka-data volume. The message is durably written to disk before Kafka acknowledges to Fluent Bit.
+        Logstash's consumer group logstash-hpc (or similar) reads from this topic. The consumer group offset tracks how far Logstash has read. If Logstash crashes and restarts, it resumes from the last committed offset — no messages are lost (up to Kafka's own retention period).
+    Step 3: Logstash processing (node-1)
+        Logstash consumes from Kafka with consumer_threads => 1 (matching your single partition). The codec => json decodes each Kafka message value as JSON.
+        Our filter pipeline then:
+            Extracts Resource.host.name → host_name
+            Extracts Resource.service.name → service_name
+            Sets level from Severity
+            Sets _msg from Body
+            Sets _time from the event timestamp
+            Determines vl_stream from source_file path
+            Flattens Attributes into attr_* fields
+            Adds ingest_stage: logstash
+            Removes @version, Body, Severity, Resource, Attributes, message, event
+        The ruby filter fixes the @timestamp float issue by setting it to LogStash::Timestamp.now.
+    Step 4: Logstash HTTP output → node-2-vlinsert
+        Logstash sends each processed event as an individual HTTP POST:
+            POST http://node-2-vlinsert:8001/insert/jsonline
+            Content-Type: application/json
+            Body: {"_time":"2026-05-22T15:49:06.222Z","_msg":"ERROR: zookeeper timeout",...}
+        Our nginx on node-2 receives this on port 8001 and proxies it to the victoria-logs-prod container. The victoria-logs-prod process receives the JSON, parses it, and begins the distribution logic.
+    Step 5: vlinsert distribution decision
+        vlinsert's distribution code (simplified):
+            gofunc (vi *vlinsert) distributeRecord(record *LogRecord) error {
+                // Step 1: Determine stream identity
+                streamID := computeStreamID(record, vi.streamFields)
+                // With no _stream_fields configured: streamID = "{}" always
+                
+                // Step 2: Consistent hash to select storage node
+                nodeIndex := hash(streamID) % len(vi.storageNodes)
+                
+                // Step 3: Forward to selected node
+                return vi.storageNodes[nodeIndex].send(record)
+            }
+        With empty _stream_fields, streamID is always "{}", hash("{}") is always the same number, and nodeIndex is always the same node. This is your 1387:332 imbalance.
+    Step 6: vlinsert → vlstorage internal transfer
+        vlinsert maintains a persistent HTTP connection pool to each storage node (configured via rdkafka.socket.keepalive.enable style settings for HTTP keepalive). It batches records into blocks before sending to reduce per-request overhead.
+        The actual HTTP request:
+            POST http://node-3-vlstorage:8002/internal/insert?version=v1
+            Content-Encoding: zstd
+            Content-Type: application/octet-stream
+            Body: [binary encoded block of log records]
+    Step 7: vlstorage write buffer
+        vlstorage maintains an in-memory pendingRecords slice. Incoming records from vlinsert are appended to this slice. A background goroutine monitors the slice and triggers a flush when:
+        The slice exceeds maxPendingRecordsSize (default ~8MB)
+        OR the flush ticker fires (default ~1 second)
+        The flush converts pendingRecords into a new smallPart on disk. During the flush, the goroutine:
+            Groups records by field name
+            ZSTD-compresses each field's column independently
+            Writes compressed bytes to fieldname.bin files
+            Builds the inverted index for _msg content
+            Writes metadata.json with row count, time range, uncompressed size, compressed size
+            Atomically moves the new part directory into place
+    Step 8: Background merge goroutine
+        A separate background goroutine continuously monitors smallParts and triggers merges. The merge logic:
+            Scans all smallParts directories to find their time ranges from metadata.json
+            Identifies parts that overlap in time or are adjacent (merge candidates)
+            Applies size heuristics — merges parts that together form a "reasonably sized" bigPart
+            Reads all candidate smallParts column by column into memory
+            Merges and sorts records by (_stream_id, _time) — the sort key for efficient range queries
+            Applies stronger ZSTD compression (more data = better ratio)
+            Writes merged result as new bigPart
+            Updates the partition index (which part IDs exist, their time ranges)
+            Atomically deletes the original smallParts
+        After merge, the docker logs victorialogs startup message changes from smallParts: 5; bigParts: 0 to smallParts: 0; bigParts: 1, indicating the merge completed successfully.
+
+
+
+- Columnar Storage
+    Our logs have approximately 12-15 fields per record. In row-oriented storage, all 15 fields of every record are stored together. To find all ERROR records, you read ALL data and check the level field of each row.
+    In columnar storage:
+        level.bin contains only the level values for all records in the partition
+        A typical 1000-record partition might have 600 INFO, 300 WARN, 100 ERROR
+        Compressing 1000 short strings (3-5 bytes each) with ZSTD achieves 20:1 ratio easily
+        The entire level.bin for 1000 records might be 200 bytes
+    To find ERROR records: decompress 200 bytes, scan 1000 values, identify 100 matching indices. Then load only those 100 indices from _msg.bin and _time.bin. Never touch host_name.bin, service_name.bin, attributes.bin, etc.
+    In row-oriented storage: load all 1000 complete records (450 bytes each = 450KB), parse each, check level field. 2,250x more data read than the columnar approach.
+
+
+
+- LogsQL Parsing and Query Planning
+    When Grafana sends GET /select/logsql/query?query=level:ERROR+AND+vl_stream:monitoring&start=1h&limit=100 to node-5-vlselect, the following happens before any storage node is contacted:
+    Step 1: URL parameter parsing
+        vlselect extracts:
+            query = level:ERROR AND vl_stream:monitoring
+            start = now - 1h → absolute timestamp
+            limit = 100
+    Step 2: LogsQL query parsing
+        The query string is parsed into an AST (Abstract Syntax Tree):
+            AndFilter{
+                filters: [
+                    FieldFilter{field: "level", value: "ERROR", type: exact_match},
+                    FieldFilter{field: "vl_stream", value: "monitoring", type: exact_match}
+                ]
+            }
+        More complex queries produce more complex ASTs. "OOM killer" produces a PhraseFilter that uses the inverted index. level:~"ERROR|WARN" produces a RegexFilter. * | stats count() by host_name produces an AggregationPipeline wrapping a MatchAllFilter.
+    Step 3: Partition pruning
+        vlselect determines which daily partitions to scan based on the time range. If start=1h, only today's partition (and possibly yesterday's if now is within 1 hour of midnight) needs to be scanned. Partitions outside the time range are completely skipped — zero bytes read from them.
+    Step 4: Fan-out planning
+        vlselect prepares identical sub-queries for all storage nodes. The fan-out is completely parallel — goroutines are launched for each storage node simultaneously. vlselect does NOT wait for node-3 to finish before starting node-4.
+
+
+
+- vlstorage Query Execution — Inside Each Storage Node
+    When node-3 receives the query from vlselect via /internal/select/logsql/query:
+    Step 1: Part enumeration
+        vlstorage scans the partition directory for the relevant time range and lists all parts (both smallParts and bigParts) that contain data in the query's time window. Each part has a metadata.json with its exact time range — parts outside the query window are skipped without opening.
+    Step 2: Per-part execution
+        For each relevant part, vlstorage:
+        Simple field filter (level:ERROR):
+            Open and decompress level.bin
+            Scan decompressed bytes for rows matching "ERROR"
+            Record matching row indices in a bitset
+            Open and decompress only the requested return fields (_msg.bin, _time.bin, etc.) for matching row indices
+            Return matching records
+        Full-text search ("OOM killer"):
+            Open index.bin (the inverted index)
+            Look up posting list for "OOM" → list of row IDs
+            Look up posting list for "killer" → list of row IDs
+            Intersect the two lists (AND operation)
+            For intersecting row IDs: verify phrase adjacency in actual _msg.bin (index may have false positives from hash collisions)
+            Return verified matches
+        Aggregation (level:ERROR | stats count() as total):
+            Execute filter as above
+            Count matching rows rather than loading their data
+            Return just the count: {"total": 423}
+            No need to load _msg, _time, or any other field for pure count queries
+    Step 3: Sorting and limiting
+        Within each part, results are returned in (_stream_id, _time) sort order (the physical storage order after merge). vlstorage applies the limit locally before returning to vlselect — this prevents sending gigabytes of data when only 100 results are needed.
+
+
+
+- vlselect Merge Phase
+    After all storage nodes respond, vlselect:
+    For record queries (non-aggregation):
+        Receives sorted result sets from each node
+        Performs a merge-sort across all result sets (efficient because each set is already sorted)
+        Applies the global limit — takes first N records from the merged stream
+        Returns NDJSON to Grafana: one JSON object per line
+    For aggregation queries (| stats count()):
+        Receives partial counts from each node: {"total": 423} from node-3, {"total": 0} from node-4
+        For count: sums the partials → 423
+        For count by field: merges the group maps, summing values for matching keys
+        Returns the aggregated result in Prometheus-compatible JSON format (for vmalert compatibility)
+    Partial responses:
+        If one storage node fails to respond (timeout, crash), vlselect can return partial results from the remaining nodes if -search.allowPartialResponses is enabled. By default this is disabled — all nodes must respond or the query fails. This is a safety feature to prevent silently returning incomplete data.
