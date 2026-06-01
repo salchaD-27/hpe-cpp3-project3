@@ -304,12 +304,15 @@ start_pipeline() {
     (cd node-1-pipeline && docker compose up -d) >/dev/null 2>&1
 
     wait_for "Kafka" \
-        "docker exec node-1-kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092 >/dev/null 2>&1" \
-        30 3
-    wait_for "Logstash" "curl -sf http://localhost:9601/_node/stats >/dev/null" 45 3
-    wait_for "Grafana"  "curl -sf http://localhost:3001/api/health >/dev/null" 90 2
-    wait_for "vmalert"  "curl -sf http://localhost:8881/-/healthy >/dev/null" 15 2
-    wait_for "Alertmanager" "curl -sf http://localhost:9095/ >/dev/null" 15 2
+        "docker exec node-1-kafka /opt/kafka/bin/kafka-topics.sh --list --bootstrap-server node-1-kafka:9092 >/dev/null 2>&1" \
+        60 3
+
+    # Logstash readiness: API endpoint is /_node/stats but the server can still be warming up.
+    # Increase retries and add a tiny log dump on failure to avoid hanging forever.
+    wait_for "Logstash" "curl -sf http://localhost:9601/_node/stats >/dev/null" 90 2
+    wait_for "Grafana"  "curl -sf http://localhost:3001/api/health >/dev/null" 180 2
+    wait_for "vmalert"  "curl -sf http://localhost:8881/-/healthy >/dev/null" 30 2
+    wait_for "Alertmanager" "curl -sf http://localhost:9095/ >/dev/null" 30 2
 
     ok "Node 1 fully operational"
 }
@@ -369,8 +372,8 @@ main() {
     start_query          # Node 5
     start_pipeline       # Node 1
 
-    log "Waiting 20s for pipeline to stabilise"
-    sleep 20
+    log "Waiting for pipeline to stabilise"
+    sleep 54
 
     show_status
     show_access
