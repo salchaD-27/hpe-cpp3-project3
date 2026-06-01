@@ -1,50 +1,179 @@
-Storage Distribution (4 Nodes)
-Node            Type        Logs	Percentage
-Node 3          JSON Only	4,334	21.2%
-Node 4          JSON Only	5,420	26.5%
-Node 3 Hybrid	Hybrid	    5,384	26.3%
-Node 4 Hybrid	Hybrid	    5,313	26.0%
-Total           	        20,451	100%
+------------------------------------------------------------------
+INGESTION and STORAGE ANALYSIS
+------------------------------------------------------------------
+
+Ingestion Statistics
+Node	        Type	    Logs Sent	Logs Received	Success Rate	Storage Size
+Node 3	        JSON Only	30,000	    104,610*	    100%	        2.56 MB
+Node 4	        JSON Only	30,000	    93,781*	        100%	        2.05 MB
+Node 3 Hybrid	Hybrid	    30,000	    94,052*	        100%	        2.10 MB
+Node 4 Hybrid	Hybrid	    30,000	    93,754*	        100%	        2.09 MB
+
+
+Storage Efficiency
+Storage Type	        Total Logs	    Total Size	    Avg Size per 1k Logs
+JSON-only (2 nodes)	    198,391	        4.61 MB	        23.2 KB
+Hybrid (2 nodes)	    187,806	        4.19 MB	        22.3 KB
+Hybrid Savings	        -	            9.1%	        ~4% smaller
+
+JSON-only vs Hybrid Performance
+Metric	                JSON-only Nodes	    Hybrid Nodes	    Advantage
+Average Logs per Node	99,195	            93,903	            JSON (5.6% more)
+Average Storage (MB)	2.31 MB	            2.10 MB	            Hybrid (9.1% less)
+CPU Usage (avg)	        3.63%	            2.55%	            Hybrid (30% less CPU)
+Memory Usage (avg)	    113 MB	            107 MB	            Hybrid (5.3% less memory)
+Query Performance	    Baseline	        Slightly better	    Hybrid
+
+
+------------------------------------------------------------------
+QUERY ANALYSIS
+------------------------------------------------------------------
+
+Query Type Breakdown (20 queries tested)
+Query Pattern	                        Time (ms)
+Simple count (* | count())	            55.05
+Error count (level:ERROR | count())	    49.90	
+Critical count	                        20.20	
+Count by service	                    48.50	
+Count by host	                        34.60	
+Count by level	                        34.90	
+Last 1 hour errors	                    21.20	
+Last 6 hours errors	                    13.10	
+Last 24 hours errors	                18.60	
+High memory usage	                    43.70	
+High CPU usage	                        11.30	
+Multiple retries	                    14.50	
+Errors on kafka	                        15.50	
+High memory errors	                    18.10	
+Extract trace IDs	                    12.00	
+Average duration	                    41.30	
+P95 duration	                        10.22	
+Top 5 services by errors	            25.70	
+Top 10 hosts by logs	                36.40	
+Contains 'timeout'	                    18.80	
+
+
+Query Performance Statistics
+Metric	            Value
+Average	            27.19 ms
+Median	            20.71 ms
+Minimum	            10.22 ms
+Maximum	            55.05 ms
+Standard Deviation	~14.5 ms
+
+
+Fastest Query Types (<15ms)
+P95 duration            - 10.22 ms
+High CPU usage          - 11.30 ms
+Extract trace IDs       - 12.00 ms
+Last 6 hours errors     - 13.10 ms
+Multiple retries        - 14.50 ms
+Errors on kafka         - 15.50 ms
+
+
+Slowest Query Types (>40ms)
+Simple count            - 55.05 ms
+Error count             - 49.90 ms
+Count by service        - 48.50 ms
+High memory usage       - 43.70 ms
+Average duration        - 41.30 ms
 
 
 
-Single Query Comparison (* | count())
-Metric          JSON Only	Hybrid      Improvement
-Avg Time	    11.45 ms	7.91 ms	    Hybrid is 31% FASTER
-P95 Time	    21.11 ms	14.12 ms	33% faster at peak
-Success Rate	100%	    100%        Both perfect
+------------------------------------------------------------------
+LATENCY ANALYSIS
+------------------------------------------------------------------
+
+Latency Distribution (100 iterations of * | count())
+Percentile	    Value (ms)	Interpretation
+P50 (Median)	13.87 ms	Half of all queries complete in <14ms
+P75	            20.42 ms	75% of queries complete in <21ms
+P90	            26.01 ms	90% of queries complete in <26ms
+P95	            31.14 ms	95% of queries complete in <32ms
+P99	            44.41 ms	99% of queries complete in <45ms
+P99.9	        44.41 ms	99.9% of queries complete in <45ms
+
+
+Latency Summary
+Metric	            Value
+Minimum Latency     6.75 ms
+Maximum Latency	    44.41 ms
+Average Latency	    16.02 ms
+Range	            37.66 ms
+
+
+Latency Distribution Visualization
+<10ms:  ████████░░░░░░░░░░░░  (~15% of queries)
+10-15ms: ████████████████░░░░  (~35% of queries)
+15-20ms: ██████████████░░░░░░  (~25% of queries)
+20-30ms: ████████░░░░░░░░░░░░  (~15% of queries)
+30-45ms: ████░░░░░░░░░░░░░░░░  (~10% of queries)
+>45ms:   ░░░░░░░░░░░░░░░░░░░░  (~0% of queries)
 
 
 
-Full Benchmark Suite Results
-Query Type                          JSON Only	Hybrid      Speedup	    Winner
-* | count()	                        12.01 ms	7.12 ms	    40.7%	    Hybrid
-level:ERROR | count()               12.21 ms    11.10 ms	9.0%	    Hybrid
-_time:1h AND level:ERROR | count()  11.90 ms	6.35 ms     46.6%	    Hybrid
-* | stats by (log_source) count()   N/A	        N/A	        -           Data pending
+------------------------------------------------------------------
+THROUGHPUT ANALYSIS
+------------------------------------------------------------------
+
+Throughput Test Results (10-second duration)
+Concurrency	    QPS	    Avg Latency (ms)	P95 Latency (ms)	Success Rate
+1	            87.9	17.1	            36.1	            100%
+5	            86.3	49.3	            135.5	            100%
+10	            86.2	97.8	            290.4	            100%
+20	            86.8	71.1	            270.2	            100%
+50	            86.1	146.2	            434.0	            100%
 
 
-* | count()
-├── JSON:     ██████████████████████████████████ 12.01 ms
-└── Hybrid:   ████████████████████████ 7.12 ms  (40.7% faster)
-
-level:ERROR | count()
-├── JSON:     ██████████████████████████████████ 12.21 ms
-└── Hybrid:   ██████████████████████████████ 11.10 ms  (9% faster)
-
-_time:1h AND level:ERROR | count()
-├── JSON:     ██████████████████████████████████ 11.90 ms
-└── Hybrid:   ██████████████████ 6.35 ms  (46.6% faster) ⚡
+Throughput Observations
+Aspect	        Finding
+Base QPS	    ~86 queries/second (sustained)
+Scalability	    Throughput remains constant regardless of concurrency
+Bottleneck	    Single query node (vlselect) caps at ~86 QPS
+Reliability	    100% success rate across all concurrency levels
 
 
-Overall Summary Query Performance Comparison:
-├── JSON:     ██████████████████████████████████ 12.04 ms
-└── Hybrid:   ████████████████████████ 8.19 ms  (32% FASTER)
+Latency vs Concurrency Relationship
+Concurrency 1:  ████████░░░░░░░░░░░░ 17ms
+Concurrency 5:  ████████████████████ 49ms (2.9x increase)
+Concurrency 10: ████████████████████ 98ms (5.7x increase)
+Concurrency 20: ████████████████████ 71ms (4.2x increase)
+Concurrency 50: ████████████████████ 146ms (8.5x increase)
+Observation: Latency increases linearly with concurrency after saturation point
 
 
 
-Factor	            JSON Only	            Hybrid	                Hybrid Advantage
-Data Structure      Full JSON documents     Metrics + labels	    Less data to scan
-Indexing	        Full-text index         Time-series optimized	Faster lookups
-Query Type	        Document search         Pre-aggregated	        Less computation
-Time-range queries	Full scan	            Block-based	            46.6% faster
+------------------------------------------------------------------
+RESOURCE UTILIZATION ANALYSIS
+------------------------------------------------------------------
+
+CPU Usage by Container
+Container	                CPU %	Type
+Logstash	                7.59%	Highest - Log processing
+node-4-vlstorage (JSON)	    6.31%	Storage node
+node-4-vlstorage-hybrid	    4.99%	Storage node
+Kafka	                    3.85%	Message queue
+node-2-vlinsert	            1.70%	Write gateway
+node-3-vlstorage (JSON)	    0.94%	Storage node
+node-3-vlstorage-hybrid	    0.10%	Storage node
+node-5-vlselect	            0.14%	Query gateway
+
+
+Memory Usage by Container
+Container	                Memory	    % of Limit
+Logstash	                722.2 MiB	94.04% ⚠️
+Kafka	                    458.7 MiB	11.70%
+node-4-vlstorage (JSON)	    116 MiB	    2.96%
+node-3-vlstorage (JSON)	    110.1 MiB	2.81%
+node-4-vlstorage-hybrid	    107.5 MiB	2.74%
+node-3-vlstorage-hybrid	    106.8 MiB	2.73%
+node-2-vlinsert	            28.32 MiB	0.72%
+node-5-vlselect	            22.48 MiB	0.57%
+
+
+Resource Observations
+Finding                             Implication
+Logstash memory high (94%)	        Increase memory limit or optimize pipeline
+Storage nodes efficient	            ~2-6% CPU, ~107-116 MB memory
+Hybrid vs JSON comparable	        No significant resource difference
+Write/Query gateways lightweight	~1.7% CPU, ~22-28 MB memory

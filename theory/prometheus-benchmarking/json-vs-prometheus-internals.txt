@@ -1,0 +1,85 @@
+JSON vs Prometheus
+
+- Prometheus Exposition Format
+    Prometheus format is fundamentally different in design intent. It was built for numerical time-series metrics, not log text. It answers questions like "how many errors per second right now?" not "what was the exact error message at 15:49:06?".
+    The format looks like this:
+        # HELP hpc_log_entries_total Total log entries processed by level and service
+        # TYPE hpc_log_entries_total counter
+        hpc_log_entries_total{level="ERROR",service="zookeeper",host="leader3"} 423 1653224346000
+        hpc_log_entries_total{level="ERROR",service="slurmctld",host="leader1"} 89 1653224346000
+        hpc_log_entries_total{level="INFO",service="zookeeper",host="leader3"} 1296 1653224346000
+
+        # HELP log_processing_latency_seconds Time to process a log batch
+        # TYPE log_processing_latency_seconds histogram
+        log_processing_latency_seconds_bucket{service="zookeeper",le="0.01"} 1000
+        log_processing_latency_seconds_bucket{service="zookeeper",le="0.05"} 5000
+        log_processing_latency_seconds_bucket{service="zookeeper",le="0.1"} 8000
+        log_processing_latency_seconds_bucket{service="zookeeper",le="+Inf"} 10000
+        log_processing_latency_seconds_sum{service="zookeeper"} 250.3
+        log_processing_latency_seconds_count{service="zookeeper"} 10000
+    Notice what is missing: the actual message text "Operation from leader3 timed out after 30000ms" does not exist anywhere. The PID 3693 does not exist. The duration_ms does not exist. All that exists is: "there were 423 ERROR logs from zookeeper on leader3 as of timestamp 1653224346000."
+    This is not a limitation — it is the design. Prometheus trades event fidelity for extreme compression and aggregation speed.
+
+- The Fundamental Philosophical Difference
+    The deepest way to understand the difference:
+    JSON stores events. An event is something that happened at a specific time with specific details. "PID 3693 on leader3 running zookeeper crashed with exit code 139 at 15:49:06.222." That specific event happened once, and JSON records it completely.
+    Prometheus stores measurements. A measurement is a numerical observation of a system's state at a point in time. "The error counter for zookeeper on leader3 is 423 at timestamp T." The measurement doesn't tell you what any individual error was.
+    This means:
+        If you need to answer "what exactly went wrong at 15:49?", you need JSON.
+        If you need to answer "is the error rate rising over the past 7 days?", Prometheus is better.
+        If you need to answer "which service generates the most errors per hour?", both work, but Prometheus is 30x faster.
+        If you need to answer "find all logs where the message contains 'timeout' and pid > 1000", only JSON can do this.
+
+- Storage Architecture Internals
+> How JSON is Stored in VictoriaLogs (Deep Internals)
+    When your Logstash sends a JSON record to node-2-vlinsert:8001, the record passes through multiple internal stages before landing on disk in node-3 or node-4.
+    Stage 1: Parsing at vlinsert
+        vlinsert receives the raw JSON bytes, parses them into an internal Go struct. It extracts _time (mandatory), _msg (mandatory), and all other fields. If _stream_fields is configured in the URL query parameter (which yours currently is not), it extracts those fields to build the stream identity. Without _stream_fields, the stream identity is {} — the empty stream.
+    Stage 2: Distribution
+        vlinsert computes hash(stream_identity) % len(storageNodes). With empty stream {}, this always produces the same hash, so almost all logs go to node-3. This is your 1387:332 imbalance.
+    Stage 3: Internal transmission
+        vlinsert sends the parsed record to the chosen vlstorage node via POST /internal/insert?version=v1. The body is NOT the original JSON — it's a binary-serialized internal format that is more compact than raw JSON.
+    Stage 4: Write buffer at vlstorage
+        vlstorage maintains an in-memory write buffer. Records are accumulated in memory before being flushed to disk. The flush happens when either the buffer size limit is reached or the flush interval expires (configurable, default ~1 second). This batching is crucial for performance — writing many small records individually would be catastrophically slow on any filesystem.
+    Stage 5: smallPart creation
+        When the buffer flushes, it creates a smallPart — a directory containing one file per field, compressed individually with ZSTD:
+            /storage/partitions/20260522/smallParts/<uuid>/
+            timestamps.bin        ← all _time values from this batch
+            _msg.bin             ← all _msg texts from this batch
+            level.bin            ← all level values from this batch
+            host_name.bin        ← all host_name values from this batch
+            service_name.bin     ← all service_name values from this batch
+            vl_stream.bin        ← all vl_stream values from this batch
+            ingest_stage.bin     ← all ingest_stage values from this batch
+            [one file per field]
+            index.bin            ← inverted index for full-text search on _msg
+            metadata.json        ← row count, time range, size stats
+        The key compression insight: within a single batch, the level column might contain 1,000 values that are overwhelmingly "INFO" with a few "ERROR" and "WARN". Compressing a column of nearly-identical strings achieves 50:1 or better compression ratios. The host_name column for a single HPC node might be "leader3" repeated 500 times — this compresses to near zero. This is why VictoriaLogs achieves 10x+ compression ratios on real log data.
+    Stage 6: Background LSM merge
+        The Log-Structured Merge (LSM) tree process runs as a background goroutine. It periodically:
+            Identifies multiple smallParts that cover overlapping time ranges
+            Reads all their columns into memory
+            Merges and re-sorts records by (_stream_id, _time) — this ordering enables range-based skipping during queries
+            Writes the merged result as a bigPart with stronger compression (more data = better compression)
+            Atomically deletes the original smallParts
+        During the merge, reads and writes continue uninterrupted. The merge is transparent to users. After merge, the bigPart has significantly better query performance because it covers a larger sorted range and is more densely compressed.
+    Stage 7: Partition retention
+        Daily partitions are enforced by a background process that simply deletes partition directories older than -retentionPeriod. Since all data for a day is in one directory, deletion is instantaneous — a single rm -rf 20250522/ removes millions of records in milliseconds. No record-by-record scanning needed.
+> How Prometheus Stores Data (TSDB Internals)
+    Prometheus uses a completely different storage model called TSDB (Time Series Database), based on the Gorilla paper from Facebook (2015).
+    Series identity: Each unique combination of metric name + label set defines a time series. hpc_log_entries_total{level="ERROR",service="zookeeper",host="leader3"} is one series. hpc_log_entries_total{level="INFO",service="zookeeper",host="leader3"} is a different series. There can be thousands of unique series.
+    Chunk encoding: Each series stores its samples in 2-hour chunks using XOR delta encoding:
+    Timestamps: Instead of storing absolute Unix timestamps (8 bytes each), store the delta between consecutive timestamps. If scrape interval is 15s, all deltas are 15000ms. Delta of delta = 0. Encodes to ~2 bits per sample.
+    Values: Store XOR between consecutive float64 values. Counters that only increment by 1 each time XOR to very small numbers. Encodes to ~1-2 bytes per sample.
+    Average: ~1.37 bytes per sample after encoding (vs 16 bytes raw for timestamp + value pair)
+    Block structure: Prometheus organizes data into 2-hour blocks on disk:
+        /data/
+        01FJQK7VXK/          ← block covering 2-hour window
+            chunks/
+            000001.chunk      ← binary encoded time+value pairs
+            index                ← postings list: for each label value, list of series IDs
+            meta.json            ← time range, stats
+            tombstones           ← deletion markers (Prometheus uses soft deletion)
+        wal/                   ← write-ahead log for recent (un-flushed) data
+    Write-ahead log (WAL): All incoming samples first go to the WAL directory. If Prometheus crashes before flushing to a block, it replays the WAL on restart. This gives durability without waiting for block compaction.
+    Compaction: Similar to VictoriaLogs' LSM merge. Small 2-hour blocks get compacted into larger blocks (up to 31-day blocks). Larger blocks achieve better compression and query performance.

@@ -1,0 +1,47 @@
+[
+  {
+    "concurrency": 1,
+    "total_queries": 879,
+    "successful": 879,
+    "success_rate": 100.0,
+    "avg_latency_ms": 17.113341948820597,
+    "p95_latency_ms": 36.06104850769043,
+    "throughput_qps": 87.9
+  },
+  {
+    "concurrency": 5,
+    "total_queries": 863,
+    "successful": 863,
+    "success_rate": 100.0,
+    "avg_latency_ms": 49.265259248771095,
+    "p95_latency_ms": 135.49814224243164,
+    "throughput_qps": 86.3
+  },
+  {
+    "concurrency": 10,
+    "total_queries": 862,
+    "successful": 862,
+    "success_rate": 100.0,
+    "avg_latency_ms": 97.78882428277673,
+    "p95_latency_ms": 290.38093090057373,
+    "throughput_qps": 86.2
+  },
+  {
+    "concurrency": 20,
+    "total_queries": 868,
+    "successful": 868,
+    "success_rate": 100.0,
+    "avg_latency_ms": 71.137284902933,
+    "p95_latency_ms": 270.20225524902344,
+    "throughput_qps": 86.8
+  },
+  {
+    "concurrency": 50,
+    "total_queries": 861,
+    "successful": 861,
+    "success_rate": 100.0,
+    "avg_latency_ms": 146.1807825839478,
+    "p95_latency_ms": 434.0153932571411,
+    "throughput_qps": 86.1
+  }
+]

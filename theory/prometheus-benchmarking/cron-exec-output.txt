@@ -1,0 +1,63 @@
+➜  multi-node-simulation git:(main) ✗ ./scripts/cron/cron-exec.sh 
+-e [2026-06-01 15:40:39] Starting Hot → Warm rotation (moving logs older than 7 days)
+-e [2026-06-01 15:40:39] Processing: node-3-vlstorage/storage
+-e [2026-06-01 15:40:39] Processing: node-4-vlstorage/storage
+-e [2026-06-01 15:40:39] Processing: node-3-vlstorage-hybrid/storage
+-e [2026-06-01 15:40:39] Processing: node-4-vlstorage-hybrid/storage
+-e [2026-06-01 15:40:39] Hot → Warm rotation complete
+-e [OK] Warm storage:        0 compressed files, total size:   0B
+-e [2026-06-01 15:40:39] Starting Warm → Cold rotation (converting logs older than 30 days to metrics)
+-e [2026-06-01 15:40:39] Warm → Cold rotation complete
+-e [OK] Cold storage:        0 archived files, total size:   0B
+
+════════════════════════════════════════════════════════════════
+  STORAGE TIER STATUS
+════════════════════════════════════════════════════════════════
+
+HOT TIER (Active Storage - Last 7 days)
+
+  node-3-vlstorage
+     Logs: 129696
+     Size: 2.80 MB
+
+  node-4-vlstorage
+     Logs: 119472
+     Size: 2.38 MB
+
+  node-3-vlstorage-hybrid
+     Logs: 119206
+     Size: 2.40 MB
+
+  node-4-vlstorage-hybrid
+     Logs: 119110
+     Size: 2.37 MB
+
+WARM TIER (Compressed Storage - Days 8-30)
+
+  Location: warm_storage/
+     Compressed files:        0
+     Compressed size:   0B
+     Estimated original size: 0 MB
+     Compression ratio:  MB compressed vs 0 MB original
+
+COLD TIER (Prometheus Metrics - Days 31-365)
+
+  Location: cold_storage/metrics/
+     Archived files:        0
+     Total size:   0B
+
+  Prometheus Cold Metrics:
+     hpc_cold_logs_total: []
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                              STORAGE TIER SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Hot Tier:  487588 logs (active, full-text searchable)
+  Warm Tier:        0 files (compressed, reduced storage)
+  Cold Tier:        0 metrics (Prometheus, long-term retention)
+
+
+Cron jobs installed:
+   - Daily 2 AM: Hot → Warm rotation
+   - Weekly Sunday 3 AM: Warm → Cold rotation

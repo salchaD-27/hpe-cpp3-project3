@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Simple count",
+    "query": "* | count()",
+    "time_ms": 55.05,
+    "status": 200
+  },
+  {
+    "name": "Error count",
+    "query": "level:ERROR | count()",
+    "time_ms": 49.9,
+    "status": 200
+  },
+  {
+    "name": "Critical count",
+    "query": "level:CRITICAL | count()",
+    "time_ms": 20.22,
+    "status": 200
+  },
+  {
+    "name": "Count by service",
+    "query": "* | stats by (service_name) count()",
+    "time_ms": 48.48,
+    "status": 200
+  },
+  {
+    "name": "Count by host",
+    "query": "* | stats by (host_name) count()",
+    "time_ms": 34.61,
+    "status": 200
+  },
+  {
+    "name": "Count by level",
+    "query": "* | stats by (level) count()",
+    "time_ms": 34.94,
+    "status": 200
+  },
+  {
+    "name": "Last 1 hour errors",
+    "query": "_time:1h AND level:ERROR | count()",
+    "time_ms": 21.2,
+    "status": 200
+  },
+  {
+    "name": "Last 6 hours errors",
+    "query": "_time:6h AND level:ERROR | count()",
+    "time_ms": 13.13,
+    "status": 200
+  },
+  {
+    "name": "Last 24 hours errors",
+    "query": "_time:24h AND level:ERROR | count()",
+    "time_ms": 18.59,
+    "status": 200
+  },
+  {
+    "name": "High memory usage",
+    "query": "memory_mb:>15000 | count()",
+    "time_ms": 43.66,
+    "status": 200
+  },
+  {
+    "name": "High CPU usage",
+    "query": "cpu_percent:>80 | count()",
+    "time_ms": 11.25,
+    "status": 200
+  },
+  {
+    "name": "Multiple retries",
+    "query": "retry_count:>2 | count()",
+    "time_ms": 14.54,
+    "status": 200
+  },
+  {
+    "name": "Errors on kafka",
+    "query": "level:ERROR AND service_name:kafka | count()",
+    "time_ms": 15.49,
+    "status": 200
+  },
+  {
+    "name": "High memory errors",
+    "query": "level:ERROR AND memory_mb:>20000 | count()",
+    "time_ms": 18.12,
+    "status": 200
+  },
+  {
+    "name": "Extract trace IDs",
+    "query": "* | extract trace_id | count()",
+    "time_ms": 12.05,
+    "status": 400
+  },
+  {
+    "name": "Average duration",
+    "query": "* | stats avg(duration_ms)",
+    "time_ms": 41.32,
+    "status": 200
+  },
+  {
+    "name": "P95 duration",
+    "query": "* | stats p95(duration_ms)",
+    "time_ms": 10.22,
+    "status": 400
+  },
+  {
+    "name": "Top 5 services by errors",
+    "query": "level:ERROR | top 5 service_name",
+    "time_ms": 25.71,
+    "status": 200
+  },
+  {
+    "name": "Top 10 hosts by logs",
+    "query": "* | top 10 host_name",
+    "time_ms": 36.42,
+    "status": 200
+  },
+  {
+    "name": "Contains 'timeout'",
+    "query": "message:timeout | count()",
+    "time_ms": 18.84,
+    "status": 200
+  }
+]
