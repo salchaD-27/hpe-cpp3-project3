@@ -1,0 +1,25 @@
+# =============================================================================
+# Node 4 Hybrid — vlstorage + Prometheus (Hybrid Storage Node 2)
+# Mirror of Node 3 Hybrid. vlinsert distributes log shards across both.
+# =============================================================================
+
+services:
+  vlstorage:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-4-vlstorage-hybrid
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=90d"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8006:9428"
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    name: multi-node-net
+    external: true

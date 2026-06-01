@@ -1,0 +1,50 @@
+Storage Distribution (4 Nodes)
+Node            Type        Logs	Percentage
+Node 3          JSON Only	4,334	21.2%
+Node 4          JSON Only	5,420	26.5%
+Node 3 Hybrid	Hybrid	    5,384	26.3%
+Node 4 Hybrid	Hybrid	    5,313	26.0%
+Total           	        20,451	100%
+
+
+
+Single Query Comparison (* | count())
+Metric          JSON Only	Hybrid      Improvement
+Avg Time	    11.45 ms	7.91 ms	    Hybrid is 31% FASTER
+P95 Time	    21.11 ms	14.12 ms	33% faster at peak
+Success Rate	100%	    100%        Both perfect
+
+
+
+Full Benchmark Suite Results
+Query Type                          JSON Only	Hybrid      Speedup	    Winner
+* | count()	                        12.01 ms	7.12 ms	    40.7%	    Hybrid
+level:ERROR | count()               12.21 ms    11.10 ms	9.0%	    Hybrid
+_time:1h AND level:ERROR | count()  11.90 ms	6.35 ms     46.6%	    Hybrid
+* | stats by (log_source) count()   N/A	        N/A	        -           Data pending
+
+
+* | count()
+├── JSON:     ██████████████████████████████████ 12.01 ms
+└── Hybrid:   ████████████████████████ 7.12 ms  (40.7% faster)
+
+level:ERROR | count()
+├── JSON:     ██████████████████████████████████ 12.21 ms
+└── Hybrid:   ██████████████████████████████ 11.10 ms  (9% faster)
+
+_time:1h AND level:ERROR | count()
+├── JSON:     ██████████████████████████████████ 11.90 ms
+└── Hybrid:   ██████████████████ 6.35 ms  (46.6% faster) ⚡
+
+
+Overall Summary Query Performance Comparison:
+├── JSON:     ██████████████████████████████████ 12.04 ms
+└── Hybrid:   ████████████████████████ 8.19 ms  (32% FASTER)
+
+
+
+Factor	            JSON Only	            Hybrid	                Hybrid Advantage
+Data Structure      Full JSON documents     Metrics + labels	    Less data to scan
+Indexing	        Full-text index         Time-series optimized	Faster lookups
+Query Type	        Document search         Pre-aggregated	        Less computation
+Time-range queries	Full scan	            Block-based	            46.6% faster

@@ -30,24 +30,75 @@
 
 
 
+
+
+
+
+
+# # =============================================================================
+# # Node 5 — vlselect (Query Node)
+# # Handles all read/query traffic from Grafana and vmalert.
+# # Fans out queries to Node 3 & 4 (vlstorage) and merges results.
+# # -insert.disable=true  → this node never accepts write traffic.
+# # =============================================================================
+
+# services:
+#   vlselect:
+#     image: victoriametrics/victoria-logs:v1.49.0
+#     container_name: node-5-vlselect
+#     command:
+#       - "-storageNode=node-3-vlstorage:9428"
+#       - "-storageNode=node-4-vlstorage:9428"
+#       - "-httpListenAddr=:9428"
+#       - "-insert.disable=true"
+#     ports:
+#       - "8004:9428"
+#     restart: unless-stopped
+#     networks:
+#       - default
+
+# networks:
+#   default:
+#     name: multi-node-net
+#     external: true
+
+
 # =============================================================================
-# Node 5 — vlselect (Query Node)
-# Handles all read/query traffic from Grafana and vmalert.
-# Fans out queries to Node 3 & 4 (vlstorage) and merges results.
-# -insert.disable=true  → this node never accepts write traffic.
+# Node 5 — vlselect + Benchmarking Middleware (Unified Query Node)
+# Queries ALL 4 storage nodes (2 JSON-only + 2 Hybrid)
+# Also provides benchmarking API to compare performance
 # =============================================================================
 
 services:
+  # Primary vlselect for unified queries across all storage nodes
   vlselect:
     image: victoriametrics/victoria-logs:v1.49.0
     container_name: node-5-vlselect
     command:
       - "-storageNode=node-3-vlstorage:9428"
       - "-storageNode=node-4-vlstorage:9428"
+      - "-storageNode=node-3-vlstorage-hybrid:9428"
+      - "-storageNode=node-4-vlstorage-hybrid:9428"
       - "-httpListenAddr=:9428"
       - "-insert.disable=true"
     ports:
       - "8004:9428"
+    restart: unless-stopped
+    networks:
+      - default
+
+  # Benchmarking middleware for JSON vs Hybrid comparison
+  benchmarking-middleware:
+    build: ./benchmark-middleware
+    container_name: benchmarking-middleware
+    ports:
+      - "8080:8080"
+    environment:
+      - VLSELECT_URL=http://node-5-vlselect:9428
+      - JSON_NODES=node-3-vlstorage:9428,node-4-vlstorage:9428
+      - HYBRID_NODES=node-3-vlstorage-hybrid:9428,node-4-vlstorage-hybrid:9428
+    volumes:
+      - ../shared/metrics:/metrics
     restart: unless-stopped
     networks:
       - default

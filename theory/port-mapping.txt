@@ -15,3 +15,22 @@ Node 3      vlstorage            9428             8002
 Node 4      vlstorage            9428             8003
 
 Node 5      vlselect             9428             8004
+
+
+
+multi-node-simulation/
+├── node-1-pipeline/           # Generator, Fluent Bit, Kafka, Logstash
+├── node-2-vlinsert/           # Write gateway
+├── node-3-vlstorage/          # JSON Only - Hot/Warm Storage
+├── node-3-vlstorage-hybrid/   # Hybrid Storage with Prometheus
+├── node-4-vlstorage/          # JSON Only - Hot/Warm Storage
+├── node-4-vlstorage-hybrid/   # Hybrid Storage with Prometheus
+├── node-5-vlselect/           # Unified Query + Benchmarking
+└── scripts/
+    ├── cron/                  # Cron job scripts for log rotation
+    │   ├── rotate_hot_to_warm.sh
+    │   ├── rotate_warm_to_cold.sh
+    │   └── archive_to_prometheus.py
+    ├── start.sh
+    ├── stop.sh
+    └── test.sh

@@ -21,6 +21,7 @@
 # =============================================================================
 # Node 2 — vlinsert (Write Gateway)
 # Accepts log writes from Logstash, fans out to Node 3 & 4 (vlstorage).
+# Receives logs from Logstash and forwards to ALL storage nodes
 # =============================================================================
 
 services:
@@ -30,6 +31,8 @@ services:
     command:
       - "-storageNode=node-3-vlstorage:9428"
       - "-storageNode=node-4-vlstorage:9428"
+      - "-storageNode=node-3-vlstorage-hybrid:9428"
+      - "-storageNode=node-4-vlstorage-hybrid:9428"
       - "-httpListenAddr=:9428"
       - "-select.disable=true"
     ports:

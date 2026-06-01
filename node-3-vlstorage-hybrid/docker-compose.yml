@@ -1,0 +1,58 @@
+# =============================================================================
+# Node 3 Hybrid — vlstorage + Prometheus (Hybrid Storage Node 1)
+# Stores both full JSON (hot/warm) and Prometheus metrics (cold)
+# =============================================================================
+
+services:
+  # Primary: VictoriaLogs for JSON storage (Hot/Warm tier)
+  vlstorage:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-3-vlstorage-hybrid
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=90d"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./storage:/storage
+      - ../shared/metrics:/metrics
+    ports:
+      - "8005:9428"
+    restart: unless-stopped
+    networks:
+      - default
+
+  # Secondary: Prometheus for cold storage (Metrics only)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: node-3-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=365d'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    networks:
+      - default
+
+  # Pushgateway for receiving metrics from logstash
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: node-3-pushgateway
+    ports:
+      - "9091:9091"
+    restart: unless-stopped
+    networks:
+      - default
+
+volumes:
+  prometheus-data:
+
+networks:
+  default:
+    name: multi-node-net
+    external: true
