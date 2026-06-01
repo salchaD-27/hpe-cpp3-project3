@@ -1,0 +1,17 @@
+Node        Component            Container Port   Host Port
+──────────────────────────────────────────────────────────
+Node 1      Fluent Bit metrics   2020             2020
+            Kafka (external)     9094             9094
+            Logstash API         9600             9601
+            Grafana              3000             3001
+            VictoriaMetrics      8428             8428
+            vmalert              8880             8881
+            Alertmanager         9093             9095
+            Kafka UI             8080             8080
+
+Node 2      vlinsert             9428             8001
+
+Node 3      vlstorage            9428             8002
+Node 4      vlstorage            9428             8003
+
+Node 5      vlselect             9428             8004

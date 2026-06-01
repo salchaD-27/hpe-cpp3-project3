@@ -25,3 +25,8 @@ Thumbs.db
 *.crt
 grafana-storage/
 node_modules/
+
+node-1-pipeline/1-generator/logs-generated/
+node-3-vlstorage/storage/
+node-4-vlstorage/storage/
+node-5-vlselect/storage/

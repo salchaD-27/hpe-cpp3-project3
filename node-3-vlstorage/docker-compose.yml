@@ -1,0 +1,47 @@
+# version: '3.8'
+
+# services:
+#   vlstorage:
+#     image: victoriametrics/victoria-logs:v1.49.0
+#     container_name: node-3-vlstorage
+#     command:
+#       - "-storageDataPath=/storage"
+#       - "-retentionPeriod=1y"
+#       - "-httpListenAddr=:9428"
+#     volumes:
+#       - ./storage:/storage
+#     ports:
+#       - "8003:9428"
+#     deploy:
+#       resources:
+#         limits:
+#           memory: 512M
+#     restart: unless-stopped
+
+# =============================================================================
+# Node 3 — vlstorage (Storage Node 1 of 2)
+# Receives sharded log data from Node 2 (vlinsert).
+# Serves data to Node 5 (vlselect) for queries.
+# Storage is bind-mounted so data survives container restarts.
+# =============================================================================
+
+services:
+  vlstorage:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-3-vlstorage
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=1y"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8002:9428"
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    name: multi-node-net
+    external: true
