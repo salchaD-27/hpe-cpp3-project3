@@ -384,11 +384,11 @@ curl -s 'http://localhost:8004/select/logsql/query?query=*%20%7C%20count()' | jq
 
 Storage Distribution (4 Nodes)
 Node            Type        Logs	Percentage
-Node 3          JSON Only	4,334	21.2%
-Node 4          JSON Only	5,420	26.5%
-Node 3 Hybrid	Hybrid	    5,384	26.3%
-Node 4 Hybrid	Hybrid	    5,313	26.0%
-Total           	        20,451	100%
+Node 3          JSON Only	  4,334	21.2%
+Node 4          JSON Only	  5,420	26.5%
+Node 3 Hybrid	  Hybrid	    5,384	26.3%
+Node 4 Hybrid	  Hybrid	    5,313	26.0%
+Total           	          20,451	100%
 
 
 
@@ -424,6 +424,9 @@ Comparing single query:
   "query": "* | count()"
 }
 
+Metric	      JSON-only	Hybrid	  Difference
+Average Time	11.45 ms	7.91 ms	  Hybrid 31% FASTER
+P95 Time	    21.11 ms	14.12 ms	Hybrid 33% FASTER
 
 
 Running full benchmark suite
@@ -550,6 +553,11 @@ Running full benchmark suite
   },
   "timestamp": "2026-06-01T08:32:20.825384"
 }
+
+Query Pattern		      Speedup	      Use Case
+Full count	          Hybrid 41%	  Dashboard metrics
+Error count	          Hybrid 9%	    Alert evaluation
+Time-range errors     Hybrid 47%	  Hourly monitoring
 
 
 Checking storage health
