@@ -6,19 +6,19 @@ groups:
     rules:
       
       # Task 3 : message-level alert separation
-      - alert: SampleMessageDetected
-        expr: '*
-          | copy "Resource.service.name" as service
-          | copy "Resource.host.name" as host
-          | copy _msg as message
-          | format "<host> | <service> | <message>" as formatted
-          | stats by (formatted) count() as cnt
-          | filter cnt:>0'
-        for: 5s
-        labels:
-          severity: info
-          source: syslog
-        annotations:
-          summary: "Syslog message detected"
-          description: "{{ $labels.formatted }}"
-          details: "A log entry was observed for service {{ $labels.formatted }}"
+      # - alert: SampleMessageDetected
+      #   expr: '*
+      #     | copy "Resource.service.name" as service
+      #     | copy "Resource.host.name" as host
+      #     | copy _msg as message
+      #     | format "<host> | <service> | <message>" as formatted
+      #     | stats by (formatted) count() as cnt
+      #     | filter cnt:>0'
+      #   for: 5s
+      #   labels:
+      #     severity: info
+      #     source: syslog
+      #   annotations:
+      #     summary: "Syslog message detected"
+      #     description: "{{ $labels.formatted }}"
+      #     details: "A log entry was observed for service {{ $labels.formatted }}"

@@ -1,0 +1,34 @@
+groups:
+  - name: unified-log-alerts
+    type: vlogs
+    interval: 30s
+
+    rules:
+      - alert: UnifiedLogAlert
+        expr: '
+          *
+          | copy "Resource.service.name" as service
+          | copy "Resource.host.name" as host
+          | copy "Attributes.priority" as priority_raw
+          | copy _msg as message
+          | replace("10.1.1.11", "node-a")
+          | replace("10.1.1.12", "node-b")
+          | replace("10.1.1.13", "node-c")
+          | replace("10.1.1.14", "node-d")
+          | replace("10.1.1.15", "node-e")
+          | math priority_raw + 0 as priority
+          | format "<host> | <service> | <message>" as formatted
+          | stats by (formatted)
+              count() if (host:="padma" OR service:in("systemd","glusterd") OR priority:range[70, Inf]) as CRITICAL,
+              count() if (priority:range[30,70) AND host:!="padma" AND service:!in("systemd","glusterd")) as WARN,
+              count() if (priority:range[0,30) AND host:!="padma" AND service:!in("systemd","glusterd")) as SAFE
+          | filter CRITICAL:>0 OR WARN:>0'
+
+        for: 1m
+
+        labels:
+          severity: "{{ $labels.severity_level }}"
+
+        annotations:
+          summary: "Log Alert ({{ $labels.severity_level }})"
+          description: "{{ $labels.formatted }} (count={{ $value }})"
