@@ -1,0 +1,194 @@
+➜  multi-node-simulation git:(multi-node-sim) ✗ cd theory/prometheus/benchmarking
+➜  benchmarking git:(multi-node-sim) ✗ ./exec.sh 
+[+] Running 1/1
+ ✔ Container victorialogs-benchmark  Running                                                                                                                                                          0.0s 
+
+
+========================================================================================================================
+  3000 LOGS                                              
+========================================================================================================================
+📂 Extracting logs from your original HPC files...
+✓ Extracted 3000 logs
+
+Query Type                              JSON-Only (ms)     Tiered (ms)       Winner    Speedup
+-----------------------------------------------------------------------------------------------
+COUNT ALL                                        6.81          14.93       JSON     119.2%
+COUNT ERRORS                                    11.15          14.61       JSON      31.1%
+COUNT CRITICAL                                   7.16          14.45       JSON     101.6%
+COUNT WARN                                       8.22          19.65       JSON     138.9%
+COUNT DEBUG                                      8.24          10.28       JSON      24.8%
+COUNT BY SERVICE                                13.50          15.78       JSON      16.9%
+COUNT BY HOST                                   14.89          11.18     TIERED      24.9%
+COUNT BY LEVEL                                  10.43          19.19       JSON      83.9%
+LAST 1 HOUR ERRORS                               6.20          16.43       JSON     165.2%
+LAST 6 HOURS ERRORS                              7.29          19.64       JSON     169.4%
+LAST 24 HOURS ERRORS                             7.42          17.43       JSON     134.8%
+HIGH MEMORY                                      8.93          11.01       JSON      23.3%
+HIGH CPU                                        27.08          15.56     TIERED      42.5%
+MULTIPLE RETRIES                                 7.89          15.06       JSON      90.8%
+KAFKA ERRORS                                     7.15          16.89       JSON     136.3%
+ZOOKEEPER ERRORS                                10.18          12.70       JSON      24.8%
+EXTRACT TRACE IDS                                6.45          17.57       JSON     172.3%
+AVERAGE DURATION                                11.52          14.37       JSON      24.7%
+P95 DURATION                                     5.55          19.87       JSON     257.8%
+CONTAINS TIMEOUT                                 8.01          16.20       JSON     102.2%
+
+
+Format                       Size (KB)      Savings vs JSON
+------------------------------------------------------------
+JSON Raw                         306.0                    -
+JSON (VictoriaLogs)              928.0                   +
+Compressed (Gzip)                 38.0                87.6%
+Prometheus Metrics                61.7                79.8%
+Tiered Storage (Total)           146.5                52.1%
+
+
+Metric                                    JSON-ONLY          TIERED
+-----------------------------------------------------------------
+Average Query Time (ms)                        9.70           15.64
+Total Wins                                       18               2
+Storage Size (KB)                             928.0           146.5
+Storage Savings                                   -           84.2%
+
+
+
+====================================================================================================
+  300,000 LOGS                               
+====================================================================================================
+➜ Generating 300,000 test logs...
+✓ Generated 300,000 logs
+  ● Estimated raw JSON size: 62.08 MB 
+Inserting data into architectures...
+✓ Data inserted
+
+Query Type                              JSON-Only (ms)     Tiered (ms)       Winner    Speedup
+-----------------------------------------------------------------------------------------------
+COUNT ALL                                        8.05          10.09       JSON      25.4%
+COUNT ERRORS                                     5.69           8.30       JSON      45.8%
+COUNT CRITICAL                                   5.85           8.10       JSON      38.5%
+COUNT WARN                                       6.87           8.06       JSON      17.3%
+COUNT DEBUG                                      6.84          10.29       JSON      50.3%
+COUNT BY SERVICE                                14.17          10.45     TIERED      26.2%
+COUNT BY HOST                                   13.32          10.82     TIERED      18.7%
+COUNT BY LEVEL                                  10.47          10.95       JSON       4.6%
+LAST 1 HOUR ERRORS                               8.08           6.90     TIERED      14.6%
+LAST 6 HOURS ERRORS                              6.66           8.97       JSON      34.6%
+LAST 24 HOURS ERRORS                             8.50           7.73     TIERED       9.0%
+HIGH MEMORY                                      6.19           8.50       JSON      37.3%
+HIGH CPU                                        12.65           9.43     TIERED      25.4%
+MULTIPLE RETRIES                                12.85          10.97     TIERED      14.6%
+KAFKA ERRORS                                     5.20           7.68       JSON      47.6%
+ZOOKEEPER ERRORS                                10.94           8.42     TIERED      23.0%
+EXTRACT TRACE IDS                                6.19          11.11       JSON      79.3%
+AVERAGE DURATION                                 6.34          11.30       JSON      78.4%
+P95 DURATION                                     9.85          11.33       JSON      15.0%
+CONTAINS TIMEOUT                                 6.81           9.27       JSON      36.2%
+
+
+Format                       Size (MB)       Savings vs Raw
+------------------------------------------------------------
+JSON Raw                         62.08                    -
+JSON (VictoriaLogs)              93.75                    +
+Compressed (Gzip)                 7.70                87.6%
+Prometheus Metrics               12.54                79.8%
+Tiered Storage (Total)           46.25                25.5%
+
+
+Metric                                    JSON-ONLY          TIERED
+-----------------------------------------------------------------
+Average Query Time (ms)                        8.58            9.43
+Total Wins                                       13               7
+Storage Size (MB)                             93.75           46.25
+Storage Savings                                   -           25.5%
+
+
+
+
+┌──────────────────────────────────────────────────┬─────────────────────────────────────────┬─────────────────────────────────────────────────────────┬───────────────┐
+│                                                  │            3,000 Logs                   │           300,000 Logs                                  │               │
+│                  Query Type                      ├─────────────────┬───────────────────────┼─────────────────┬───────────────────────────────────────┤    Winner     │
+│                                                  │ JSON-ONLY (ms)  │ Tiered (ms)           │ JSON-ONLY (ms)  │ Tiered (ms)                           │               │
+├──────────────────────────────────────────────────┼─────────────────┼───────────────────────┼─────────────────┼───────────────────────────────────────┼───────────────┤
+│  COUNT ALL                                       │ 6.81            │ 14.93                 │ 8.05            │ 10.09                                 │ JSON          │
+│  COUNT ERRORS                                    │ 11.15           │ 14.61                 │ 5.69            │ 8.30                                  │ JSON          │
+│  COUNT CRITICAL                                  │ 7.16            │ 14.45                 │ 5.85            │ 8.10                                  │ JSON          │
+│  COUNT WARN                                      │ 8.22            │ 19.65                 │ 6.87            │ 8.06                                  │ JSON          │
+│  COUNT DEBUG                                     │ 8.24            │ 10.28                 │ 6.84            │ 10.29                                 │ JSON          │
+│  COUNT BY SERVICE                                │ 13.50           │ 15.78                 │ 14.17           │ 10.45                                 │ TIERED        │
+│  COUNT BY HOST                                   │ 14.89           │ 11.18                 │ 13.32           │ 10.82                                 │ TIERED        │
+│  COUNT BY LEVEL                                  │ 10.43           │ 19.19                 │ 10.47           │ 10.95                                 │ JSON          │
+│  LAST 1 HOUR ERRORS                              │ 6.20            │ 16.43                 │ 8.08            │ 6.90                                  │ TIERED        │
+│  LAST 6 HOURS ERRORS                             │ 7.29            │ 19.64                 │ 6.66            │ 8.97                                  │ JSON          │
+│  LAST 24 HOURS ERRORS                            │ 7.42            │ 17.43                 │ 8.50            │ 7.73                                  │ TIERED        │
+│  HIGH MEMORY                                     │ 8.93            │ 11.01                 │ 6.19            │ 8.50                                  │ JSON          │
+│  HIGH CPU                                        │ 27.08           │ 15.56                 │ 12.65           │ 9.43                                  │ TIERED        │
+│  MULTIPLE RETRIES                                │ 7.89            │ 15.06                 │ 12.85           │ 10.97                                 │ TIERED        │
+│  KAFKA ERRORS                                    │ 7.15            │ 16.89                 │ 5.20            │ 7.68                                  │ JSON          │
+│  ZOOKEEPER ERRORS                                │ 10.18           │ 12.70                 │ 10.94           │ 8.42                                  │ TIERED        │
+│  EXTRACT TRACE IDS                               │ 6.45            │ 17.57                 │ 6.19            │ 11.11                                 │ JSON          │
+│  AVERAGE DURATION                                │ 11.52           │ 14.37                 │ 6.34            │ 11.30                                 │ JSON          │
+│  P95 DURATION                                    │ 5.55            │ 19.87                 │ 9.85            │ 11.33                                 │ JSON          │
+│  CONTAINS TIMEOUT                                │ 8.01            │ 16.20                 │ 6.81            │ 9.27                                  │ JSON          │
+├──────────────────────────────────────────────────┼─────────────────┼───────────────────────┼─────────────────┼───────────────────────────────────────┼───────────────┤
+│  AVERAGE QUERY TIME (ms)                         │ 9.70            │ 15.64                 │ 8.58            │ 9.43                                  │ JSON          │
+│  TOTAL WINS                                      │ 18              │ 2                     │ 13              │ 7                                     │ JSON          │
+│  WIN PERCENTAGE                                  │ 90%             │ 10%                   │ 65%             │ 35%                                   │ JSON          │
+└──────────────────────────────────────────────────┴─────────────────┴───────────────────────┴─────────────────┴───────────────────────────────────────┴───────────────┘
+
+
+
+┌─────────────────────────────────┬─────────────────────────────────────────────┬───────────────────────────────────────────────────┬─────────────────────────────────────────┐
+│                                 │                3,000 Logs                   │               300,000 Logs                        │                                         │
+│            Format               ├─────────────────────┬───────────────────────┼─────────────────────┬─────────────────────────────┤             Savings vs Raw              │
+│                                 │    Size (KB)        │    Savings vs Raw     │      Size (MB)      │      Savings vs Raw         │                                         │
+├─────────────────────────────────┼─────────────────────┼───────────────────────┼─────────────────────┼─────────────────────────────┼─────────────────────────────────────────┤
+│  JSON Raw                       │ 306.0               │ -                     │ 62.08               │ -                           │ Baseline                                │
+│  JSON (VictoriaLogs indexed)    │ 928.0               │ +203% (larger)        │ 93.75               │ +51% (larger)               │ Indexed for fast search                 │
+│  Compressed (Gzip)              │ 38.0                │ 87.6% LESS            │ 7.70                │ 87.6% LESS                  │ Best for warm tier                      │
+│  Prometheus Metrics             │ 61.7                │ 79.8% LESS            │ 12.54               │ 79.8% LESS                  │ Best for cold tier                      │
+│  Tiered Storage (Total)         │ 146.5               │ 52.1% LESS            │ 46.25               │ 25.5% LESS                  │ Hybrid approach                         │
+└─────────────────────────────────┴─────────────────────┴───────────────────────┴─────────────────────┴─────────────────────────────┴─────────────────────────────────────────┘
+
+
+
+┌────────────────────────────────────────────┬─────────────────────────┬───────────────────────┬─────────────────────────────────────────────────────┐
+│  Metric                                    │ 3,000 Logs              │ 300,000 Logs          │ Average                                             │
+├────────────────────────────────────────────┼─────────────────────────┼───────────────────────┼─────────────────────────────────────────────────────┤
+│  Gzip Compression Savings                  │ 87.6%                   │ 87.6%                 │ 87.6%                                               │
+│  Prometheus Format Savings                 │ 79.8%                   │ 79.8%                 │ 79.8%                                               │
+│  Tiered Storage Savings vs Raw             │ 52.1%                   │ 25.5%                 │ 38.8%                                               │
+│  JSON-ONLY Index Overhead                  │ +203%                   │ +51%                  │ +127%                                               │
+└────────────────────────────────────────────┴─────────────────────────┴───────────────────────┴─────────────────────────────────────────────────────┘
+
+
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│  Metric                                    │ 3,000 Logs              │ 300,000 Logs           │ WINNER                                              │
+├────────────────────────────────────────────┼─────────────────────────┼────────────────────────┼─────────────────────────────────────────────────────┤
+│  Average Query Time (ms) - JSON-ONLY       │ 9.70                    │ 8.58                   │ JSON-ONLY (9% faster)                               │
+│  Average Query Time (ms) - TIERED          │ 15.64                   │ 9.43                   │                                                     │
+│  JSON-ONLY Wins (out of 20)                │ 18                      │ 13                     │ JSON-ONLY (65-90%)                                  │
+│  TIERED Wins (out of 20)                   │ 2                       │ 7                      │                                                     │
+│  Storage Size - JSON-ONLY                  │ 928 KB                  │ 93.75 MB               │ TIERED (25-52% less)                                │
+│  Storage Size - TIERED                     │ 146 KB                  │ 46.25 MB               │                                                     │
+│  Annual Storage Savings (300K/day)         │ -                       │ 5.65 GB                │ TIERED                                              │
+└────────────────────────────────────────────┴─────────────────────────┴────────────────────────┴─────────────────────────────────────────────────────┘
+
+
+
+VERDICT
+──────────────────────────────────────────────────────────────────────────────────────────────────
+QUERY PERFORMANCE WINNER:     JSON-ONLY (VictoriaLogs) - 65-90% of queries faster                                                                                       
+STORAGE EFFICIENCY WINNER:    TIERED STORAGE - 25-52% less space                                  
+
+USE JSON-ONLY FOR:                                                                                                                                                       
+   • Real-time debugging and troubleshooting (8-10ms queries)                                                                                                               
+   • Specific error tracking (KAFKA ERRORS: 5.20ms)                                                                                                                         
+   • Extract operations (TRACE IDS: 6.19ms)                                                                                                                                
+   • Full-text search requirements              
+                                                                                                                                                                                                                                                                                                          
+USE TIERED STORAGE FOR:                                                                                                                                                  
+   • Long-term retention (>30 days) - 25-52% storage savings                                                                                                                
+   • Time-range queries (LAST 1 HOUR ERRORS: 6.90ms)                                                                                                                        
+   • Aggregations (COUNT BY SERVICE/HOST)                                                                                                                                  
+   • Cost-sensitive deployments - saves 5.65 GB/year                                                                                                                                                                                                                                                                                                    

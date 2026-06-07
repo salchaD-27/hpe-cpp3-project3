@@ -1,0 +1,15 @@
+
+services:
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: victorialogs-benchmark
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=1y"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./storage:/storage
+      - ./data:/data
+    ports:
+      - "9428:9428"
+    restart: unless-stopped
