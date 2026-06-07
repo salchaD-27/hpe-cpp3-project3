@@ -1,63 +1,85 @@
-Node        Component            Container Port   Host Port    Purpose
-────────────────────────────────────────────────────────────────────────────────────────────────
-Node 1      Fluent Bit metrics   2020             2020         Metrics endpoint
-            Kafka (external)     9094             9094         Message queue access
-            Logstash API         9600             9601         Logstash metrics/stats
-            Grafana              3000             3001         Web dashboard (admin/admin)
-            VictoriaMetrics      8428             8428         VM metrics (if enabled)
-            vmalert              8880             8881         Alert evaluation UI
-            Alertmanager         9093             9095         Alert routing UI
-            Kafka UI             8080             8080         Kafka management UI
-
-Node 2      vlinsert             9428             8001         Write API (insert logs)
-
-Node 3      vlstorage            9428             8002         JSON-only Storage Node 1
-Node 4      vlstorage            9428             8003         JSON-only Storage Node 2
-
-Node 3      vlstorage-hybrid     9428             8005         (deprecated - not used in latest 5-node implementation)
-Node 4      vlstorage-hybrid     9428             8006         (deprecated - not used in latest 5-node implementation)
-
-Node 5      vlselect             9428             8004         Unified Query API (JSON-only storage)
-
-
-Node 5      benchmarking-api     8080             8081*        Performance comparison API
-            (middleware)                                         (POST /api/compare, /api/benchmark/suite)
-
-Node 6*     Prometheus           9090             9090         Prometheus TSDB (if deployed)
-            Pushgateway          9091             9091         Metrics push endpoint
-*benchmarking-api runs on port 8080 inside container, mapped to host port 8080 (or 8081 if conflict)
-
+┌─────────────┬──────────────────┬─────────────────┐
+│    Node     │    Component     │   Host Port     │
+├─────────────┼──────────────────┼─────────────────┤
+│             │ Fluent Bit       │ 8081            │
+│             │ Kafka            │ 9094            │
+│   Node 1    │ Logstash         │ 9601            │
+│             │ Grafana          │ 3001            │
+│             │ vmalert          │ 8881            │
+│             │ Alertmanager     │ 9095            │
+│             │ Kafka UI         │ 8080            │
+├─────────────┼──────────────────┼─────────────────┤
+│   Node 2    │ vlinsert         │ 8001            │
+├─────────────┼──────────────────┼─────────────────┤
+│   Node 3    │ vlstorage        │ 8002            │
+├─────────────┼──────────────────┼─────────────────┤
+│   Node 4    │ vlstorage        │ 8003            │
+├─────────────┼──────────────────┼─────────────────┤
+│   Node 5    │ vlselect         │ 8004            │
+└─────────────┴──────────────────┴─────────────────┘
 
 
 Service	            URL	                    Credentials
-Grafana	            http://localhost:3001	admin/admin
-vmalert	            http://localhost:8881	-
-Alertmanager	    http://localhost:9095	-
-Kafka UI	        http://localhost:8080	-
-Write API	        http://localhost:8001	-
-Query API	        http://localhost:8004	-
-Benchmarking API	http://localhost:8080	-
-JSON Storage 1	    http://localhost:8002	-
-JSON Storage 2	    http://localhost:8003	-
-Hybrid Storage 1	http://localhost:8005	-
-Hybrid Storage 2	http://localhost:8006	-
-Prometheus	        http://localhost:9090	-
+Grafana             http://localhost:3001   (admin/admin)
+Write API	        http://localhost:8001
+Query API	        http://localhost:8004
+Storage Node 3	    http://localhost:8002
+Storage Node 4	    http://localhost:8003
 
 
-
-multi-node-simulation/
-├── node-1-pipeline/           # Generator, Fluent Bit, Kafka, Logstash
-├── node-2-vlinsert/           # Write gateway
-├── node-3-vlstorage/          # JSON Only - Hot/Warm Storage
-├── node-3-vlstorage-hybrid/   # Hybrid Storage with Prometheus
-├── node-4-vlstorage/          # JSON Only - Hot/Warm Storage
-├── node-4-vlstorage-hybrid/   # Hybrid Storage with Prometheus
-├── node-5-vlselect/           # Unified Query + Benchmarking
-└── scripts/
-    ├── cron/                  # Cron job scripts for log rotation
-    │   ├── rotate_hot_to_warm.sh
-    │   ├── rotate_warm_to_cold.sh
-    │   └── archive_to_prometheus.py
-    ├── start.sh
-    ├── stop.sh
-    └── test.sh
+multi-node-simulation git:(multi-node-sim) ✗ tree
+.
+├── node-1-pipeline
+│   ├── 1-generator
+│   │   ├── generator.py
+│   │   ├── logs-generated
+│   │   └── logs-original
+│   │       ├── hpcmlog.json
+│   │       ├── monitoring_service.json
+│   │       └── syslog.json
+│   ├── 2-fluent-bit
+│   │   ├── fluent-bit.conf
+│   │   └── parsers.conf
+│   ├── 3-kafka
+│   ├── 4-logstash
+│   │   ├── hpc-pipeline.conf
+│   │   └── logstash.yml
+│   ├── 6-grafana
+│   │   ├── hpc-alert-explorer.json
+│   │   ├── hpc-log-explorer.json
+│   │   └── provisioning
+│   │       └── datasources
+│   │           └── datasources.yml
+│   ├── 7-vmalert
+│   │   ├── alertmanager.yml
+│   │   └── alerts.yml
+│   ├── 8-victoriametrics
+│   │   └── scrape.yml
+│   └── docker-compose.yml
+├── node-2-vlinsert
+│   └── docker-compose.yml
+├── node-3-vlstorage
+│   ├── docker-compose.yml
+│   └── storage
+├── node-4-vlstorage
+│   ├── docker-compose.yml
+│   └── storage
+├── node-5-vlselect
+│   └── docker-compose.yml
+├── port-mapping.txt
+├── start.sh
+├── stop.sh
+├── test.sh
+└── theory
+    ├── alerting
+    ├── grafana
+    ├── prometheus-benchmarking
+    │   ├── benchmarking-analysis.txt
+    │   ├── hybrid-setup-arch.png
+    │   └── json-vs-prometheus-internals.txt
+    └── victorialogs
+        ├── architectural-analysis.txt
+        ├── multinode-arch-new.jpg
+        ├── multinode-arch-old.jpg
+        ├── multinode-setup-internals-arch.png
+        └── multinode-setup-internals-theory.txt
