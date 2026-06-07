@@ -21,14 +21,14 @@
 <body>
 <div class="container">
     <h1>🔬 JSON vs Hybrid Storage - Complete Benchmark Report</h1>
-    <p>Generated: 2026-06-01 15:11:00</p>
+    <p>Generated: 2026-06-04 10:59:02</p>
     
     <div class="summary-box">
         <h3>📊 Executive Summary</h3>
         <p>• Total Logs Tested: <span class="metric">120,000</span> (30,000 per storage node)</p>
         <p>• Storage Nodes: 4 (2 JSON-only + 2 Hybrid)</p>
-        <p>• Average Query Time: <span class="metric">27.19 ms</span></p>
-        <p>• P95 Latency: <span class="metric">31.14 ms</span></p>
+        <p>• Average Query Time: <span class="metric">13.98 ms</span></p>
+        <p>• P95 Latency: <span class="metric">9.71 ms</span></p>
     </div>
     
     <h2>📈 Query Performance Results</h2>
@@ -37,102 +37,102 @@
 
         <tr>
             <td>Simple count</td>
-            <td>55.05</td>
+            <td>19.79</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Error count</td>
-            <td>49.90</td>
+            <td>31.30</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Critical count</td>
-            <td>20.22</td>
+            <td>13.38</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Count by service</td>
-            <td>48.48</td>
+            <td>18.69</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Count by host</td>
-            <td>34.61</td>
+            <td>28.98</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Count by level</td>
-            <td>34.94</td>
+            <td>26.89</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Last 1 hour errors</td>
-            <td>21.20</td>
+            <td>12.56</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Last 6 hours errors</td>
-            <td>13.13</td>
+            <td>7.75</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Last 24 hours errors</td>
-            <td>18.59</td>
+            <td>7.47</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>High memory usage</td>
-            <td>43.66</td>
+            <td>13.46</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>High CPU usage</td>
-            <td>11.25</td>
+            <td>7.08</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Multiple retries</td>
-            <td>14.54</td>
+            <td>8.49</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Errors on kafka</td>
-            <td>15.49</td>
+            <td>7.43</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>High memory errors</td>
-            <td>18.12</td>
+            <td>14.02</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Extract trace IDs</td>
-            <td>12.05</td>
+            <td>5.16</td>
             <td style="color: #f44336">400</td>
         </tr>
         <tr>
             <td>Average duration</td>
-            <td>41.32</td>
+            <td>18.30</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>P95 duration</td>
-            <td>10.22</td>
+            <td>2.31</td>
             <td style="color: #f44336">400</td>
         </tr>
         <tr>
             <td>Top 5 services by errors</td>
-            <td>25.71</td>
+            <td>14.14</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Top 10 hosts by logs</td>
-            <td>36.42</td>
+            <td>14.65</td>
             <td style="color: #4CAF50">200</td>
         </tr>
         <tr>
             <td>Contains 'timeout'</td>
-            <td>18.84</td>
+            <td>7.71</td>
             <td style="color: #4CAF50">200</td>
         </tr>
     </table>
@@ -143,27 +143,27 @@
 
         <tr>
             <td>P50</td>
-            <td>13.87</td>
+            <td>4.96</td>
         </tr>
         <tr>
             <td>P75</td>
-            <td>20.42</td>
+            <td>6.98</td>
         </tr>
         <tr>
             <td>P90</td>
-            <td>26.01</td>
+            <td>8.25</td>
         </tr>
         <tr>
             <td>P95</td>
-            <td>31.14</td>
+            <td>9.71</td>
         </tr>
         <tr>
             <td>P99</td>
-            <td>44.41</td>
+            <td>10.73</td>
         </tr>
         <tr>
             <td>P99.9</td>
-            <td>44.41</td>
+            <td>10.73</td>
         </tr>
     </table>
     
@@ -173,32 +173,32 @@
 
         <tr>
             <td>1</td>
-            <td>87.9</td>
-            <td>17.1</td>
+            <td>84.8</td>
+            <td>8.2</td>
             <td>100.0%</td>
         </tr>
         <tr>
             <td>5</td>
-            <td>86.3</td>
-            <td>49.3</td>
+            <td>84.1</td>
+            <td>9.5</td>
             <td>100.0%</td>
         </tr>
         <tr>
             <td>10</td>
-            <td>86.2</td>
-            <td>97.8</td>
+            <td>83.4</td>
+            <td>8.3</td>
             <td>100.0%</td>
         </tr>
         <tr>
             <td>20</td>
-            <td>86.8</td>
-            <td>71.1</td>
+            <td>84.3</td>
+            <td>9.1</td>
             <td>100.0%</td>
         </tr>
         <tr>
             <td>50</td>
-            <td>86.1</td>
-            <td>146.2</td>
+            <td>85.4</td>
+            <td>18.2</td>
             <td>100.0%</td>
         </tr>
     </table>

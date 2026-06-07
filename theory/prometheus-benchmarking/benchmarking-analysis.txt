@@ -1,179 +1,768 @@
-------------------------------------------------------------------
-INGESTION and STORAGE ANALYSIS
-------------------------------------------------------------------
+➜  multi-node-simulation git:(multi-node-sim) ✗ ./scripts/exec.sh 
+...
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 1: GENERATING 120000 TEST LOGS (30K per node)
+════════════════════════════════════════════════════════════════════════════════════════════════════
 
-Ingestion Statistics
-Node	        Type	    Logs Sent	Logs Received	Success Rate	Storage Size
-Node 3	        JSON Only	30,000	    104,610*	    100%	        2.56 MB
-Node 4	        JSON Only	30,000	    93,781*	        100%	        2.05 MB
-Node 3 Hybrid	Hybrid	    30,000	    94,052*	        100%	        2.10 MB
-Node 4 Hybrid	Hybrid	    30,000	    93,754*	        100%	        2.09 MB
+  Generating logs with varied patterns...
+Generated 30000 logs for node-3-vlstorage
+Generated 30000 logs for node-4-vlstorage
+Generated 30000 logs for node-3-vlstorage-hybrid
+Generated 30000 logs for node-4-vlstorage-hybrid
 
+TOTAL LOGS GENERATED: 120,000 (30,000 per storage node)
+   Files created:
+     - logs_json_only_1.jsonl  (for node-3-vlstorage)
+     - logs_json_only_2.jsonl  (for node-4-vlstorage)
+     - logs_hybrid_1.jsonl     (for node-3-vlstorage-hybrid)
+     - logs_hybrid_2.jsonl     (for node-4-vlstorage-hybrid)
+  Generated 120000 test logs (30K per storage node)
 
-Storage Efficiency
-Storage Type	        Total Logs	    Total Size	    Avg Size per 1k Logs
-JSON-only (2 nodes)	    198,391	        4.61 MB	        23.2 KB
-Hybrid (2 nodes)	    187,806	        4.19 MB	        22.3 KB
-Hybrid Savings	        -	            9.1%	        ~4% smaller
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 2: INGESTING LOGS TO STORAGE NODES
+════════════════════════════════════════════════════════════════════════════════════════════════════
 
-JSON-only vs Hybrid Performance
-Metric	                JSON-only Nodes	    Hybrid Nodes	    Advantage
-Average Logs per Node	99,195	            93,903	            JSON (5.6% more)
-Average Storage (MB)	2.31 MB	            2.10 MB	            Hybrid (9.1% less)
-CPU Usage (avg)	        3.63%	            2.55%	            Hybrid (30% less CPU)
-Memory Usage (avg)	    113 MB	            107 MB	            Hybrid (5.3% less memory)
-Query Performance	    Baseline	        Slightly better	    Hybrid
+  Sending logs to Node 3 (JSON only) (port 8002)...
+    Progress: 1000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 2000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 3000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 4000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 5000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 6000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 7000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 8000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 9000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 10000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 11000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 12000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 13000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 14000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 15000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 16000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 17000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 18000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 19000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 20000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 21000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 22000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 23000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 24000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 25000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 26000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 27000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 28000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 29000/   30000 logs sent to Node 3 (JSON only)...
+    Progress: 30000/   30000 logs sent to Node 3 (JSON only)...
+    Completed: 30000 logs sent to Node 3 (JSON only)
+  Sending logs to Node 4 (JSON only) (port 8003)...
+    Progress: 1000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 2000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 3000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 4000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 5000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 6000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 7000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 8000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 9000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 10000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 11000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 12000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 13000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 14000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 15000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 16000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 17000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 18000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 19000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 20000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 21000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 22000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 23000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 24000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 25000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 26000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 27000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 28000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 29000/   30000 logs sent to Node 4 (JSON only)...
+    Progress: 30000/   30000 logs sent to Node 4 (JSON only)...
+    Completed: 30000 logs sent to Node 4 (JSON only)
+  Sending logs to Node 3 Hybrid (port 8005)...
+    Progress: 1000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 2000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 3000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 4000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 5000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 6000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 7000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 8000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 9000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 10000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 11000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 12000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 13000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 14000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 15000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 16000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 17000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 18000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 19000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 20000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 21000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 22000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 23000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 24000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 25000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 26000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 27000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 28000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 29000/   30000 logs sent to Node 3 Hybrid...
+    Progress: 30000/   30000 logs sent to Node 3 Hybrid...
+    Completed: 30000 logs sent to Node 3 Hybrid
+  Sending logs to Node 4 Hybrid (port 8006)...
+    Progress: 1000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 2000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 3000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 4000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 5000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 6000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 7000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 8000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 9000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 10000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 11000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 12000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 13000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 14000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 15000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 16000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 17000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 18000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 19000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 20000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 21000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 22000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 23000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 24000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 25000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 26000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 27000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 28000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 29000/   30000 logs sent to Node 4 Hybrid...
+    Progress: 30000/   30000 logs sent to Node 4 Hybrid...
+    Completed: 30000 logs sent to Node 4 Hybrid
+  All logs ingested successfully (30,000 logs per node)
+  Waiting 60 seconds for indexing to complete...
 
-
-------------------------------------------------------------------
-QUERY ANALYSIS
-------------------------------------------------------------------
-
-Query Type Breakdown (20 queries tested)
-Query Pattern	                        Time (ms)
-Simple count (* | count())	            55.05
-Error count (level:ERROR | count())	    49.90	
-Critical count	                        20.20	
-Count by service	                    48.50	
-Count by host	                        34.60	
-Count by level	                        34.90	
-Last 1 hour errors	                    21.20	
-Last 6 hours errors	                    13.10	
-Last 24 hours errors	                18.60	
-High memory usage	                    43.70	
-High CPU usage	                        11.30	
-Multiple retries	                    14.50	
-Errors on kafka	                        15.50	
-High memory errors	                    18.10	
-Extract trace IDs	                    12.00	
-Average duration	                    41.30	
-P95 duration	                        10.22	
-Top 5 services by errors	            25.70	
-Top 10 hosts by logs	                36.40	
-Contains 'timeout'	                    18.80	
-
-
-Query Performance Statistics
-Metric	            Value
-Average	            27.19 ms
-Median	            20.71 ms
-Minimum	            10.22 ms
-Maximum	            55.05 ms
-Standard Deviation	~14.5 ms
-
-
-Fastest Query Types (<15ms)
-P95 duration            - 10.22 ms
-High CPU usage          - 11.30 ms
-Extract trace IDs       - 12.00 ms
-Last 6 hours errors     - 13.10 ms
-Multiple retries        - 14.50 ms
-Errors on kafka         - 15.50 ms
-
-
-Slowest Query Types (>40ms)
-Simple count            - 55.05 ms
-Error count             - 49.90 ms
-Count by service        - 48.50 ms
-High memory usage       - 43.70 ms
-Average duration        - 41.30 ms
-
-
-
-------------------------------------------------------------------
-LATENCY ANALYSIS
-------------------------------------------------------------------
-
-Latency Distribution (100 iterations of * | count())
-Percentile	    Value (ms)	Interpretation
-P50 (Median)	13.87 ms	Half of all queries complete in <14ms
-P75	            20.42 ms	75% of queries complete in <21ms
-P90	            26.01 ms	90% of queries complete in <26ms
-P95	            31.14 ms	95% of queries complete in <32ms
-P99	            44.41 ms	99% of queries complete in <45ms
-P99.9	        44.41 ms	99.9% of queries complete in <45ms
-
-
-Latency Summary
-Metric	            Value
-Minimum Latency     6.75 ms
-Maximum Latency	    44.41 ms
-Average Latency	    16.02 ms
-Range	            37.66 ms
-
-
-Latency Distribution Visualization
-<10ms:  ████████░░░░░░░░░░░░  (~15% of queries)
-10-15ms: ████████████████░░░░  (~35% of queries)
-15-20ms: ██████████████░░░░░░  (~25% of queries)
-20-30ms: ████████░░░░░░░░░░░░  (~15% of queries)
-30-45ms: ████░░░░░░░░░░░░░░░░  (~10% of queries)
->45ms:   ░░░░░░░░░░░░░░░░░░░░  (~0% of queries)
-
-
-
-------------------------------------------------------------------
-THROUGHPUT ANALYSIS
-------------------------------------------------------------------
-
-Throughput Test Results (10-second duration)
-Concurrency	    QPS	    Avg Latency (ms)	P95 Latency (ms)	Success Rate
-1	            87.9	17.1	            36.1	            100%
-5	            86.3	49.3	            135.5	            100%
-10	            86.2	97.8	            290.4	            100%
-20	            86.8	71.1	            270.2	            100%
-50	            86.1	146.2	            434.0	            100%
-
-
-Throughput Observations
-Aspect	        Finding
-Base QPS	    ~86 queries/second (sustained)
-Scalability	    Throughput remains constant regardless of concurrency
-Bottleneck	    Single query node (vlselect) caps at ~86 QPS
-Reliability	    100% success rate across all concurrency levels
-
-
-Latency vs Concurrency Relationship
-Concurrency 1:  ████████░░░░░░░░░░░░ 17ms
-Concurrency 5:  ████████████████████ 49ms (2.9x increase)
-Concurrency 10: ████████████████████ 98ms (5.7x increase)
-Concurrency 20: ████████████████████ 71ms (4.2x increase)
-Concurrency 50: ████████████████████ 146ms (8.5x increase)
-Observation: Latency increases linearly with concurrency after saturation point
-
-
-
-------------------------------------------------------------------
-RESOURCE UTILIZATION ANALYSIS
-------------------------------------------------------------------
-
-CPU Usage by Container
-Container	                CPU %	Type
-Logstash	                7.59%	Highest - Log processing
-node-4-vlstorage (JSON)	    6.31%	Storage node
-node-4-vlstorage-hybrid	    4.99%	Storage node
-Kafka	                    3.85%	Message queue
-node-2-vlinsert	            1.70%	Write gateway
-node-3-vlstorage (JSON)	    0.94%	Storage node
-node-3-vlstorage-hybrid	    0.10%	Storage node
-node-5-vlselect	            0.14%	Query gateway
-
-
-Memory Usage by Container
-Container	                Memory	    % of Limit
-Logstash	                722.2 MiB	94.04% ⚠️
-Kafka	                    458.7 MiB	11.70%
-node-4-vlstorage (JSON)	    116 MiB	    2.96%
-node-3-vlstorage (JSON)	    110.1 MiB	2.81%
-node-4-vlstorage-hybrid	    107.5 MiB	2.74%
-node-3-vlstorage-hybrid	    106.8 MiB	2.73%
-node-2-vlinsert	            28.32 MiB	0.72%
-node-5-vlselect	            22.48 MiB	0.57%
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 3: VERIFYING LOG COUNTS PER NODE
+════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
-Resource Observations
-Finding                             Implication
-Logstash memory high (94%)	        Increase memory limit or optimize pipeline
-Storage nodes efficient	            ~2-6% CPU, ~107-116 MB memory
-Hybrid vs JSON comparable	        No significant resource difference
-Write/Query gateways lightweight	~1.7% CPU, ~22-28 MB memory
+  Checking log counts on each storage node:
+  Node 3 (JSON only): 53872 logs (may still be indexing)
+  Node 4 (JSON only): 54698 logs (may still be indexing)
+  Node 3 Hybrid: 54854 logs (may still be indexing)
+  Node 4 Hybrid: 54757 logs (may still be indexing)
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 4: STORAGE EFFICIENCY ANALYSIS
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+  Storage Metrics Per Node:
+  ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Node                      │ Type            │ Size (MB)            │ Log Count       │
+  ├─────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ node-3-vlstorage          │ JSON only       │ 1.48                 │ 53872           │
+  │ node-4-vlstorage          │ JSON only       │ 1.56                 │ 54698           │
+  │ node-3-vlstorage-hybrid   │ Hybrid          │ 1.56                 │ 54854           │
+  │ node-4-vlstorage-hybrid   │ Hybrid          │ 1.51                 │ 54757           │
+  └─────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  Storage Summary:
+  ● JSON-only Total Logs: 108578
+  ● Hybrid Total Logs: 109611
+
+
+
+
+
+➜  cron git:(multi-node-sim) ✗ ./cron-exec.sh 
+==========================================
+TEST: Forcing hot → warm rotation (moving current partition)
+==========================================
+  Moving partition: 20260604 from node-3-vlstorage
+    Compressed: items.bin
+    Compressed: lens.bin
+    Compressed: index.bin
+    Compressed: metaindex.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Removed original partition
+  Moving partition: 20260604 from node-4-vlstorage
+    Compressed: items.bin
+    Compressed: lens.bin
+    Compressed: index.bin
+    Compressed: metaindex.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Removed original partition
+  Moving partition: 20260604 from node-3-vlstorage-hybrid
+    Compressed: items.bin
+    Compressed: lens.bin
+    Compressed: index.bin
+    Compressed: metaindex.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Removed original partition
+  Moving partition: 20260604 from node-4-vlstorage-hybrid
+    Compressed: items.bin
+    Compressed: lens.bin
+    Compressed: index.bin
+    Compressed: metaindex.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Compressed: column_names.bin
+    Compressed: message_values.bin
+    Compressed: index.bin
+    Compressed: columns_header.bin
+    Compressed: columns_header_index.bin
+    Compressed: metaindex.bin
+    Compressed: timestamps.bin
+    Compressed: column_idxs.bin
+    Compressed: message_bloom.bin
+    Removed original partition
+
+════════════════════════════════════════════════════════════════
+  STORAGE TIER STATUS
+════════════════════════════════════════════════════════════════
+
+  Hot Tier:  972 logs (active, full-text searchable)
+  Warm Tier:      568 files (compressed, reduced storage)
+  Cold Tier:      854 metrics (Prometheus, long-term retention)
+
+
+
+
+➜  scripts git:(multi-node-sim) ✗ ./benchmark_tiers.sh
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 1: INGESTION & STORAGE ANALYSIS
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  Storage Distribution (4 Nodes):
+
+  Node                   Type                Logs Percentage
+  -----------------------------------------------------------------
+  Node 3                 JSON Only           4846      26.8%
+  Node 4                 JSON Only           4563      25.2%
+  Node 3 Hybrid          Hybrid              4312      23.9%
+  Node 4 Hybrid          Hybrid              4318      23.9%
+  -----------------------------------------------------------------
+  TOTAL                  -                  18039      100%
+
+  Storage Size per Node:
+  node-3-vlstorage            : .08 MB
+  node-4-vlstorage            : .14 MB
+  node-3-vlstorage-hybrid     : .12 MB
+  node-4-vlstorage-hybrid     : .15 MB
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 2: QUERY PERFORMANCE BENCHMARK (20 Query Patterns)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  Running 20 query patterns...
+
+    Simple count                  ... 15.37ms
+    Error count                   ... 14.62ms
+    Critical count                ... 7.84ms
+    Count by service              ... 16.31ms
+    Count by host                 ... 19.10ms
+    Count by level                ... 18.76ms
+    Last 1 hour errors            ... 13.13ms
+    Last 6 hours errors           ... 9.78ms
+    Last 24 hours errors          ... 14.04ms
+    High memory usage             ... 16.26ms
+    High CPU usage                ... 12.20ms
+    Multiple retries              ... 16.98ms
+    Errors on kafka               ... 12.13ms
+    High memory errors            ... 9.20ms
+    Extract trace IDs             ... 6.30ms
+    Average duration              ... 11.33ms
+    P95 duration                  ... 5.42ms
+    Top 5 services by errors      ... 15.63ms
+    Top 10 hosts by logs          ... 9.60ms
+    Contains 'timeout'            ... 8.69ms
+
+============================================================
+  QUERY PERFORMANCE STATISTICS
+============================================================
+
+  Average: 12.63 ms
+  Median:  12.66 ms
+  Minimum: 5.42 ms
+  Maximum: 19.10 ms
+
+  Fastest Queries (<15ms):
+    P95 duration                   - 5.42 ms
+    Extract trace IDs              - 6.30 ms
+    Critical count                 - 7.84 ms
+    Contains 'timeout'             - 8.69 ms
+    High memory errors             - 9.20 ms
+
+  Slowest Queries (>40ms):
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 3: LATENCY PERCENTILE ANALYSIS
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  Running 50 iterations...
+    Progress: 10/50
+    Progress: 20/50
+    Progress: 30/50
+    Progress: 40/50
+    Progress: 50/50
+
+============================================================
+  LATENCY PERCENTILES
+============================================================
+
+  P50: 4.48 ms
+  P75: 5.23 ms
+  P90: 7.47 ms
+  P95: 7.50 ms
+  P99: 14.51 ms
+
+  Min: 2.70 ms
+  Max: 14.51 ms
+  Avg: 5.06 ms
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 4: JSON vs HYBRID COMPARISON
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  Single Query Comparison (* | count()):
+{
+    "comparison": {
+        "speedup_percent": 52.160212500795964,
+        "speedup_ratio": 2.090310288306858,
+        "time_difference_ms": 6.835365295410156,
+        "winner": "Hybrid"
+    },
+    "hybrid": {
+        "avg_result_count": 2,
+        "avg_time_ms": 6.269192695617676,
+        "p95_time_ms": 11.705994606018066,
+        "samples": 5,
+        "success_rate": 100.0
+    },
+    "iterations": 5,
+    "json": {
+        "avg_result_count": 2,
+        "avg_time_ms": 13.104557991027832,
+        "p95_time_ms": 41.49055480957031,
+        "samples": 5,
+
+  JSON vs Hybrid Speedup Summary:
+
+  Query Results:
+    * | count(): 8.889937400817871ms (JSON) vs 4.391956329345703ms (Hybrid)
+    _time:1h AND level:ERROR | count(): 6.413102149963379ms (JSON) vs 5.156469345092773ms (Hybrid)
+    level:ERROR | count(): 5.332279205322266ms (JSON) vs 5.1044464111328125ms (Hybrid)
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  COMPLETE BENCHMARK SUMMARY
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  Total Logs Processed: 18039
+  📁 Results saved to: benchmark_results_20260604_121327/
+
+  ⚡ Hot Tier Query Performance:
+     Average: 12.38 ms
+     Fastest: 6.23 ms (Extract trace IDs)
+     Slowest: 23.69 ms (Simple count)
+
+
+
+
+➜  scripts git:(multi-node-sim) ✗ ./benchmark_tiers.sh
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 1: DIRECT NODE QUERIES - JSON-ONLY vs HYBRID
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Query                                                   │ JSON-only (ms)  │ Hybrid (ms) │ Speedup   │ Winner  │
+  ├───────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ * | count()                                             │           71.75 │       86.13 │   -20.0%  │ JSON    │
+  │ level:ERROR | count()                                   │           60.01 │       45.81 │   30.0%   │ Hybrid  │
+  │ level:CRITICAL | count()                                │           40.28 │       59.72 │   -40.0%  │ JSON    │
+  │ _time:1h AND level:ERROR | count()                      │           47.68 │       37.33 │   30.0%   │ Hybrid  │
+  │ _time:6h AND level:ERROR | count()                      │           47.97 │       33.49 │   40.0%   │ Hybrid  │
+  │ _time:24h AND level:ERROR | count()                     │           32.60 │       39.62 │   -20.0%  │ JSON    │
+  │ * | stats by (service_name) count()                     │           33.09 │       32.68 │   10.0%   │ Hybrid  │
+  │ * | stats by (host_name) count()                        │           38.31 │       33.27 │   20.0%   │ Hybrid  │
+  │ cpu_percent:>80 | count()                               │           52.10 │       30.12 │   50.0%   │ Hybrid  │
+  │ memory_mb:>15000 | count()                              │           31.11 │       32.78 │   0%      │ JSON    │
+  │ retry_count:>2 | count()                                │           43.08 │       41.48 │   10.0%   │ Hybrid  │
+  │ duration_ms:>5000 | count()                             │           34.23 │       32.96 │   10.0%   │ Hybrid  │
+  └───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ┌───────────────────────────────────────────────────────────────────────────────────────┐
+  │ Metric                     │    JSON-only  │        Hybrid │  Winner                  │
+  ├───────────────────────────────────────────────────────────────────────────────────────┤
+  │ Average Query Time         │       44.35ms │       42.11ms │  Hybrid                  │
+  │ Total Wins                 │             4 │             8 │  Hybrid                  │
+  │ Overall Speedup            │             - │             - │  10.0% faster for Hybrid │
+  └───────────────────────────────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 2: THROUGHPUT COMPARISON
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  Running throughput comparison...
+
+  Concurrency   JSON-only QPS     Hybrid QPS   JSON Latency Hybrid Latency
+  ----------------------------------------------------------------------
+  1                    172.2         171.6           4.0           4.6
+  5                    168.6         168.8           6.5           7.0
+  10                   170.6         169.8           6.1           7.6
+  20                   168.6         168.6           5.8           5.3
+  50                   168.8         167.8           5.5           5.5
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 3: STORAGE & RESOURCE COMPARISON
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │ Storage Type        │ Total Size │ Avg per Node │ Savings                   │
+  ├─────────────────────────────────────────────────────────────────────────────┤
+  │ JSON-only            │     .40 MB │       .20 MB │ -                        │
+  │ Hybrid               │     .37 MB │       .18 MB │ 10.0% smaller            │
+  └─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │ Container                   │ CPU %     │ Memory       │ Type               │
+  ├─────────────────────────────────────────────────────────────────────────────┤
+  │ node-3-vlstorage            │     0.57% │    43.77 MiB │ JSON-only          │
+  │ node-4-vlstorage            │     0.25% │    60.79 MiB │ JSON-only          │
+  │ node-3-vlstorage-hybrid     │     0.42% │    43.71 MiB │ Hybrid             │
+  │ node-4-vlstorage-hybrid     │     3.42% │    50.57 MiB │ Hybrid             │
+  └─────────────────────────────────────────────────────────────────────────────┘
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  SECTION 4: JSON vs HYBRID - Benchmarking API
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+{
+    "comparison": {
+        "speedup_percent": 56.89547269216925,
+        "speedup_ratio": 2.3199419236371748,
+        "time_difference_ms": 6.632494926452637,
+        "winner": "Hybrid"
+    },
+    "hybrid": {
+        "avg_result_count": 2,
+        "avg_time_ms": 5.024838447570801,
+        "p95_time_ms": 10.039448738098145,
+        "samples": 5,
+        "success_rate": 100.0
+    },
+    "iterations": 5,
+    "json": {
+        "avg_result_count": 2,
+        "avg_time_ms": 11.657333374023438,
+        "p95_time_ms": 21.05712890625,
+        "samples": 5,
+        "success_rate": 100.0
+    },
+    "query": "* | count()"
+}
+
+./benchmark_tiers.sh: line 279: print_info: command not found
+
+  Query Results:
+    * | count(): 12.248921394348145ms (JSON) vs 5.497598648071289ms (Hybrid) → Hybrid (55.1% faster)
+    * | stats by (service_name) count(): 6.4479827880859375ms (JSON) vs 5.15749454498291ms (Hybrid) → Hybrid (20.0% faster)
+    _time:1h AND level:ERROR | count(): 4.526567459106445ms (JSON) vs 2.159595489501953ms (Hybrid) → Hybrid (52.3% faster)
+    level:ERROR | count(): 8.604598045349121ms (JSON) vs 5.840778350830078ms (Hybrid) → Hybrid (32.1% faster)
+
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  DIRECT COMPARISON RESULTS
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  QUERY PERFORMANCE:
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │ JSON-only Average:  44.35ms                                                 │
+  │ Hybrid Average:     42.11ms                                                 │
+  │ Hybrid Speedup:     10.0% FASTER                                            │
+  │ Hybrid Wins:        8/12 queries                                            │
+  └─────────────────────────────────────────────────────────────────────────────┘
+
+  STORAGE EFFICIENCY:
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │ JSON-only Total:         .40 MB                                             │
+  │ Hybrid Total:            .37 MB                                             │
+  │ Hybrid Savings:         10.0%                                               │
+  └─────────────────────────────────────────────────────────────────────────────┘
+
+  Hybrid is:
+    • 10.0% FASTER on average query execution
+    • 100% MORE STORAGE EFFICIENT
+    • Winner in 8/12 query types tested

@@ -1,0 +1,27 @@
+[
+  {
+    "query": "Simple count",
+    "avg_time_ms": 4.63,
+    "nodes_queried": 4
+  },
+  {
+    "query": "Error count",
+    "avg_time_ms": 9.85,
+    "nodes_queried": 4
+  },
+  {
+    "query": "Time range (1h)",
+    "avg_time_ms": 4.62,
+    "nodes_queried": 4
+  },
+  {
+    "query": "Aggregate by service",
+    "avg_time_ms": 2.65,
+    "nodes_queried": 4
+  },
+  {
+    "query": "High CPU",
+    "avg_time_ms": 2.64,
+    "nodes_queried": 4
+  }
+]

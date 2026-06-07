@@ -1,47 +1,47 @@
 [
   {
     "concurrency": 1,
-    "total_queries": 879,
-    "successful": 879,
+    "total_queries": 848,
+    "successful": 848,
     "success_rate": 100.0,
-    "avg_latency_ms": 17.113341948820597,
-    "p95_latency_ms": 36.06104850769043,
-    "throughput_qps": 87.9
+    "avg_latency_ms": 8.237242136361465,
+    "p95_latency_ms": 13.77100944519043,
+    "throughput_qps": 84.8
   },
   {
     "concurrency": 5,
-    "total_queries": 863,
-    "successful": 863,
+    "total_queries": 841,
+    "successful": 841,
     "success_rate": 100.0,
-    "avg_latency_ms": 49.265259248771095,
-    "p95_latency_ms": 135.49814224243164,
-    "throughput_qps": 86.3
+    "avg_latency_ms": 9.544884832520546,
+    "p95_latency_ms": 18.740415573120117,
+    "throughput_qps": 84.1
   },
   {
     "concurrency": 10,
-    "total_queries": 862,
-    "successful": 862,
+    "total_queries": 834,
+    "successful": 834,
     "success_rate": 100.0,
-    "avg_latency_ms": 97.78882428277673,
-    "p95_latency_ms": 290.38093090057373,
-    "throughput_qps": 86.2
+    "avg_latency_ms": 8.333703025067738,
+    "p95_latency_ms": 13.510584831237793,
+    "throughput_qps": 83.4
   },
   {
     "concurrency": 20,
-    "total_queries": 868,
-    "successful": 868,
+    "total_queries": 843,
+    "successful": 843,
     "success_rate": 100.0,
-    "avg_latency_ms": 71.137284902933,
-    "p95_latency_ms": 270.20225524902344,
-    "throughput_qps": 86.8
+    "avg_latency_ms": 9.073552429181118,
+    "p95_latency_ms": 14.410400390625,
+    "throughput_qps": 84.3
   },
   {
     "concurrency": 50,
-    "total_queries": 861,
-    "successful": 861,
+    "total_queries": 854,
+    "successful": 854,
     "success_rate": 100.0,
-    "avg_latency_ms": 146.1807825839478,
-    "p95_latency_ms": 434.0153932571411,
-    "throughput_qps": 86.1
+    "avg_latency_ms": 18.181794979533212,
+    "p95_latency_ms": 64.62740898132324,
+    "throughput_qps": 85.4
   }
 ]
