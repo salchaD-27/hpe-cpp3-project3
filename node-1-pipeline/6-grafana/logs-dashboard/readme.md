@@ -4,26 +4,26 @@ A Grafana dashboard for exploring and analyzing logs from an HPCM (HP Cluster Ma
 
 > **Dashboard:** `HPCM — Log Explorer`
 
-<img width="1895" height="755" alt="image" src="https://github.com/user-attachments/assets/ee6f6dc7-e325-4ed3-875d-9cbac1a1aeaa" />
 
 ---
 
 ### 1. Overview — Totals, Distribution & Volume by Host
 
-<img width="1898" height="778" alt="image" src="https://github.com/user-attachments/assets/9d133fa1-06b9-47bb-810e-38b931236cb0" />
+<img width="1895" height="755" alt="image" src="https://github.com/user-attachments/assets/ee6f6dc7-e325-4ed3-875d-9cbac1a1aeaa" />
 
 
 ---
 
 ### 2. Log Trends Over Time
 
-<img width="1914" height="836" alt="image" src="https://github.com/user-attachments/assets/0162c163-b08f-4d62-8efd-fd32b520327c" />
+<img width="1898" height="778" alt="image" src="https://github.com/user-attachments/assets/9d133fa1-06b9-47bb-810e-38b931236cb0" />
 
 
 ---
 
 ### 3. Error & Warning Trends
 
+<img width="1914" height="836" alt="image" src="https://github.com/user-attachments/assets/0162c163-b08f-4d62-8efd-fd32b520327c" />
 
 
 ---
