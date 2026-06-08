@@ -7,19 +7,20 @@ A Grafana dashboard for monitoring the health, performance, and resource usage o
 
 ### 1. Cluster Overview — Uptime, Ingestion & Memory
 
-![Cluster Overview](image-3.png)
+<img width="1568" height="759" alt="image" src="https://github.com/user-attachments/assets/8e96e55f-7702-42b7-b11d-ac7157a43bdb" />
+
 ---
 
 ### 2. Storage Health & Ingestion
 
-![Storage Health and Ingestion](image-4.png)
+<img width="1568" height="733" alt="image" src="https://github.com/user-attachments/assets/6f22cb22-6914-4a33-95f0-4321f70e0eea" />
 
 
 ---
 
 ### 3. Latency & CPU Usage
 
-![Latency and CPU Usage](image-5.png)
+<img width="1568" height="677" alt="image" src="https://github.com/user-attachments/assets/2edee373-4f4d-4876-9989-31c513f7db21" />
 
 
 ---
