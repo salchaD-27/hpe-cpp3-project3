@@ -53,7 +53,7 @@ HPE CPP3 project — a distributed HPC log ingestion, storage, and querying pipe
 ├── send.py
 ├── inventory-data-querying.md
 ├── start.sh
-├── stop.sh
+└── stop.sh
 ```
 
 ---
