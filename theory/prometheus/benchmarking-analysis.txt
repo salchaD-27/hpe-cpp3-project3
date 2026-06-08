@@ -191,4 +191,113 @@ USE TIERED STORAGE FOR:
    • Long-term retention (>30 days) - 25-52% storage savings                                                                                                                
    • Time-range queries (LAST 1 HOUR ERRORS: 6.90ms)                                                                                                                        
    • Aggregations (COUNT BY SERVICE/HOST)                                                                                                                                  
-   • Cost-sensitive deployments - saves 5.65 GB/year                                                                                                                                                                                                                                                                                                    
+
+
+┌───────────────────────────────────┬──────────────────────────┬────────────────────────────┬─────────────────────────────┬────────────────────────────────┬────────────────────────┬──────────────────────┬──────────────────────────────┐
+| Dimension                         | 1: Pure JSON Single-Node | 2: Pure JSON 1-2-2 Cluster | 3: Hybrid 1-2-2 (JSON+Prom) | 4: Tiered JSON (Hot/Warm/Cold) | 5: VictoriaLogs + Loki | 6: VictoriaLogs + S3 | 7: Official Cluster + vmauth |
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+| Official Recommendation           | Small Scale              | Medium Scale               | Non-Standard                | Non-Standard                   | Not Recommended        | Roadmap              | Production Standard          |
+| Industry Standard                 | Small Teams              | Growing Teams              | Rare Hybrid                 | Netflix/Uber Style             | Grafana Ecosystem      | Cloud-Native         | VictoriaMetrics Stack        |
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+  QUERY PERFORMANCE
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+| Avg Latency (3k logs)             | 9 ms                     | 9.7 ms                     | 12.6 ms                     | 15.6 ms                        | 15-25 ms               | 20-50 ms             | 8-10 ms                      |
+| Avg Latency (300k logs)           | 8.5 ms                   | 8.6 ms                     | 9.4 ms                      | 9.4 ms                         | 20-40 ms               | 30-80 ms             | 7-9 ms                       |
+| COUNT ALL                         | Baseline                 | Baseline                   | 2x slower                   | 1.2x slow                      | 3x slower              | 5x slower            | Fastest                      |
+| COUNT BY SERVICE/HOST             | Slower                   | Comparable                 | Comparable                  | Wins Scale                     | Comparable             | Slow                 | Fastest                      |
+| Time Range Queries                | Fast                     | Fast                       | Mixed                       | Mixed                          | Slow                   | Very Slow            | Fastest                      |
+| Full Text Search                  | Fast                     | Fast                       | Fast                        | Fast                           | Loki Slow              | Fast                 | Fastest                      |
+| Aggregations                      | OK                       | OK                         | +30-57%                     | Comparable                     | Slow                   | Slow                 | Fastest                      |
+| JSON Wins @ 3k Logs               | -                        | 18/20                      | 8/12                        | 18/20                          | -                      | -                    | -                            |
+| JSON Wins @ 300k Logs             | -                        | 13/20                      | 8/12                        | 13/20                          | -                      | -                    | -                            |
+| Sustained QPS                     | ~170                     | ~170                       | ~170                        | ~170                           | 80-100                 | 30-50                | 400+                         |
+| P95 Latency                       | 7.5 ms                   | 7.5 ms                     | 10 ms                       | 19.9 ms                        | 40+ ms                 | 100+ ms              | 6 ms                         |
+| P99 Latency                       | 14.5 ms                  | 14.5 ms                    | -                           | -                              | 100+ ms                | 200+ ms              | 10 ms                        |
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+  STORAGE EFFICIENCY
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+| Raw JSON (3k logs)                | 306 KB                   | 306 KB                     | 306 KB                      | 306 KB                         | 306 KB                 | 306 KB               | 306 KB                       |
+| Stored Size (VL ZSTD)             | 928 KB                   | 928 KB                     | 928 KB*                     | 928 KB                         | 928 KB                 | 928 KB               | 928 KB                       |
+| After gzip                        | 38 KB                    | 38 KB                      | 38 KB                       | 38 KB→Warm                      | 38 KB                 | S3                   | 38 KB                        |
+| Hybrid Storage Overhead           | -                        | -                          | +10% CPU                    | -                              | +100%                  | +S3 Cost             | -                            |
+| Long-Term (100GB/day, 1 year)     | 36.5 TB                  | 36.5 TB                    | ~33 TB                      | ~2.9 TB                        | 36.5 TB                | 2-5 TB               | 36.5 TB                      |
+| Warm Tier Savings                 | None                     | None                       | None                        | 66%                            | None                   | Native               | None                         |
+| Cold Tier Savings                 | None                     | None                       | ~70%                        | ~70%                           | None                   | Native               | None                         |
+| Overall vs Raw                    | Baseline                 | Baseline                   | -10%                        | -52/-25%                       | +100%                  | -80% LT              | Baseline                     |
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+* VictoriaLogs internal index overhead can make small datasets larger than raw input; this reverses at scale.
+
+  COMPLEXITY & OPERATIONS
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+| Containers to Manage              | 1                        | 5                          | 7                           | 5 + cron                       | 8+                     | 6+                   | 5 + vmauth                   |
+| Cron Jobs Required                | 0                        | 0                          | 0                           | 2                              | 0                      | 0                    | 0                            |
+| Config Files                      | 1                        | ~8                         | ~12                         | ~10                            | ~15                    | ~10                  | ~10                          |
+| Failure Modes                     | 1                        | 5 SPOFs                    | 7 SPOFs                     | 5 + cron                       | 8+ SPOFs               | 6 + S3               | 5 + vmauth                   |
+| Debugging Difficulty              | Easy                     | Medium                     | Hard                        | Hard                           | Very Hard              | Hard                 | Medium                       |
+| Tailscale Complexity              | None                     | Medium                     | High                        | High                           | Very High              | Ext. S3              | Medium                       |
+| Script Maintenance                | None                     | Low                        | Medium                      | High                           | Medium                 | Low                  | Low                          |
+| Learning Curve                    | Minimal                  | Medium                     | High                        | High                           | Very High              | High                 | Medium                       |
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+  DATA INTEGRITY & RELIABILITY
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+| Full Event Fidelity               | Always                   | Always                     | Hot Tier                    | Hot+Warm                       | VL Side                | Hot Only             | Always                       |
+| Fidelity After Cold Transition    | Retained                 | Retained                   | Retained                    | Lost                           | Retained               | On S3                | Retained                     |
+| Replication / Redundancy          | None                     | None                       | None                        | None                           | Partial                | S3 Native            | None                         |
+| Data Loss on Node Failure         | 100%                     | Shard                      | Shard                       | Shard                          | Partial                | No Loss              | Shard                        |
+| SPOF Count                        | 1                        | 5                          | 7                           | 5                              | 8                      | 3                    | 5                            |
+| Consistent Hashing Distribution   | N/A                      | Imbalanced                 | Mixed                       | Imbalanced                     | N/A                    | N/A                  | Balanced                     |
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+  FIT AS PER USE CASE
+├───────────────────────────────────┼──────────────────────────┼────────────────────────────┼─────────────────────────────┼────────────────────────────────┼────────────────────────┼──────────────────────┼──────────────────────────────┤
+| Full-Text Search                  | ✓                        | ✓                          | ✓                           | ✓ Hot                          | ✓                      | ✓ Hot                | ✓                            |
+| Incident Debugging                | ✓                        | ✓                          | ✓                           | Hot Only                       | ✓                      | Hot Only             | ✓                            |
+| Long-Term Trend Queries (1 Year)  | $                        | $                          | ✓                           | ✓                              | $                      | ✓                    | $                            |
+| 5-Laptop Tailscale Team           | Easy                     | Medium                     | Complex                     | Complex                        | Very Complex           | Needs S3             | Medium                       |
+| Benchmark / Learning Value        | Low                      | High                       | Very High                   | Very High                      | High                   | Medium               | High                         |
+| Grafana Integration               | ✓                        | ✓                          | ✓                           | ✓                              | ✓                      | ✓                    | ✓                            |
+| vmalert Support                   | ✓                        | ✓                          | ✓                           | ✓                              | ✓                      | ✓                    | ✓                            |
+| Works if One Laptop Offline       | No                       | Partial                    | Partial                     | Partial                        | Partial                | Partial              | Partial                      |
+| Closest to HPE HPCM Architecture  | Partial                  | Better                     | Better                      | Best Concept                   | No                     | Best Prod            | Best Arch                    |
+└───────────────────────────────────┴──────────────────────────┴────────────────────────────┴─────────────────────────────┴────────────────────────────────┴────────────────────────┴──────────────────────┴──────────────────────────────┘
+✓  = Good fit / supported
+$  = Expensive at scale
+SPOF = Single Point of Failure
+VL = VictoriaLogs
+LT = Long-Term
+
+
+                  Performance
+                      ▲
+                      │
+              7       │
+          3           │
+      4               2
+ Reliability ◄────────┼────────► Simplicity
+      6               │
+          5           │
+                      ▼
+                   Storage
+
+
+Reliability ▲
+10 |                 7
+ 9 |
+ 8 |         4
+ 7 |     3
+ 6 | 2
+ 5 | 1
+ 4 |            5
+ 3 |                 6
+   └──────────────────────► Performance
+
+
+Official VictoriaLogs Recommendation & Industry Standard
+──────────────────────────────────────────────────────────────────────────────────────────────────
+Single node or cluster?             Single node for under ~1TB/day; cluster beyond that
+How to do tiering?                  Not officially recommended — use -retentionPeriod instead; they handle deletion automatically
+Prometheus + VictoriaLogs hybrid?   Not officially recommended — VictoriaLogs is for logs, VictoriaMetrics is for metrics; keep separate
+Production load balancing?          Use vmauth in front of vlinsert and vlselect — it is the official LB component
+_stream_fields config?              Always configure — critical for even distribution and query performance
+Replication?                        Achieve at collection layer (send same logs to multiple vlinsert endpoints), not storage layer
+Kubernetes?                         Official Helm chart: victoria-logs-cluster with vmauth, vlinsert StatefulSet, vlselect Deployment
+Industry standard (2025)            VictoriaLogs cluster + vmauth + Vector collector — this is the reference architecture
