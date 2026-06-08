@@ -51,7 +51,7 @@ HPE CPP3 project — a distributed HPC log ingestion, storage, and querying pipe
 ├── node-5-vlselect/
 │   └── docker-compose.yml
 ├── send.py
-├── inventory-data-querying.md
+├── Inventory queries.md    ## contains query and result of Inventory data
 ├── start.sh
 └── stop.sh
 ```
