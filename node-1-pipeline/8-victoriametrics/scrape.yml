@@ -13,3 +13,20 @@ scrape_configs:
   - job_name: victoriametrics
     static_configs:
       - targets: ["node-1-victoriametrics:8428"]
+
+  # Scrape VictoriaLogs components
+  - job_name: vlselect
+    static_configs:
+      - targets: ["node-5-vlselect:9428"]
+
+  - job_name: vlinsert
+    static_configs:
+      - targets: ["node-2-vlinsert:9428"]
+
+  - job_name: vlstorage-1
+    static_configs:
+      - targets: ["node-3-vlstorage:9428"]
+
+  - job_name: vlstorage-2
+    static_configs:
+      - targets: ["node-4-vlstorage:9428"]
