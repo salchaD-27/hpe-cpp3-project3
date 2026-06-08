@@ -9,7 +9,7 @@ A Grafana dashboard for exploring and analyzing logs from an HPCM (HP Cluster Ma
 
 ### 1. Overview — Totals, Distribution & Volume by Host
 
-<img width="1896" height="704" alt="image" src="https://github.com/user-attachments/assets/872bc7d3-70c2-418d-be1a-d4c2f09fcff6" />
+<img width="1908" height="772" alt="image" src="https://github.com/user-attachments/assets/694fa7f1-5eba-449f-8760-42ff4daf8da2" />
 
 
 ---
