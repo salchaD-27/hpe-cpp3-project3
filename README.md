@@ -26,13 +26,13 @@ HPE CPP3 project — a distributed HPC log ingestion, storage, and querying pipe
 │   ├── 6-grafana/
 │   │   ├──alerting-dashboard
 │   │   │    ├── hpc-alert-explorer.json    
-│   │   │    └── alerts-dashbord.md
+│   │   │    └── readme.md
 │   │   ├── logs-dashboard
 │   │   │    ├── hpc-log-explorer.json    
-│   │   │    └── logs-dashbord.md
-│   │   ├── metrics-dashboard
-│   │   │   ├── hpc-metric-explorer.json    
-│   │   │   └── metrics-dashbord.md
+│   │   │    └── readme.md
+│   │   ├── health-dashboard
+│   │   │   ├── hpc-health-explorer.json    
+│   │   │   └── readme.md
 │   │   └── provisioning/datasources/datasources.yml
 │   ├── 7-vmalert/
 │   │   ├── alertmanager.yml
