@@ -72,7 +72,6 @@ def build_record(item):
     record["_time"]      = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     record["_msg"]       = f"{item['type']} | {item['name']}"
     record["log_source"] = "inventory"
-    record["node"]       = NODE_NAME
     record["name"]       = item["name"]
     record["type"]       = item["type"]
     record["manufacturer"] = item.get("manufacturer", "Unknown")
