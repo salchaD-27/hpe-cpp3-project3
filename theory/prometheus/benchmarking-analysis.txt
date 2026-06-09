@@ -1,7 +1,19 @@
 ➜  multi-node-simulation git:(multi-node-sim) ✗ cd theory/prometheus/benchmarking
 ➜  benchmarking git:(multi-node-sim) ✗ ./exec.sh 
-[+] Running 1/1
- ✔ Container victorialogs-benchmark  Running                                                                                                                                                          0.0s 
+[+] Running 4/4
+ ✔ Container victorialogs-json          Removed    0.3s 
+ ✔ Container victoriametrics-benchmark  Removed    0.4s 
+ ✔ Container victorialogs-tiered-hot    Removed    0.3s 
+ ✔ Network benchmarking_default         Removed    0.2s 
+[+] Running 4/4
+ ✔ Network benchmarking_default         Created    0.0s 
+ ✔ Container victorialogs-tiered-hot    Started    0.3s 
+ ✔ Container victoriametrics-benchmark  Started    0.4s 
+ ✔ Container victorialogs-json          Started    0.4s 
+CONTAINER ID   IMAGE                                     COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+85945f097a7b   victoriametrics/victoria-logs:v1.49.0     "/victoria-logs-prod…"   11 seconds ago   Up 10 seconds   0.0.0.0:9429->9428/tcp, [::]:9429->9428/tcp   victorialogs-tiered-hot
+fd12b578c6cf   victoriametrics/victoria-metrics:latest   "/victoria-metrics-p…"   11 seconds ago   Up 10 seconds   0.0.0.0:8428->8428/tcp, [::]:8428->8428/tcp   victoriametrics-benchmark
+ab47fb89a89f   victoriametrics/victoria-logs:v1.49.0     "/victoria-logs-prod…"   11 seconds ago   Up 10 seconds   0.0.0.0:9428->9428/tcp, [::]:9428->9428/tcp   victorialogs-json
 
 
 ========================================================================================================================
@@ -61,16 +73,16 @@ Storage Savings                                   -           84.2%
 Inserting data into architectures...
 ✓ Data inserted
 
-Query Type                              JSON-Only (ms)     Tiered (ms)       Winner    Speedup
+Query Type                              JSON-Only (ms)     Tiered (ms)    Winner    Speedup
 -----------------------------------------------------------------------------------------------
-COUNT ALL                                        8.05          10.09       JSON      25.4%
-COUNT ERRORS                                     5.69           8.30       JSON      45.8%
-COUNT CRITICAL                                   5.85           8.10       JSON      38.5%
-COUNT WARN                                       6.87           8.06       JSON      17.3%
-COUNT DEBUG                                      6.84          10.29       JSON      50.3%
-COUNT BY SERVICE                                14.17          10.45     TIERED      26.2%
-COUNT BY HOST                                   13.32          10.82     TIERED      18.7%
-COUNT BY LEVEL                                  10.47          10.95       JSON       4.6%
+COUNT ALL                                       10.06          61.05       JSON      83.5%
+COUNT ERRORS                                    16.33         275.05       JSON      94.1%
+COUNT CRITICAL                                   8.14         266.19       JSON      96.9%
+COUNT WARN                                      13.50         290.40       JSON      95.4%
+COUNT DEBUG                                     12.58         275.35       JSON      95.4%
+COUNT BY SERVICE                                29.10         317.78       JSON      90.8%
+COUNT BY HOST                                   37.05         304.16       JSON      87.8%
+COUNT BY LEVEL                                  34.62         287.44       JSON      88.0%
 LAST 1 HOUR ERRORS                               8.08           6.90     TIERED      14.6%
 LAST 6 HOURS ERRORS                              6.66           8.97       JSON      34.6%
 LAST 24 HOURS ERRORS                             8.50           7.73     TIERED       9.0%
@@ -83,7 +95,6 @@ EXTRACT TRACE IDS                                6.19          11.11       JSON 
 AVERAGE DURATION                                 6.34          11.30       JSON      78.4%
 P95 DURATION                                     9.85          11.33       JSON      15.0%
 CONTAINS TIMEOUT                                 6.81           9.27       JSON      36.2%
-
 
 Format                       Size (MB)       Savings vs Raw
 ------------------------------------------------------------
@@ -272,7 +283,7 @@ LT = Long-Term
               7       │
           3           │
       4               2
- Reliability ◄────────┼────────► Simplicity
+ Reliability ◄────────┼──────1─► Simplicity
       6               │
           5           │
                       ▼

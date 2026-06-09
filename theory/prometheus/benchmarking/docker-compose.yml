@@ -1,15 +1,41 @@
-
 services:
-  victorialogs:
+  victorialogs-json:
     image: victoriametrics/victoria-logs:v1.49.0
-    container_name: victorialogs-benchmark
+    container_name: victorialogs-json
     command:
       - "-storageDataPath=/storage"
       - "-retentionPeriod=1y"
       - "-httpListenAddr=:9428"
     volumes:
-      - ./storage:/storage
-      - ./data:/data
+      - ./storage-json:/storage
     ports:
       - "9428:9428"
     restart: unless-stopped
+
+  victorialogs-tiered-hot:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: victorialogs-tiered-hot
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=7d"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./storage-tiered-hot:/storage
+    ports:
+      - "9429:9428"
+    restart: unless-stopped
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:latest
+    container_name: victoriametrics-benchmark
+    ports:
+      - "8428:8428"
+    volumes:
+      - vm_data:/storage
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=12"
+    restart: unless-stopped
+
+volumes:
+  vm_data:
