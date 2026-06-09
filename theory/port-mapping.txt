@@ -74,12 +74,4 @@ multi-node-simulation git:(multi-node-sim) ✗ tree
     ├── alerting
     ├── grafana
     ├── prometheus-benchmarking
-    │   ├── benchmarking-analysis.txt
-    │   ├── hybrid-setup-arch.png
-    │   └── json-vs-prometheus-internals.txt
     └── victorialogs
-        ├── architectural-analysis.txt
-        ├── multinode-arch-new.jpg
-        ├── multinode-arch-old.jpg
-        ├── multinode-setup-internals-arch.png
-        └── multinode-setup-internals-theory.txt
