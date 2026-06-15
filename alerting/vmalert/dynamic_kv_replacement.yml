@@ -4,21 +4,21 @@ groups:
     interval: 30s
 
     rules:
-      # - alert: IPMappedLogDetected
-      #   expr: '
-      #     *
-      #     | extract "<ip> *" from _msg
-      #     | replace("10.1.1.11", "node-a")
-      #     | replace("10.1.1.12", "node-b")
-      #     | replace("10.1.1.13", "node-c")
-      #     | replace("10.1.1.14", "node-d")
-      #     | replace("10.1.1.15", "node-e")
-      #     | format "<_msg>" as formatted
-      #     | stats by (formatted) count() as hits
-      #     | filter hits :> 0'
-      #   for: 3s
-      #   labels:
-      #     severity: warning
-      #   annotations:
-      #     summary: "IP to Host Mapping Alert"
-      #     description: "{{ $labels.formatted }}"
+      - alert: IPMappedLogDetected
+        expr: '
+          *
+          | extract "<ip> *" from _msg
+          | replace("10.1.1.11", "node-a")
+          | replace("10.1.1.12", "node-b")
+          | replace("10.1.1.13", "node-c")
+          | replace("10.1.1.14", "node-d")
+          | replace("10.1.1.15", "node-e")
+          | format "<_msg>" as formatted
+          | stats by (formatted) count() as hits
+          | filter hits :> 0'
+        for: 3s
+        labels:
+          severity: warning
+        annotations:
+          summary: "IP to Host Mapping Alert"
+          description: "{{ $labels.formatted }}"

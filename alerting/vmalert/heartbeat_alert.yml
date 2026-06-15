@@ -1,0 +1,18 @@
+groups:
+
+- name: heartbeat-demo
+  type: vlogs
+  interval: 5s
+
+  rules:
+  - alert: NodeHeartbeatMissing
+    expr: '
+      _time:15s {log_source="heartbeat"}
+      | stats count() as heartbeats
+      | filter heartbeats :< 1'
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Node node-a missing heartbeat"
+      description: "No heartbeat received for 30 seconds."

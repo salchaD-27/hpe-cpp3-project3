@@ -165,7 +165,7 @@ services:
       - "-evaluationInterval=30s"
       - "-httpListenAddr=:8880"
     volumes:
-      - ./alerting/vmalert:/etc/alerts:ro
+      - ./alerting/vmalert/heartbeat_alert.yml:/etc/alerts/heartbeat_alert.yml:ro
     depends_on:
       - victorialogs
       - alertmanager
