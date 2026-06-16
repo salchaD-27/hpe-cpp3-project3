@@ -1,9 +1,4 @@
-logs/*
-!logs/generated/
-!logs/generated/**
-data/*
-!data/.gitkeep
-**pycache**/
+__pycache__/
 *.py[cod]
 *.pyo
 *.pyd
@@ -12,22 +7,22 @@ venv/
 env/
 .env
 .env.*
-docker-compose.override.yml
 *.pid
 .vscode/
 .idea/
-*.swp
-*.swo
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
 *.key
 *.pem
 *.crt
-grafana-storage/
 node_modules/
+grafana-storage/
 
 node-1-pipeline/1-generator/logs-generated/
 node-5-vlstorage-1/storage/
 node-6-vlstorage-2/storage/
 node-7-vlstorage-3/storage/
 node-10-vlagent/vlagent-data/
+storage/
