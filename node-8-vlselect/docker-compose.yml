@@ -1,0 +1,32 @@
+services:
+  vlselect:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-8-vlselect
+    command:
+      # Query ALL 3 storage nodes
+      - "-storageNode=node-5-vlstorage-1:9428"
+      - "-storageNode=node-6-vlstorage-2:9428"
+      - "-storageNode=node-7-vlstorage-3:9428"
+      - "-httpListenAddr=:9428"
+      - "-insert.disable=true"
+
+      # Allow partial responses when some storage nodes are unavailable
+      - "-search.allowPartialResponse=true"
+      
+      # Query performance optimization
+      - "-search.maxConcurrentRequests=16"
+      - "-search.maxQueryDuration=30s"
+    ports:
+      - "8005:9428"
+    restart: unless-stopped
+    networks:
+      - multi-node-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  multi-node-net:
+    external: true

@@ -1,0 +1,30 @@
+users:
+  - username: "write1"
+    password: "hpc-write-pass-1"
+    url_map:
+      - src_paths: [".*"]
+        url_prefix: "http://node-2-vlinsert-1:9428"
+
+  - username: "write2"
+    password: "hpc-write-pass-2"
+    url_map:
+      - src_paths: [".*"]
+        url_prefix: "http://node-3-vlinsert-2:9428"
+
+  - username: "write3"
+    password: "hpc-write-pass-3"
+    url_map:
+      - src_paths: [".*"]
+        url_prefix: "http://node-4-vlinsert-3:9428"
+
+  - username: "read"
+    password: "hpc-read-pass"
+    url_map:
+      - src_paths: [".*"]
+        url_prefix: "http://node-8-vlselect:9428"
+
+  - username: "health"
+    password: "health-pass"
+    url_map:
+      - src_paths: [".*"]
+        url_prefix: "http://node-2-vlinsert-1:9428"

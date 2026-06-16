@@ -1,0 +1,131 @@
+vlagent + RF=3
+vlagent maintains three independent persistent queues — one per destination.
+When a storage node is unavailable, vlagent does NOT drop that log.
+It buffers it to disk (/vlagent-data/remotewrite/persistent-queue/) and retries until the node comes back.
+
+Phase 1 — Kill node 1, send log A:
+vlagent sends log A to all 3 targets simultaneously
+write2 (→ node-3-vlinsert-2 → vlstorage-2) ✅ succeeds
+write3 (→ node-4-vlinsert-3 → vlstorage-3) ✅ succeeds
+write1 (→ node-2-vlinsert-1 → vlstorage-1) ❌ fails → buffered to disk queue
+Log A exists on nodes 2 and 3 immediately
+When node 1 comes back, vlagent automatically replays log A from its queue → node 1 gets it too
+
+Phase 2 — Kill nodes 2 and 3, restore node 1, send log B:
+write1 → vlstorage-1 ✅ succeeds
+write2 → vlstorage-2 ❌ fails → buffered
+write3 → vlstorage-3 ❌ fails → buffered
+Log B exists on node 1 immediately
+When nodes 2 and 3 come back, vlagent replays log B
+
+Query during outage:
+vlselect fans out to all 3 nodes
+Unavailable nodes return errors or empty
+Available nodes return their data
+You get partial results (whatever nodes are up have)
+
+This is the key difference from a simple sharded cluster
+- no log is ever permanently lost as long as vlagent's disk queue doesn't fill up (you have 10GB configured per URL).
+
+
+
+3 main properties
+1. Write-to-disk before forward
+    When log A arrives at vlagent, it is written to all three queue directories on disk before vlagent attempts a single network call.
+    This means the log survives even if vlagent itself crashes immediately after receiving it — the data is already persisted.
+    Logstash gets its 200 OK from vlagent as soon as the disk write completes, not when all three storage nodes confirm.
+2. Per-destination independent queues
+    Each remoteWrite target (write1→vlinsert-1, write2→vlinsert-2, write3→vlinsert-3) has its own queue.
+    A failure on queue 1 does not block queue 2 or queue 3. This is why in Phase 1, vlstorage-2 and vlstorage-3 received log A immediately even though vlstorage-1 was down.
+    The three delivery pipelines are completely independent.
+3. Retry with backoff until acknowledgment
+    vlagent retries delivery on the retry: 1s - 1m schedule — starting at 1 second intervals and backing off up to 1 minute.
+    The log stays in the queue until the destination sends back HTTP 200. When vlstorage-1 came back up, vlagent was sitting on an undelivered queue entry and immediately replayed it.
+    This is why your test showed the log appearing on node-1 exactly 20 seconds after restore — vlagent was in a retry backoff cycle and the next retry landed within that window.
+
+
+vlselect during a node outage
+During Phase 1 while vlstorage-1 was down, vlselect was still configured to fan out to all three storage nodes.
+It sent queries to all three in parallel, got responses from nodes 2 and 3, got an error from node 1, and returned partial results.
+Our test showed this working — ha_test_log_A came back from the vlselect fan-out because nodes 2 and 3 had it.
+The -search.allowPartialResponse flag controls whether vlselect returns partial results or fails the entire query when any node is unreachable.
+Without it, a single node being down would make all queries fail.
+
+
+
+➜  vmauth-arch git:(main) ✗ ./ha-test.sh
+=== Stopping vlstorage-1 ===
+[+] Stopping 1/1
+ ✔ Container node-5-vlstorage-1  Stopped                                                                                      0.5s 
+=== Sending Log A (node 1 is DOWN) ===
+
+=== Query state while node 1 is still DOWN ===
+
+--- vlstorage-1 (DOWN — expect error or empty) ---
+
+--- vlstorage-2 (UP — expect result) ---
+{"_msg":"ha_test_log_A","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T15:00:00Z","ha_phase":"1_node1_down","level":"ERROR"}
+
+--- vlstorage-3 (UP — expect result) ---
+{"_msg":"ha_test_log_A","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T15:00:00Z","ha_phase":"1_node1_down","level":"ERROR"}
+
+--- vlselect fan-out (partial results from nodes 2+3) ---
+{"_time":"2026-06-14T15:00:00Z","_msg":"ha_test_log_A"}
+
+
+=== Restoring vlstorage-1 ===
+[+] Running 1/1
+ ✔ Container node-5-vlstorage-1  Started                                                                                      0.3s 
+Waiting 20s for vlagent to replay buffered log A to node 1...
+
+=== Node 1 after restore — should now have log A ===
+{"_msg":"ha_test_log_A","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T15:00:00Z","ha_phase":"1_node1_down","level":"ERROR"}
+
+=== Stopping vlstorage-2 and vlstorage-3 ===
+[+] Stopping 1/1
+ ✔ Container node-6-vlstorage-2  Stopped                                                                                      0.3s 
+[+] Stopping 1/1
+ ✔ Container node-7-vlstorage-3  Stopped                                                                                      0.5s 
+
+=== Sending Log B (nodes 2 and 3 are DOWN) ===
+
+=== Query state while nodes 2+3 are DOWN ===
+
+--- vlstorage-1 (UP — expect log B) ---
+{"_msg":"ha_test_log_B","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T15:05:00Z","ha_phase":"2_nodes23_down","level":"CRITICAL"}
+
+--- vlstorage-2 (DOWN — expect error) ---
+
+--- vlstorage-3 (DOWN — expect error) ---
+
+--- vlselect (partial — only node 1 responds) ---
+{"_time":"2026-06-14T15:05:00Z","_msg":"ha_test_log_B"}
+
+=== Restoring vlstorage-2 and vlstorage-3 ===
+[+] Running 1/1
+ ✔ Container node-6-vlstorage-2  Started                                                                                      0.2s 
+[+] Running 1/1
+ ✔ Container node-7-vlstorage-3  Started                                                                                      0.2s 
+
+Waiting 20s for vlagent to replay buffered log B to nodes 2 and 3...
+
+=== Final verification — ALL nodes should have BOTH logs ===
+--- Storage 8002 ---
+-n   Log A: 
+1
+-n   Log B: 
+1
+--- Storage 8003 ---
+-n   Log A: 
+1
+-n   Log B: 
+1
+--- Storage 8004 ---
+-n   Log A: 
+1
+-n   Log B: 
+1
+
+=== vlselect deduped final count ===
+{"_time":"2026-06-14T15:05:00Z","_msg":"ha_test_log_B"}
+{"_time":"2026-06-14T15:00:00Z","_msg":"ha_test_log_A"}

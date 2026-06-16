@@ -75,7 +75,7 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_INSTALL_PLUGINS: victoriametrics-logs-datasource
+      # GF_INSTALL_PLUGINS: "https://github.com/VictoriaMetrics/grafana-datasource/releases/download/v0.8.0/victoriametrics-logs-datasource-0.8.0.zip;victoriametrics-logs-datasource"
     volumes:
       - ./6-grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - grafana-data:/var/lib/grafana
@@ -89,12 +89,18 @@ services:
     image: victoriametrics/vmalert:latest
     container_name: node-1-vmalert
     command:
-      - "-datasource.url=http://node-5-vlselect:8004"
+      - "-datasource.url=http://node-9-vmauth:8427"
       - "-datasource.queryStep=30s"
       - "-rule=/etc/alerts/alerts.yml"
       - "-evaluationInterval=30s"
       - "-httpListenAddr=:8880"
       - "-notifier.url=http://alertmanager:9093"
+      - "-datasource.basicAuth.username=read"
+      - "-datasource.basicAuth.password=hpc-read-pass"
+      # for better integration
+      - "-remoteWrite.url=http://node-1-victoriametrics:8428/api/v1/write"
+      - "-remoteWrite.basicAuth.username="
+      - "-remoteWrite.basicAuth.password="
     volumes:
       - ./7-vmalert/alerts.yml:/etc/alerts/alerts.yml:ro
       - ./7-vmalert/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
@@ -102,6 +108,7 @@ services:
       - "8881:8880"
     depends_on:
       - alertmanager
+      # - node-7-vmauth
     restart: unless-stopped
     networks:
       - multi-node-net
@@ -120,9 +127,25 @@ services:
     networks:
       - multi-node-net
 
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:latest
+    container_name: node-1-victoriametrics
+    command:
+      - "-storageDataPath=/victoria-metrics-data"
+      - "-httpListenAddr=:8428"
+      - "-retentionPeriod=30d"
+    volumes:
+      - victoriametrics-data:/victoria-metrics-data
+    ports:
+      - "8428:8428"
+    restart: unless-stopped
+    networks:
+      - multi-node-net
+
 volumes:
   kafka-data:
   grafana-data:
+  victoriametrics-data:
 
 networks:
   multi-node-net:

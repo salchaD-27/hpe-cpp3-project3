@@ -1,0 +1,197 @@
+➜  scripts git:(multi-node-sim) ✗ clear && ./compare.sh        
+
+════════════════════════════════════════════════════════════════════
+  VictoriaLogs Storage Benchmark — Complete Run
+════════════════════════════════════════════════════════════════════
+
+── Cleaning up old containers and data ─────────────────────────────
+vl-bench-storage
+vl-bench-storage
+  Cleanup complete
+
+── Starting VictoriaLogs ───────────────────────────────────────────
+[+] Running 2/2
+ ✔ Network scripts_default     Created                                                                                                                 0.0s 
+ ✔ Container vl-bench-storage  Started                                                                                                                 0.3s 
+  VictoriaLogs is healthy
+
+── Running generator ───────────────────────────────────────────────
+Loading original syslog.json...
+Loaded 1000 entries from OpenSearch response
+   Using 1000 templates to generate 3,006,295 logs
+Waiting for VictoriaLogs to be ready... ready.
+
+Estimated raw size: 685.22 MB
+   Batch size: 10000 records/batch
+   Total batches: 301
+
+Inserting 3,006,295 records...
+  [ 16.6%]    500,000 / 3,006,295 | 87,952 logs/s | ETA 0.5m
+  [ 33.3%]  1,000,000 / 3,006,295 | 90,130 logs/s | ETA 0.4m
+  [ 49.9%]  1,500,000 / 3,006,295 | 90,664 logs/s | ETA 0.3m
+  [ 66.5%]  2,000,000 / 3,006,295 | 88,801 logs/s | ETA 0.2m
+  [ 83.2%]  2,500,000 / 3,006,295 | 85,300 logs/s | ETA 0.1m
+  [ 99.8%]  3,000,000 / 3,006,295 | 84,087 logs/s | ETA 0.0m
+
+Done! 3,006,295 records in 0.6m (83,936 logs/s avg)
+
+Waiting 60s for VictoriaLogs to flush and merge partitions...
+
+Verifying inserted count...
+   Response: {"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"total"},"value":[1781594941.7896059,"3006295"]}]}}...
+   VictoriaLogs reports 3,006,295 logs
+
+── Waiting 90s for full merge to complete ──────────────────────────
+
+── On-disk storage ─────────────────────────────────────────────────
+  Total VictoriaLogs storage dir :  32M
+
+  Per-partition breakdown:
+    20260606 :  32M
+
+── Record count (via LogsQL) ───────────────────────────────────────
+sed: 2: ":a;s/\B[0-9]\{3\}\>/,&/ ...": unused label 'a;s/\B[0-9]\{3\}\>/,&/;ta'
+  Total logs in VictoriaLogs : 3006295
+
+════════════════════════════════════════════════════════════════════
+  RESULTS: OpenSearch vs VictoriaLogs — 3,006,295 syslog logs
+════════════════════════════════════════════════════════════════════
+
+  Metric                              OpenSearch            VictoriaLogs        
+  ──────────────────────────────────  ────────────────────  ────────────────────
+  Record count                        3,006,295             3006295             
+  Single-node storage                 399.4 MB               32M                
+  RF=3 total (3 copies)               1.1 GB                 32M × 3           
+  Estimated raw JSON size             ~688 MB               ~688 MB (same input)
+  Compression engine                  LZ4 + inverted index  ZSTD columnar       
+  Ingest speed                        ~15-25k logs/s        ~90k logs/s         
+  Full-text search                    Yes (Lucene)          Yes (built-in index)
+  Schema required                     Yes (mappings)        No (schemaless)     
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  VictoriaLogs is 12.5x smaller than OpenSearch (single-node)    │
+  │  OpenSearch: 399.4 MB  →  VictoriaLogs:  32M                    │
+  │  With RF=3: OpenSearch 1.1 GB  →  VictoriaLogs ~99 MB           │
+  └─────────────────────────────────────────────────────────────────┘
+
+  Why VictoriaLogs is smaller:
+  • ZSTD columnar compression — each field compressed independently
+  • Repeated values (service names, host names, log levels) compress
+    to near-zero since ZSTD sees thousands of identical strings per column
+  • No Lucene inverted index overhead (OpenSearch stores both the
+    original doc AND a full inverted index per field)
+  • No doc_values / BKD trees / segment metadata overhead
+
+════════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+➜  scripts git:(multi-node-sim) ✗ clear && ./compare.sh
+
+════════════════════════════════════════════════════════════════════
+  VictoriaLogs Storage Benchmark — Complete Run
+════════════════════════════════════════════════════════════════════
+
+── Cleaning up old containers and data ─────────────────────────────
+  Cleanup complete
+
+── Starting VictoriaLogs ───────────────────────────────────────────
+[+] Running 2/2
+ ✔ Network scripts_default     Created                                                                                                                 0.0s 
+ ✔ Container vl-bench-storage  Started                                                                                                                 0.4s 
+  VictoriaLogs is healthy
+
+── Running generator ───────────────────────────────────────────────
+Generating 3,006,295 COMPLETELY UNIQUE logs...
+Every log has unique: message, service name, host, trace_id, session_id
+Only severity has 5 unique values.
+
+  100,000 / 3,006,295 (40163 logs/s)
+  200,000 / 3,006,295 (42298 logs/s)
+  300,000 / 3,006,295 (43206 logs/s)
+  400,000 / 3,006,295 (43676 logs/s)
+  500,000 / 3,006,295 (44013 logs/s)
+  600,000 / 3,006,295 (44113 logs/s)
+  700,000 / 3,006,295 (44324 logs/s)
+  800,000 / 3,006,295 (44507 logs/s)
+  900,000 / 3,006,295 (44606 logs/s)
+  1,000,000 / 3,006,295 (44482 logs/s)
+  1,100,000 / 3,006,295 (44308 logs/s)
+  1,200,000 / 3,006,295 (44351 logs/s)
+  1,300,000 / 3,006,295 (44324 logs/s)
+  1,400,000 / 3,006,295 (44341 logs/s)
+  1,500,000 / 3,006,295 (44254 logs/s)
+  1,600,000 / 3,006,295 (44167 logs/s)
+  1,700,000 / 3,006,295 (44176 logs/s)
+  1,800,000 / 3,006,295 (44279 logs/s)
+  1,900,000 / 3,006,295 (44361 logs/s)
+  2,000,000 / 3,006,295 (44187 logs/s)
+  2,100,000 / 3,006,295 (44247 logs/s)
+  2,200,000 / 3,006,295 (44284 logs/s)
+  2,300,000 / 3,006,295 (44307 logs/s)
+  2,400,000 / 3,006,295 (44369 logs/s)
+  2,500,000 / 3,006,295 (44289 logs/s)
+  2,600,000 / 3,006,295 (44367 logs/s)
+  2,700,000 / 3,006,295 (44325 logs/s)
+  2,800,000 / 3,006,295 (44377 logs/s)
+  2,900,000 / 3,006,295 (44390 logs/s)
+  3,000,000 / 3,006,295 (44319 logs/s)
+
+Done! 3,006,295 logs in 1.1m
+Waiting for merges...
+
+── Waiting 90s for full merge to complete ──────────────────────────
+
+── On-disk storage ─────────────────────────────────────────────────
+  Total VictoriaLogs storage dir : 380M
+
+  Per-partition breakdown:
+    20260606 : 380M
+
+── Record count (via LogsQL) ───────────────────────────────────────
+sed: 2: ":a;s/\B[0-9]\{3\}\>/,&/ ...": unused label 'a;s/\B[0-9]\{3\}\>/,&/;ta'
+  Total logs in VictoriaLogs : 3006295
+
+════════════════════════════════════════════════════════════════════
+  RESULTS: OpenSearch vs VictoriaLogs — 3,006,295 syslog logs
+════════════════════════════════════════════════════════════════════
+
+  Metric                              OpenSearch            VictoriaLogs        
+  ──────────────────────────────────  ────────────────────  ────────────────────
+  Record count                        3,006,295             3006295             
+  Single-node storage                 399.4 MB              380M                
+  RF=3 total (3 copies)               1.1 GB                380M × 3           
+  Estimated raw JSON size             ~688 MB               ~688 MB (same input)
+  Compression engine                  LZ4 + inverted index  ZSTD columnar       
+  Ingest speed                        ~15-25k logs/s        ~90k logs/s         
+  Full-text search                    Yes (Lucene)          Yes (built-in index)
+  Schema required                     Yes (mappings)        No (schemaless)     
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  VictoriaLogs is 1.0x smaller than OpenSearch (single-node)     │
+  │  OpenSearch: 399.4 MB  →  VictoriaLogs: 380M                    │
+  │  With RF=3: OpenSearch 1.1 GB  →  VictoriaLogs ~1143 MB         │
+  └─────────────────────────────────────────────────────────────────┘
+
+  Why VictoriaLogs is smaller:
+  • ZSTD columnar compression — each field compressed independently
+  • Repeated values (service names, host names, log levels) compress
+    to near-zero since ZSTD sees thousands of identical strings per column
+  • No Lucene inverted index overhead (OpenSearch stores both the
+    original doc AND a full inverted index per field)
+  • No doc_values / BKD trees / segment metadata overhead
+
+════════════════════════════════════════════════════════════════════

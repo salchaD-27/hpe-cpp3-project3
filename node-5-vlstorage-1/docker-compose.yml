@@ -1,0 +1,24 @@
+services:
+  vlstorage:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-5-vlstorage-1
+    command:
+      - "-storageDataPath=/storage"
+      - "-retentionPeriod=365d"
+      - "-httpListenAddr=:9428"
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "8002:9428"
+    restart: unless-stopped
+    networks:
+      - multi-node-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  multi-node-net:
+    external: true

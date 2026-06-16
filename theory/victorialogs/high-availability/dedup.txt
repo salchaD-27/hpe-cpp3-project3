@@ -1,0 +1,55 @@
+Deduplication Workaround
+
+# checking the full help for anything related to dedup or deduplicate
+-> docker exec node-8-vlselect /victoria-logs-prod -help 2>&1 | grep -i "dedup\|deduplic\|distinct"
+Whether to disable automatic parsing of JSON-encoded log fields inside Loki log message into distinct log fields
+-> docker exec node-8-vlselect /victoria-logs-prod -version 2>&1
+victoria-logs-20260403-085433-tags-v1.49.0-0-gace4e81653
+
+This confirms.
+There is no deduplication flag in VictoriaLogs v1.49.0.
+The only match for "distinct" is about Loki JSON parsing — completely unrelated.
+-dedup.minScrapeInterval is a VictoriaMetrics metrics flag that does not exist in VictoriaLogs.
+This means deduplication at the vlselect layer is not a built-in feature in your version.
+
+There is no dedicated command-line flag to enable or disable deduplication in vlselect for VictoriaLogs.
+By design, the vlselect component does not natively support or perform per-query deduplication in cluster mode.
+
+
+Why vlselect Deduplication is Unsupported
+- Architectural Flow:
+    In a VictoriaLogs Cluster, log entry processing is decentralized. 
+    Storage nodes (vlstorage) process heavyweight queries locally and only push intermediate, lightweight states to vlselect.
+- Performance Impact:
+    If vlselect were to perform deduplication, it would have to fetch all log records from every storage node and process them centrally.
+    This creates a severe performance bottleneck and eliminates the linear scalability benefits of the cluster.
+- Feature Requests:
+    Community discussions are tracking the capability for this logic, but as of 2026, it remains unimplemented to preserve query capacity and performance.
+
+
+Deduplicate at Query Time Using LogsQL (Workaround)
+VictoriaLogs supports | uniq in LogsQL queries. Instead of relying on vlselect to deduplicate automatically
+
+# Without dedup — returns 3
+vmauth-arch git:(main) ✗ echo "=== Without dedup ==="
+curl -s "http://localhost:8005/select/logsql/query?query=dedup_test_single" | wc -l
+=== Without dedup ===
+       3
+
+# With dedup via uniq — returns 1
+echo "=== With uniq ==="
+curl -s "http://localhost:8005/select/logsql/query?query=dedup_test_single%20%7C%20uniq%20by%20(_time%2C_msg)" | wc -l
+=== With uniq ===
+       1
+
+echo "=== Count without dedup ==="
+curl -s "http://localhost:8005/select/logsql/query?query=*%20%7C%20count()"
+=== Count without dedup ===
+{"count(*)":"563259"}
+
+echo "=== Count with dedup ==="
+curl -s "http://localhost:8005/select/logsql/query?query=*%20%7C%20uniq%20by%20(_time%2C_msg)%20%7C%20count()"
+=== Count with dedup ===
+{"count(*)":"187840"}
+
+For Grafana dashboards and vmalert rules, every query would include | uniq by (_time, _msg) before any aggregation.

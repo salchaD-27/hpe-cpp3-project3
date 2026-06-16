@@ -1,0 +1,423 @@
+➜  vmauth-arch git:(main) ✗ ./test.sh 
+════════════════════════════════════════════════════════════════════════════════════
+              HPC LOG PIPELINE - COMPLETE TEST SUITE                                  
+════════════════════════════════════════════════════════════════════════════════════
+
+[1/10] Restarting all components...
+Stopping HPC Log Pipeline with HA + Deduplication...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stopping components in reverse order...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stopping Pipeline (Grafana, vmalert, Logstash, Kafka, etc.)...
+ Container node-1-fluent-bit  Stopping
+ Container node-1-logstash  Stopping
+ Container node-1-grafana  Stopping
+ Container node-1-log-generator  Stopping
+ Container node-1-vmalert  Stopping
+ Container node-1-victoriametrics  Stopping
+ Container node-1-vmalert  Stopped
+ Container node-1-vmalert  Removing
+ Container node-1-vmalert  Removed
+ Container node-1-alertmanager  Stopping
+ Container node-1-grafana  Stopped
+ Container node-1-grafana  Removing
+ Container node-1-grafana  Removed
+ Container node-1-victoriametrics  Stopped
+ Container node-1-victoriametrics  Removing
+ Container node-1-victoriametrics  Removed
+ Container node-1-alertmanager  Stopped
+ Container node-1-alertmanager  Removing
+ Container node-1-alertmanager  Removed
+ Container node-1-fluent-bit  Stopped
+ Container node-1-fluent-bit  Removing
+ Container node-1-fluent-bit  Removed
+ Container node-1-logstash  Stopped
+ Container node-1-logstash  Removing
+ Container node-1-logstash  Removed
+ Container node-1-kafka  Stopping
+ Container node-1-kafka  Stopped
+ Container node-1-kafka  Removing
+ Container node-1-kafka  Removed
+ Container node-1-log-generator  Stopped
+ Container node-1-log-generator  Removing
+ Container node-1-log-generator  Removed
+  ✓ Pipeline (Grafana, vmalert, Logstash, Kafka, etc.) stopped
+Stopping vlagent...
+ Container node-10-vlagent  Stopping
+ Container node-10-vlagent  Stopped
+ Container node-10-vlagent  Removing
+ Container node-10-vlagent  Removed
+  ✓ vlagent stopped
+  ⚠ node-10-vlagent-1 not found - skipping
+  ⚠ node-10-vlagent-2 not found - skipping
+  ⚠ node-10-vlagent-3 not found - skipping
+Stopping vmauth...
+ Container node-9-vmauth  Stopping
+ Container node-9-vmauth  Stopped
+ Container node-9-vmauth  Removing
+ Container node-9-vmauth  Removed
+  ✓ vmauth stopped
+Stopping vlselect...
+ Container node-8-vlselect  Stopping
+ Container node-8-vlselect  Stopped
+ Container node-8-vlselect  Removing
+ Container node-8-vlselect  Removed
+  ✓ vlselect stopped
+Stopping vlinsert-1...
+ Container node-2-vlinsert-1  Stopping
+ Container node-2-vlinsert-1  Stopped
+ Container node-2-vlinsert-1  Removing
+ Container node-2-vlinsert-1  Removed
+  ✓ vlinsert-1 stopped
+Stopping vlinsert-2...
+ Container node-3-vlinsert-2  Stopping
+ Container node-3-vlinsert-2  Stopped
+ Container node-3-vlinsert-2  Removing
+ Container node-3-vlinsert-2  Removed
+  ✓ vlinsert-2 stopped
+Stopping vlinsert-3...
+ Container node-4-vlinsert-3  Stopping
+ Container node-4-vlinsert-3  Stopped
+ Container node-4-vlinsert-3  Removing
+ Container node-4-vlinsert-3  Removed
+  ✓ vlinsert-3 stopped
+Stopping vlstorage-1...
+ Container node-5-vlstorage-1  Stopping
+ Container node-5-vlstorage-1  Stopped
+ Container node-5-vlstorage-1  Removing
+ Container node-5-vlstorage-1  Removed
+  ✓ vlstorage-1 stopped
+Stopping vlstorage-2...
+ Container node-6-vlstorage-2  Stopping
+ Container node-6-vlstorage-2  Stopped
+ Container node-6-vlstorage-2  Removing
+ Container node-6-vlstorage-2  Removed
+  ✓ vlstorage-2 stopped
+Stopping vlstorage-3...
+ Container node-7-vlstorage-3  Stopping
+ Container node-7-vlstorage-3  Stopped
+ Container node-7-vlstorage-3  Removing
+ Container node-7-vlstorage-3  Removed
+  ✓ vlstorage-3 stopped
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Cleaning up any remaining containers...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ No remaining containers with 'node-' prefix
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ All components stopped!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ No containers remaining
+Starting HPC Log Pipeline with HA + Deduplication...
+Network already exists
+Starting storage nodes (3 tiers)...
+[+] Running 1/1
+ ✔ Container node-5-vlstorage-1  Started                                                                                                               0.2s 
+[+] Running 1/1
+ ✔ Container node-6-vlstorage-2  Started                                                                                                               0.2s 
+[+] Running 1/1
+ ✔ Container node-7-vlstorage-3  Started                                                                                                               0.2s 
+Starting vlinsert nodes (3 write gateways)...
+[+] Running 1/1
+ ✔ Container node-2-vlinsert-1  Started                                                                                                                0.2s 
+[+] Running 1/1
+ ✔ Container node-3-vlinsert-2  Started                                                                                                                0.2s 
+[+] Running 1/1
+ ✔ Container node-4-vlinsert-3  Started                                                                                                                0.2s 
+Starting vlselect with deduplication...
+[+] Running 1/1
+ ✔ Container node-8-vlselect  Started                                                                                                                  0.2s 
+Starting vmauth load balancer...
+[+] Running 1/1
+ ✔ Container node-9-vmauth  Started                                                                                                                    0.2s 
+Starting vlagent for log replication...
+[+] Running 1/1
+ ✔ Container node-10-vlagent  Started                                                                                                                  0.2s 
+Starting pipeline...
+[+] Running 8/8
+ ✔ Container node-1-kafka            Healthy                                                                                                          12.4s 
+ ✔ Container node-1-alertmanager     Started                                                                                                           1.0s 
+ ✔ Container node-1-log-generator    Started                                                                                                           0.7s 
+ ✔ Container node-1-victoriametrics  Started                                                                                                           0.9s 
+ ✔ Container node-1-grafana          Started                                                                                                           0.8s 
+ ✔ Container node-1-vmalert          Started                                                                                                           1.3s 
+ ✔ Container node-1-logstash         Started                                                                                                          12.4s 
+ ✔ Container node-1-fluent-bit       Started                                                                                                           1.2s 
+
+=== Container Status ===
+NAMES                    STATUS                    PORTS
+node-1-fluent-bit        Up 16 seconds             0.0.0.0:8081->2020/tcp, [::]:8081->2020/tcp
+node-1-vmalert           Up 16 seconds             0.0.0.0:8881->8880/tcp, [::]:8881->8880/tcp
+node-1-logstash          Up 5 seconds              0.0.0.0:9601->9600/tcp, [::]:9601->9600/tcp
+node-1-kafka             Up 17 seconds (healthy)   0.0.0.0:9094->9092/tcp, [::]:9094->9092/tcp
+node-1-grafana           Up 17 seconds             0.0.0.0:3001->3000/tcp, [::]:3001->3000/tcp
+node-1-victoriametrics   Up 17 seconds             0.0.0.0:8428->8428/tcp, [::]:8428->8428/tcp
+node-1-log-generator     Up 17 seconds             
+node-1-alertmanager      Up 17 seconds             0.0.0.0:9095->9093/tcp, [::]:9095->9093/tcp
+node-10-vlagent          Up 20 seconds             0.0.0.0:9429->9429/tcp, [::]:9429->9429/tcp
+node-9-vmauth            Up 24 seconds             0.0.0.0:8427->8427/tcp, [::]:8427->8427/tcp
+node-8-vlselect          Up 27 seconds             0.0.0.0:8005->9428/tcp, [::]:8005->9428/tcp
+node-4-vlinsert-3        Up 31 seconds             0.0.0.0:8013->9428/tcp, [::]:8013->9428/tcp
+node-3-vlinsert-2        Up 31 seconds             0.0.0.0:8012->9428/tcp, [::]:8012->9428/tcp
+node-2-vlinsert-1        Up 31 seconds             0.0.0.0:8011->9428/tcp, [::]:8011->9428/tcp
+node-7-vlstorage-3       Up 36 seconds             0.0.0.0:8004->9428/tcp, [::]:8004->9428/tcp
+node-6-vlstorage-2       Up 37 seconds             0.0.0.0:8003->9428/tcp, [::]:8003->9428/tcp
+node-5-vlstorage-1       Up 37 seconds             0.0.0.0:8002->9428/tcp, [::]:8002->9428/tcp
+
+=== Access Points ===
+   Grafana:        http://localhost:3001 (admin/admin)
+   vmauth (LB):    http://localhost:8427
+   Write:          http://localhost:8427/write1/insert/jsonline
+                   http://localhost:8427/write2/insert/jsonline
+                   http://localhost:8427/write3/insert/jsonline
+   Read:           http://localhost:8427/read/select/logsql/query
+   vlagent:        http://localhost:9429
+
+Storage Nodes:
+   vlstorage-1:    http://localhost:8002
+   vlstorage-2:    http://localhost:8003
+   vlstorage-3:    http://localhost:8004
+
+All components started!
+
+[2/10] Waiting for services to be ready (120 seconds)...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         AUTHENTICATION TOKENS                                      
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Write1 (User 1):  d3JpdGUxOmhwYy13cml0ZS1wYXNzLTE=
+Write2 (User 2): d3JpdGUyOmhwYy13cml0ZS1wYXNzLTI=
+Write3 (User 3): d3JpdGUzOmhwYy13cml0ZS1wYXNzLTM=
+Read:            cmVhZDpocGMtcmVhZC1wYXNz
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[3/10] TEST 1: Direct Write to Each Storage Node
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+➤ Writing to vlinsert-1 (Port 8011 → Storage 8002)...
+  Response: 
+  ✓ Write successful
+
+➤ Writing to vlinsert-2 (Port 8012 → Storage 8003)...
+  Response: 
+  ✓ Write successful
+
+➤ Writing to vlinsert-3 (Port 8013 → Storage 8004)...
+  Response: 
+  ✓ Write successful
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[4/10] TEST 2: Query Through vmauth (Read User)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+➤ Querying for direct_test_8002 (should be on Storage 8002)...
+  Response: {"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:43:07Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T07:47:08Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T07:52:31Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:52:41Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:59:04Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:31:20Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:36:56Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T08:06:53Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T14:07:29Z","level":"INFO","service":"direct-test"}
+{"_msg":"direct_test_8002","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T08:01:00Z","level":"INFO","service":"direct-test"}
+  ✓ Log found successfully
+
+➤ Querying for direct_test_8003 (should be on Storage 8003)...
+  Response: {"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:31:21Z","level":"WARN","service":"direct-test"}
+{"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:36:56Z","level":"WARN","service":"direct-test"}
+{"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T07:52:31Z","level":"WARN","service":"direct-test"}
+{"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T07:47:08Z","level":"WARN","service":"direct-test"}
+{"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T08:01:00Z","level":"WARN","service":"direct-test"}
+{"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:59:04Z","level":"WARN","service":"direct-test"}
+{"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T08:06:53Z","level":"WARN","service":"direct-test"}
+{"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:43:07Z","level":"WARN","service":"direct-test"}
+{"_msg":"direct_test_8003","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:52:41Z","level":"WARN","service":"direct-test"}
+  ✓ Log found successfully
+
+➤ Querying for direct_test_8004 (should be on Storage 8004)...
+  Response: {"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:31:21Z","level":"ERROR","service":"direct-test"}
+{"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:36:56Z","level":"ERROR","service":"direct-test"}
+{"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T08:01:00Z","level":"ERROR","service":"direct-test"}
+{"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T08:06:53Z","level":"ERROR","service":"direct-test"}
+{"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:43:07Z","level":"ERROR","service":"direct-test"}
+{"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:52:41Z","level":"ERROR","service":"direct-test"}
+{"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T07:47:08Z","level":"ERROR","service":"direct-test"}
+{"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T13:59:04Z","level":"ERROR","service":"direct-test"}
+{"_msg":"direct_test_8004","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-13T07:52:31Z","level":"ERROR","service":"direct-test"}
+  ✓ Log found successfully
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[5/10] TEST 3: vlagent Replication Test (RF=3)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+➤ Test ID: replication_test_1781446052
+
+➤ Sending test log to vlagent (Port 9429)...
+  Request: POST http://localhost:9429/insert/jsonline
+  Payload: {"_time":"2026-06-14T14:07:32Z","level":"INFO","_msg":"replication_test_1781446052","service":"replication-test"}
+  ✓ vlagent response: (empty - success)
+
+➤ Waiting 15 seconds for replication to propagate...
+    Waiting... 1s remainingg
+    ✓ Wait complete
+
+➤ Verifying log exists on ALL 3 storage nodes...
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ Checking Storage Node 8002
+  │ URL: http://localhost:8002/select/logsql/query?query=replication_test_1781446052
+  └─────────────────────────────────────────────────────────────┘
+  ✓ Storage 8002: FOUND
+    Response: {"_msg":"replication_test_1781446052","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T14:07:32Z","level":"INFO","service":"replication-test"}
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ Checking Storage Node 8003
+  │ URL: http://localhost:8003/select/logsql/query?query=replication_test_1781446052
+  └─────────────────────────────────────────────────────────────┘
+  ✓ Storage 8003: FOUND
+    Response: {"_msg":"replication_test_1781446052","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T14:07:32Z","level":"INFO","service":"replication-test"}
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ Checking Storage Node 8004
+  │ URL: http://localhost:8004/select/logsql/query?query=replication_test_1781446052
+  └─────────────────────────────────────────────────────────────┘
+  ✓ Storage 8004: FOUND
+    Response: {"_msg":"replication_test_1781446052","_stream":"{}","_stream_id":"0000000000000000e934a84adb05276890d7f7bfcadabe92","_time":"2026-06-14T14:07:32Z","level":"INFO","service":"replication-test"}
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ 8002: SUCCESS
+  ✅ 8003: SUCCESS
+  ✅ 8004: SUCCESS
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ REPLICATION SUCCESSFUL: Log exists on all 3 storage nodes (RF=3)!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[6/10] TEST 4: Logstash Pipeline Integration
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+➤ Checking Logstash container status...
+  Logstash status: Up 2 minutes
+
+➤ Checking if Logstash is actively sending logs...
+./test.sh: line 188: [: 0
+0: integer expression expected
+  ⚠ No recent HTTP logs from Logstash - may be normal if idle
+
+➤ Sending test log through complete pipeline (Generator → Kafka → Logstash → vlagent)...
+  Test ID: pipeline_test_1781446067
+
+➤ Verifying pipeline test log reached storage...
+  ✓ Storage 8002: Pipeline test log found
+  ✓ Storage 8003: Pipeline test log found
+  ✓ Storage 8004: Pipeline test log found
+  ✓ Pipeline test successful: Log flowed through complete pipeline
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[7/10] TEST 5: Storage Node Consistency
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+➤ Checking log counts on each storage node...
+  Storage 8002:   170405 logs
+  Storage 8003:   170623 logs
+  Storage 8004:   170596 logs
+
+  Total logs across all nodes: 511624
+  Average per node: 170541
+  Variation: 0%
+  ✓ Storage nodes consistent (0% variation) - RF=3 working
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[8/10] TEST 6: Alerting Components Health
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+➤ Checking vmalert health (Port 8881)...
+  ✓ vmalert is healthy
+    Response: VictoriaMetrics is Healthy.
+    HTTP Status: 200
+
+➤ Checking Alertmanager health (Port 9095)...
+  ✓ Alertmanager is healthy
+    Response: OK
+    HTTP Status: 200
+
+➤ Checking VictoriaMetrics health (Port 8428)...
+  ✓ VictoriaMetrics is healthy
+    Response: VictoriaMetrics is Healthy.
+    HTTP Status: 200
+
+➤ Checking vlagent container status...
+  ✓ vlagent is running
+    Status: Up 2 minutes
+
+➤ Checking vmauth container status...
+  ✓ vmauth is running
+    Status: Up 3 minutes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[9/10] TEST 7: vmauth Authentication & Authorization
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+➤ Testing write with correct credentials (write1 user)...
+  ✓ Write with correct credentials: HTTP 200 (Success)
+
+➤ Testing write with incorrect credentials (should return 401)...
+  ✓ Write with incorrect credentials correctly returned HTTP 401 (Unauthorized)
+
+➤ Testing read with correct credentials (read user)...
+  ✓ Read with correct credentials: HTTP 200 (Success)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[10/10] TEST 8: Grafana Connectivity
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+➤ Checking Grafana health...
+  ✓ Grafana is healthy
+    Response: {
+  "database": "ok",
+  "version": "11.4.0",
+  "commit": "b58701869e1a11b696010a6f28bd96b68a2cf0d0"
+}
+    HTTP Status: 200
+  ✓ Grafana URL: http://localhost:3001 (admin/admin)
+
+════════════════════════════════════════════════════════════════════════════════════
+                          TEST SUMMARY                                               
+════════════════════════════════════════════════════════════════════════════════════
+
+✓ RF=3 High Availability
+   - vlagent replicates logs to all 3 storage nodes
+   - Each log exists on all 3 nodes
+   - Lose 1 node = zero data loss
+
+✓ Replication Architecture
+   - Logstash → vlagent → vmauth → 3× vlinsert → 3× vlstorage
+   - Grafana → vmauth → vlselect → ALL 3 storage nodes
+
+✓ Security
+   - vmauth enforces authentication (HTTP 200 with auth, 401 without)
+   - Separate read/write users
+   - Path-based authorization
+
+✓ Monitoring
+   - Grafana: http://localhost:3001 (admin/admin)
+   - vmalert: http://localhost:8881
+   - Alertmanager: http://localhost:9095
+   - VictoriaMetrics: http://localhost:8428
+
+✓ Storage Status
+   - Storage 8002: 170405 logs
+   - Storage 8003: 170623 logs
+   - Storage 8004: 170596 logs
+   - Total: 511624 logs processed
+   - Average: 170541 logs per node
+   - Variation: 0%
+
+✓ RF=3 High Availability - CONFIRMED
+   - vlagent replicates logs to all 3 storage nodes
+   - Each log exists on all 3 nodes
+   - Lose 1 node = zero data loss

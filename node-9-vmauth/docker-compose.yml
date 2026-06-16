@@ -1,0 +1,24 @@
+services:
+  vmauth:
+    image: victoriametrics/vmauth:latest
+    container_name: node-9-vmauth
+    command:
+      - "-auth.config=/etc/vmauth/vmauth.yml"
+      - "-httpListenAddr=:8427"
+      # - "-logLevel=INFO"
+    volumes:
+      - ./vmauth.yml:/etc/vmauth/vmauth.yml:ro
+    ports:
+      - "8427:8427"
+    restart: unless-stopped
+    networks:
+      - multi-node-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  multi-node-net:
+    external: true

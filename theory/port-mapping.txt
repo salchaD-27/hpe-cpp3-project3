@@ -1,38 +1,64 @@
-┌─────────────┬──────────────────┬─────────────────┐
-│    Node     │    Component     │   Host Port     │
-├─────────────┼──────────────────┼─────────────────┤
-│             │ Fluent Bit       │ 8081            │
-│             │ Kafka            │ 9094            │
-│   Node 1    │ Logstash         │ 9601            │
-│             │ Grafana          │ 3001            │
-│             │ vmalert          │ 8881            │
-│             │ Alertmanager     │ 9095            │
-│             │ Kafka UI         │ 8080            │
-├─────────────┼──────────────────┼─────────────────┤
-│   Node 2    │ vlinsert         │ 8001            │
-├─────────────┼──────────────────┼─────────────────┤
-│   Node 3    │ vlstorage        │ 8002            │
-├─────────────┼──────────────────┼─────────────────┤
-│   Node 4    │ vlstorage        │ 8003            │
-├─────────────┼──────────────────┼─────────────────┤
-│   Node 5    │ vlselect         │ 8004            │
-└─────────────┴──────────────────┴─────────────────┘
+┌─────────────────────┬────────────────────┬──────────┬─────────────────────────────────────────────────┐
+│        Node         │      Service       │   Port   │                    Purpose                      │
+├─────────────────────┼────────────────────┼──────────┼─────────────────────────────────────────────────┤
+│ Node 1 (Pipeline)   │ Grafana            │ 3001     │ Web UI for dashboards                           │
+│ Node 1 (Pipeline)   │ vmalert            │ 8881     │ Alert rule evaluation                           │
+│ Node 1 (Pipeline)   │ Alertmanager       │ 9095     │ Alert notification routing                      │
+│ Node 1 (Pipeline)   │ VictoriaMetrics    │ 8428     │ Alert state storage                             │
+│ Node 1 (Pipeline)   │ Kafka              │ 9094     │ Message queue for logs                          │
+│ Node 1 (Pipeline)   │ Logstash           │ 9601     │ Log enrichment API                              │
+│ Node 1 (Pipeline)   │ Fluent Bit         │ 8081     │ Log tailing metrics                             │
+├─────────────────────┼────────────────────┼──────────┼─────────────────────────────────────────────────┤
+│ Node 2 (Write 1)    │ vlinsert-1         │ 8011     │ Writes to Storage-1 only                        │
+│ Node 3 (Write 2)    │ vlinsert-2         │ 8012     │ Writes to Storage-2 only                        │
+│ Node 4 (Write 3)    │ vlinsert-3         │ 8013     │ Writes to Storage-3 only                        │
+├─────────────────────┼────────────────────┼──────────┼─────────────────────────────────────────────────┤
+│ Node 5 (Storage 1)  │ vlstorage-1        │ 8002     │ Stores 100% of logs (via vlinsert-1)            │
+│ Node 6 (Storage 2)  │ vlstorage-2        │ 8003     │ Stores 100% of logs (via vlinsert-2)            │
+│ Node 7 (Storage 3)  │ vlstorage-3        │ 8004     │ Stores 100% of logs (via vlinsert-3)            │
+├─────────────────────┼────────────────────┼──────────┼─────────────────────────────────────────────────┤
+│ Node 8 (Read)       │ vlselect           │ 8005     │ Queries all 3 storage nodes with partial resp.  │
+├─────────────────────┼────────────────────┼──────────┼─────────────────────────────────────────────────┤
+│ Node 9 (Gateway)    │ vmauth             │ 8427     │ Universal Auth + LB Gateway                     │
+├─────────────────────┼────────────────────┼──────────┼─────────────────────────────────────────────────┤
+│ Node 10 (Replicator)│ vlagent            │ 9429     │ Log replication & disk buffering (10GB)         │
+└─────────────────────┴────────────────────┴──────────┴─────────────────────────────────────────────────┘
 
+AUTHENTICATION MATRIX                   
+┌─────────────────┬─────────────────────────────────┬───────────────────┬──────────────────────────────────┬─────────────────────────────────────────────────┐
+│      User       │           Credentials           │   Allowed Paths   │            Can Do                │                  Cannot Do                      │
+├─────────────────┼─────────────────────────────────┼───────────────────┼──────────────────────────────────┼─────────────────────────────────────────────────┤
+│   write1        │ Username: write1                │ /insert/*         │ • Ingest logs                    │ • Query logs                                    │
+│   (Logstash)    │ Password: hpc-write-pass-1      │                   │ • Write data to Storage-1        │ • Access storage directly                       │
+│                 │                                 │                   │                                  │ • Delete logs                                   │
+├─────────────────┼─────────────────────────────────┼───────────────────┼──────────────────────────────────┼─────────────────────────────────────────────────┤
+│   write2        │ Username: write2                │ /insert/*         │ • Ingest logs                    │ • Query logs                                    │
+│   (Logstash)    │ Password: hpc-write-pass-2      │                   │ • Write data to Storage-2        │ • Access storage directly                       │
+│                 │                                 │                   │                                  │ • Delete logs                                   │
+├─────────────────┼─────────────────────────────────┼───────────────────┼──────────────────────────────────┼─────────────────────────────────────────────────┤
+│   write3        │ Username: write3                │ /insert/*         │ • Ingest logs                    │ • Query logs                                    │
+│   (Logstash)    │ Password: hpc-write-pass-3      │                   │ • Write data to Storage-3        │ • Access storage directly                       │
+│                 │                                 │                   │                                  │ • Delete logs                                   │
+├─────────────────┼─────────────────────────────────┼───────────────────┼──────────────────────────────────┼─────────────────────────────────────────────────┤
+│   read          │ Username: read                  │ /select/*         │ • Query logs                     │ • Ingest logs                                   │
+│   (Grafana,     │ Password: hpc-read-pass         │                   │ • View data                      │ • Write data                                    │
+│    vmalert)     │                                 │                   │ • Create alerts                  │ • Delete logs                                   │
+├─────────────────┼─────────────────────────────────┼───────────────────┼──────────────────────────────────┼─────────────────────────────────────────────────┤
+│   health        │ Username: health                │ /health           │ • Health checks                  │ • Query or write logs                           │
+│   (Monitoring)  │ Password: health-pass           │                   │                                  │                                                 │
+├─────────────────┼─────────────────────────────────┼───────────────────┼──────────────────────────────────┼─────────────────────────────────────────────────┤
+│   Unauthorized  │ None or invalid                 │ (none)            │ • Nothing                        │ • Everything - Returns HTTP 401 Unauthorized    │
+└─────────────────┴─────────────────────────────────┴───────────────────┴──────────────────────────────────┴─────────────────────────────────────────────────┘
 
-Service	            URL	                    Credentials
-Grafana             http://localhost:3001   (admin/admin)
-Write API	        http://localhost:8001
-Query API	        http://localhost:8004
-Storage Node 3	    http://localhost:8002
-Storage Node 4	    http://localhost:8003
-
-
-multi-node-simulation git:(multi-node-sim) ✗ tree
 .
 ├── node-1-pipeline
 │   ├── 1-generator
+│   │   ├── Dockerfile
 │   │   ├── generator.py
 │   │   ├── logs-generated
+│   │   │   ├── hpcmlog.jsonl
+│   │   │   ├── monitoring_service.jsonl
+│   │   │   └── syslog.jsonl
 │   │   └── logs-original
 │   │       ├── hpcmlog.json
 │   │       ├── monitoring_service.json
@@ -45,8 +71,15 @@ multi-node-simulation git:(multi-node-sim) ✗ tree
 │   │   ├── hpc-pipeline.conf
 │   │   └── logstash.yml
 │   ├── 6-grafana
-│   │   ├── hpc-alert-explorer.json
-│   │   ├── hpc-log-explorer.json
+│   │   ├── alerting-dashboard
+│   │   │   ├── hpc-alert-explorer.json
+│   │   │   └── readme.md
+│   │   ├── health-dashboard
+│   │   │   ├── hpc-health-explorer.json
+│   │   │   └── readme.md
+│   │   ├── logs-dashboard
+│   │   │   ├── hpc-log-explorer.json
+│   │   │   └── readme.md
 │   │   └── provisioning
 │   │       └── datasources
 │   │           └── datasources.yml
@@ -56,22 +89,43 @@ multi-node-simulation git:(multi-node-sim) ✗ tree
 │   ├── 8-victoriametrics
 │   │   └── scrape.yml
 │   └── docker-compose.yml
-├── node-2-vlinsert
+├── node-2-vlinsert-1
 │   └── docker-compose.yml
-├── node-3-vlstorage
+├── node-3-vlinsert-2
+│   └── docker-compose.yml
+├── node-4-vlinsert-3
+│   └── docker-compose.yml
+├── node-5-vlstorage-1
 │   ├── docker-compose.yml
 │   └── storage
-├── node-4-vlstorage
+├── node-6-vlstorage-2
 │   ├── docker-compose.yml
 │   └── storage
-├── node-5-vlselect
+├── node-7-vlstorage-3
+│   ├── docker-compose.yml
+│   └── storage
+├── node-8-vlselect
 │   └── docker-compose.yml
-├── port-mapping.txt
-├── start.sh
-├── stop.sh
-├── test.sh
+├── node-9-vmauth
+│   ├── docker-compose.yml
+│   └── vmauth.yml
+├── node-10-vlagent
+│   ├── docker-compose.yml
+│   └── vlagent-data
+│       └── remotewrite
+│           └── persistent-queue
+├── 1-stop.sh
+├── 2-start.sh
+├── 3-test.sh
+├── 4-ha-test.sh
 └── theory
+    ├── port-mapping.txt
     ├── alerting
     ├── grafana
-    ├── prometheus-benchmarking
+        └── Inventory queries.md
+    ├── port-mapping.txt
+    ├── prometheus
+    │   ├── benchmarking
     └── victorialogs
+        ├── high-availability
+        └── multi-node

@@ -1,0 +1,23 @@
+services:
+  vlinsert:
+    image: victoriametrics/victoria-logs:v1.49.0
+    container_name: node-2-vlinsert-1
+    command:
+      # Only writes to vlstorage-1
+      - "-storageNode=node-5-vlstorage-1:9428"
+      - "-httpListenAddr=:9428"
+      - "-select.disable=true"
+    ports:
+      - "8011:9428"
+    restart: unless-stopped
+    networks:
+      - multi-node-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  multi-node-net:
+    external: true
