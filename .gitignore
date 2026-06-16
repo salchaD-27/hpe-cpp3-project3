@@ -27,12 +27,7 @@ grafana-storage/
 node_modules/
 
 node-1-pipeline/1-generator/logs-generated/
-node-3-vlstorage/storage/
-node-3-vlstorage-hybrid/storage/
-node-4-vlstorage/storage/
-node-4-vlstorage-hybrid/storage/
-node-5-vlselect/storage/
-shared/
-hot_storage/
-warm_storage/
-cold_storage/
+node-5-vlstorage-1/storage/
+node-6-vlstorage-2/storage/
+node-7-vlstorage-3/storage/
+node-10-vlagent/vlagent-data/
