@@ -12,8 +12,9 @@ import re
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-INPUT_DIR  = "/scripts/logs-original"
-OUTPUT_DIR = "/generated-logs"
+BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+INPUT_DIR  = os.path.join(BASE_DIR, "scripts", "logs-original")
+OUTPUT_DIR = os.path.join(BASE_DIR, "generated-logs")
 RATE       = 20          # logs per second per file
 
 LOG_FILES = [
@@ -22,8 +23,7 @@ LOG_FILES = [
     # ("syslog.json",             "syslog.jsonl"),
     # ("sample_alerting_task3.json",             "sample_alerting_task3.jsonl"),
     # ("dynamic_kv_ip_logs.json",             "dynamic_kv_ip_logs.jsonl"),
-    ("heartbeat.json",             "heartbeat.jsonl")
-
+    ("heartbeat.jsonl",             "heartbeat.jsonl")
 ]
 
 # ---------------------------------------------------------------------------
@@ -54,9 +54,16 @@ def extract_severity(src: dict) -> str | None:
 
 def load_logs(filename: str) -> list[dict]:
     """Load log entries from the original JSON export (Elasticsearch hits format)."""
+    if filename == "heartbeat.jsonl":
+        return []
+
     path = os.path.join(INPUT_DIR, filename)
-    with open(path) as f:
-        data = json.load(f)
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
+        print(f"Skipping {filename}: {exc}")
+        return []
 
     hits = data.get("hits", {}).get("hits", [])
     entries = []
@@ -90,6 +97,9 @@ print("Loading logs...")
 all_logs: dict[str, list] = {}
 for input_file, output_file in LOG_FILES:
     logs = load_logs(input_file)
+    if not logs:
+        print(f"  {input_file}: skipped")
+        continue
     all_logs[output_file] = logs
     print(f"  {input_file}: {len(logs)} entries")
 
@@ -102,13 +112,13 @@ for _, output_file in LOG_FILES:
 handles = {
     output_file: open(os.path.join(OUTPUT_DIR, output_file), "a")
     for _, output_file in LOG_FILES
+    if output_file in all_logs
 }
-positions = {output_file: 0 for _, output_file in LOG_FILES}
+positions = {output_file: 0 for output_file in all_logs}
 
 try:
     while True:
-        for _, output_file in LOG_FILES:
-            logs = all_logs[output_file]
+        for output_file, logs in all_logs.items():
             pos  = positions[output_file]
 
             entry = dict(logs[pos % len(logs)])
