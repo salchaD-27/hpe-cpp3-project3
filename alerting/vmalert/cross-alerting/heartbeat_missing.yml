@@ -4,7 +4,7 @@ groups:
 
 - name: heartbeat-demo
   type: vlogs
-  interval: 30s
+  interval: 5m
 
   rules:
   - alert: NodeHeartbeatMissing

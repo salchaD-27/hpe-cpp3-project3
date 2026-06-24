@@ -13,6 +13,7 @@ groups:
       | stats count() as heartbeats
       | filter heartbeats :> 0'
     for: 5s
+    endsAt: 2024-06-05T12:00:00Z
     labels:
       severity: info
     annotations:
