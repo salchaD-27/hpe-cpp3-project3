@@ -1,6 +1,9 @@
 """
 Log Simulator
 Reads original JSON log files and streams entries as JSONL at a fixed rate.
+Output files are tailed by Fluent Bit.
+
+Identical to the single-node simulator — no changes needed.
 """
 
 import json
@@ -8,9 +11,10 @@ import time
 import os
 import re
 
+# ---------------------------------------------------------------------------
 # Configuration
-
-INPUT_DIR  = "/scripts/logs-original"
+# ---------------------------------------------------------------------------
+INPUT_DIR  = "/logs-original"
 OUTPUT_DIR = "/generated-logs"
 RATE       = 20          # logs per second per file
 
@@ -20,8 +24,9 @@ LOG_FILES = [
     ("syslog.json",             "syslog.jsonl"),
 ]
 
+# ---------------------------------------------------------------------------
 # Helpers
-
+# ---------------------------------------------------------------------------
 SEVERITY_REGEX = re.compile(
     r"\b(TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL|NOTICE|)\b",
     re.IGNORECASE
@@ -74,8 +79,9 @@ def load_logs(filename: str) -> list[dict]:
     return entries
 
 
+# ---------------------------------------------------------------------------
 # Main
-
+# ---------------------------------------------------------------------------
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 print("Loading logs...")
