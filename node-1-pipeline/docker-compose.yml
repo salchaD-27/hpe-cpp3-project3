@@ -11,14 +11,14 @@ services:
   # ---------------------------------------------------------------------------
   # Log Simulator
   # ---------------------------------------------------------------------------
-  log-generator:
+  logs-generator:
     image: python:3.12-slim
     container_name: node-1-generator
     volumes:
-      - ./1-generator/simulator.py:/scripts/simulator.py:ro
+      - ./1-generator/generator.py:/scripts/generator.py:ro
       - ./1-generator/logs-original:/logs-original:ro
       - ./1-generator/generated-logs:/generated-logs
-    command: python /scripts/simulator.py
+    command: python /scripts/generator.py
     restart: unless-stopped
     networks:
       - multi-node-net
