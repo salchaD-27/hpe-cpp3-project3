@@ -20,7 +20,7 @@ Thumbs.db
 node_modules/
 grafana-storage/
 
-node-1-pipeline/1-generator/logs-generated/
+node-1-pipeline/1-generator/generated-logs/
 node-5-vlstorage-1/storage/
 node-6-vlstorage-2/storage/
 node-7-vlstorage-3/storage/
