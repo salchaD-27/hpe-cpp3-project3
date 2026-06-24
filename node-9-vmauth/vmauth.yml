@@ -17,11 +17,26 @@ users:
       - src_paths: [".*"]
         url_prefix: "http://node-4-vlinsert-3:9428"
 
+  # READ PATH — pick ONE.
+  # Option A (active): nodes are REPLICAS → round-robin direct.
+  # Option B (commented): nodes are SHARDS → route via vlselect to merge.
+
+  # --- Option A: replicas, direct round-robin (current setup) ---
   - username: "read"
     password: "hpc-read-pass"
     url_map:
       - src_paths: [".*"]
-        url_prefix: "http://node-8-vlselect:9428"
+        url_prefix:
+          - "http://node-5-vlstorage-1:9428"
+          - "http://node-6-vlstorage-2:9428"
+          - "http://node-7-vlstorage-3:9428"
+
+  # --- Option B: shards, route through vlselect for a merged view ---
+  # - username: "read"
+  #   password: "hpc-read-pass"
+  #   url_map:
+  #     - src_paths: [".*"]
+  #       url_prefix: "http://node-8-vlselect:9428"
 
   - username: "health"
     password: "health-pass"
