@@ -1,0 +1,20 @@
+# event-driven state transitions; controlling alert lifecycle explicitly via Alertmanager API
+# 
+groups:
+
+- name: heartbeat-demo
+  type: vlogs
+  interval: 5m
+
+  rules:
+  - alert: NodeHeartbeatMissing
+    expr: '
+      _time:15s | {log_source="heartbeat", Resource.service.name="heartbeat_missing"}
+      | stats count() as heartbeats
+      | filter heartbeats :> 0'
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Node node-a missing heartbeat"
+      description: "No heartbeat received for 30 seconds."

@@ -1,0 +1,840 @@
+{
+  "hits": {
+    "total": {
+      "value": 40,
+      "relation": "eq"
+    },
+    "max_score": 10,
+    "hits": [
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 1,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:12:56Z",
+          "Timestamp": 1769987576.090682,
+          "ip": "10.1.1.11",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1000"
+          },
+          "Body": "10.1.1.11 failed login attempt",
+          "Severity": "ERROR",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 2,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:13:56Z",
+          "Timestamp": 1769987636.090682,
+          "ip": "10.1.1.12",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.12 connection timeout",
+          "SeverityText": "WARN",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-1.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 3,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:14:56Z",
+          "Timestamp": 1769987696.090682,
+          "ip": "10.1.1.13",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.13 disk usage high",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 4,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:15:56Z",
+          "Timestamp": 1769987756.090682,
+          "ip": "10.1.1.14",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1003"
+          },
+          "Body": "10.1.1.14 service restarted",
+          "Severity": "INFO",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 5,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:16:56Z",
+          "Timestamp": 1769987816.090682,
+          "ip": "10.1.1.15",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.15 CPU spike detected",
+          "SeverityText": "WARN",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 6,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:17:56Z",
+          "Timestamp": 1769987876.090682,
+          "ip": "10.1.1.11",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.11 SSH session opened",
+          "SeverityText": "INFO",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 7,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:18:56Z",
+          "Timestamp": 1769987936.090682,
+          "ip": "10.1.1.12",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1006"
+          },
+          "Body": "10.1.1.12 packet loss detected",
+          "Severity": "ERROR",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 8,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:19:56Z",
+          "Timestamp": 1769987996.090682,
+          "ip": "10.1.1.13",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.13 memory threshold exceeded",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-1.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 9,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:20:56Z",
+          "Timestamp": 1769988056.090682,
+          "ip": "10.1.1.14",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.14 daemon crashed",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 10,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:21:56Z",
+          "Timestamp": 1769988116.090682,
+          "ip": "10.1.1.15",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1009"
+          },
+          "Body": "10.1.1.15 network latency high",
+          "Severity": "WARN",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 1,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:22:56Z",
+          "Timestamp": 1769988176.090682,
+          "ip": "10.1.1.11",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.11 user login success",
+          "SeverityText": "INFO",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 2,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:23:56Z",
+          "Timestamp": 1769988236.090682,
+          "ip": "10.1.1.12",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.12 failed authentication",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 3,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:24:56Z",
+          "Timestamp": 1769988296.090682,
+          "ip": "10.1.1.13",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1012"
+          },
+          "Body": "10.1.1.13 disk mounted",
+          "Severity": "INFO",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 4,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:25:56Z",
+          "Timestamp": 1769988356.090682,
+          "ip": "10.1.1.14",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.14 kernel panic",
+          "SeverityText": "CRITICAL",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-1.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 5,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:26:56Z",
+          "Timestamp": 1769988416.090682,
+          "ip": "10.1.1.15",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.15 service degraded",
+          "SeverityText": "WARN",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 6,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:27:56Z",
+          "Timestamp": 1769988476.090682,
+          "ip": "10.1.1.11",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1015"
+          },
+          "Body": "10.1.1.11 backup completed",
+          "Severity": "INFO",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 7,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:28:56Z",
+          "Timestamp": 1769988536.090682,
+          "ip": "10.1.1.12",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.12 node unreachable",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 8,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:29:56Z",
+          "Timestamp": 1769988596.090682,
+          "ip": "10.1.1.13",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.13 temperature high",
+          "SeverityText": "WARN",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 9,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:30:56Z",
+          "Timestamp": 1769988656.090682,
+          "ip": "10.1.1.14",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1018"
+          },
+          "Body": "10.1.1.14 service healthy",
+          "Severity": "INFO",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 10,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:31:56Z",
+          "Timestamp": 1769988716.090682,
+          "ip": "10.1.1.15",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.15 I/O error",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-1.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 1,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:32:56Z",
+          "Timestamp": 1769988776.090682,
+          "ip": "10.1.1.11",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.11 disk check complete",
+          "SeverityText": "INFO",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 2,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:33:56Z",
+          "Timestamp": 1769988836.090682,
+          "ip": "10.1.1.12",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1021"
+          },
+          "Body": "10.1.1.12 CPU overload",
+          "Severity": "CRITICAL",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 3,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:34:56Z",
+          "Timestamp": 1769988896.090682,
+          "ip": "10.1.1.13",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.13 pod restarted",
+          "SeverityText": "INFO",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 4,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:35:56Z",
+          "Timestamp": 1769988956.090682,
+          "ip": "10.1.1.14",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.14 DB connection lost",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 5,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:36:56Z",
+          "Timestamp": 1769989016.090682,
+          "ip": "10.1.1.15",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1024"
+          },
+          "Body": "10.1.1.15 high latency",
+          "Severity": "WARN",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 6,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:37:56Z",
+          "Timestamp": 1769989076.090682,
+          "ip": "10.1.1.11",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.11 connection reset",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-1.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 7,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:38:56Z",
+          "Timestamp": 1769989136.090682,
+          "ip": "10.1.1.12",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.12 cache cleared",
+          "SeverityText": "INFO",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 8,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:39:56Z",
+          "Timestamp": 1769989196.090682,
+          "ip": "10.1.1.13",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1027"
+          },
+          "Body": "10.1.1.13 API timeout",
+          "Severity": "ERROR",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 9,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:40:56Z",
+          "Timestamp": 1769989256.090682,
+          "ip": "10.1.1.14",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.14 thread blocked",
+          "SeverityText": "WARN",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 10,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:41:56Z",
+          "Timestamp": 1769989316.090682,
+          "ip": "10.1.1.15",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.15 disk failure",
+          "SeverityText": "CRITICAL",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 1,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:42:56Z",
+          "Timestamp": 1769989376.090682,
+          "ip": "10.1.1.11",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1030"
+          },
+          "Body": "10.1.1.11 network restored",
+          "Severity": "INFO",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 2,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:43:56Z",
+          "Timestamp": 1769989436.090682,
+          "ip": "10.1.1.12",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.12 load balanced",
+          "SeverityText": "INFO",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-1.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 3,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:44:56Z",
+          "Timestamp": 1769989496.090682,
+          "ip": "10.1.1.13",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.13 service unavailable",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 4,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:45:56Z",
+          "Timestamp": 1769989556.090682,
+          "ip": "10.1.1.14",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1033"
+          },
+          "Body": "10.1.1.14 pod crash loop",
+          "Severity": "CRITICAL",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 5,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:46:56Z",
+          "Timestamp": 1769989616.090682,
+          "ip": "10.1.1.15",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.15 node draining",
+          "SeverityText": "WARN",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-0.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 6,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:47:56Z",
+          "Timestamp": 1769989676.090682,
+          "ip": "10.1.1.11",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.11 login failed",
+          "SeverityText": "ERROR",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 7,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:48:56Z",
+          "Timestamp": 1769989736.090682,
+          "ip": "10.1.1.12",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1036"
+          },
+          "Body": "10.1.1.12 DNS resolution failed",
+          "Severity": "ERROR",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      },
+      {
+        "_index": "hpcmlog-2026.02.01",
+        "_id": "test2",
+        "_score": 8,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:49:56Z",
+          "Timestamp": 1769989796.090682,
+          "ip": "10.1.1.13",
+          "Resource": {
+            "service.name": "cmuserver-0",
+            "host.name": "padma"
+          },
+          "Body": "10.1.1.13 memory leak detected",
+          "SeverityText": "CRITICAL",
+          "Attributes": {
+            "hpcmlog.filename": "/opt/clmgr/log/cmuserver-1.log"
+          }
+        }
+      },
+      {
+        "_index": "monitoring_services-2026.02.01",
+        "_id": "test2",
+        "_score": 9,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:50:56Z",
+          "Timestamp": 1769989856.090682,
+          "ip": "10.1.1.14",
+          "Resource": {
+            "service.name": "opensearch"
+          },
+          "Body": "10.1.1.14 restart triggered",
+          "SeverityText": "INFO",
+          "Attributes": {
+            "monitoring_services.filename": "/var/log/opensearch/hpc_monitoring.log"
+          }
+        }
+      },
+      {
+        "_index": "syslog-2026.02.01",
+        "_id": "test2",
+        "_score": 10,
+        "_source": {
+          "@version": "1",
+          "@timestamp": "2026-02-01T23:51:56Z",
+          "Timestamp": 1769989916.090682,
+          "ip": "10.1.1.15",
+          "Resource": {
+            "service.name": "systemd",
+            "host.name": "leader1",
+            "process_id": "1039"
+          },
+          "Body": "10.1.1.15 service restarted",
+          "Severity": "INFO",
+          "Attributes": {
+            "facility": "3",
+            "type": "log_syslog",
+            "priority": "30"
+          }
+        }
+      }
+    ]
+  }
+}

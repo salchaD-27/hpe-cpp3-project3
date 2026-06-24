@@ -1,0 +1,65 @@
+groups:
+  - name: hpc-alerts
+    type: vlogs
+    interval: 30s   # how often rules are evaluated
+
+    rules:
+
+      - alert: ServiceRestartDetected
+        expr: 'log_source:syslog OR _msg:"Started" 
+              | stats count() as restarts 
+              | filter restarts:>1'
+        for: 5s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Service restart detected"
+          description: "Multiple services restarted ({{$value}})"
+
+      - alert: KafkaGCPauseSpike
+        expr: 'log_source:monitoring OR _msg:"GC(" OR _msg:"Pause" 
+              | stats count() as gc_events 
+              | filter gc_events:>2'
+        for: 5s
+        labels:
+          severity: warning
+        annotations:
+          summary: "High GC activity in Kafka"
+          description: "Frequent GC pauses detected ({{$value}})"
+
+      - alert: KafkaHeapPressure
+        expr: 'log_source:monitoring OR _msg:"Humongous regions" 
+              | stats count() as heap_events 
+              | filter heap_events:>0'
+        for: 5s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka heap pressure"
+          description: "Large object allocation pressure detected"
+
+      - alert: HighLogRatePerHost
+        expr: '* 
+              | stats by (Resource.host.name) count() as logs
+              | filter logs:>1'
+        for: 5s
+        labels:
+          severity: warning
+        annotations:
+          summary: "High log rate on host"
+          description: "Host {{$labels.Resource.host.name}} generating high logs ({{$value}})"
+
+      - alert: NoLogsIngestion
+        expr: '*
+              | copy "Resource.service.name" as service
+              | copy level as severity
+              | copy _msg as message
+              | format "<service> : {<severity> : <message>}" as formatted
+              | stats by (formatted) count()'
+        for: 2s
+        labels:
+          severity: critical
+        annotations:
+          summary: "No logs ingested"
+          # description: "Pipeline failure"
+          description: "{{ $labels.formatted }}"

@@ -1,0 +1,116 @@
+lazyg@archlinux benchmark_scripts]$ python query.py 
+--------------------------------------------------
+Executed query: log_source:syslog OR _msg:'Started' | stats count() as restarts | filter restarts:>1
+--------------------------------------------------
+
+=== Results ===
+Requests: 339
+p50: 0.102s
+p95: 0.593s
+p99: 1.037s
+max: 1.584s
+--------------------------------------------------
+Throuput(Query Per Second):
+Total duration: 60 seconds
+Throughput: 5.65 QPS
+--------------------------------------------------
+success: 523
+failure: 0
+success rate: 100.00%
+failure rate: 0.00%
+--------------------------------------------------
+avg response size = 120.96 KB
+max response size = 440.59 KB
+--------------------------------------------------
+--------------------------------------------------
+Executed query: * | extract '<ip> *' from _msg | replace('10.1.1.11', 'node-a') | replace('10.1.1.12', 'node-b') | replace('10.1.1.13', 'node-c') | replace('10.1.1.14', 'node-d') | replace('10.1.1.15', 'node-e') | format '<_msg>' as formatted | stats by (formatted) count() as hits | filter hits :> 0
+--------------------------------------------------
+
+=== Results ===
+Requests: 39
+p50: 1.554s
+p95: 2.123s
+p99: 2.314s
+max: 2.314s
+--------------------------------------------------
+Throuput(Query Per Second):
+Total duration: 60 seconds
+Throughput: 0.65 QPS
+--------------------------------------------------
+success: 523
+failure: 0
+success rate: 100.00%
+failure rate: 0.00%
+--------------------------------------------------
+avg response size = 120.96 KB
+max response size = 440.59 KB
+--------------------------------------------------
+--------------------------------------------------
+Executed query: * | copy 'Resource.service.name' as service | copy 'Resource.host.name' as host | copy 'Attributes.priority' as priority_raw | math priority_raw + 0 as priority | format '<host> : <service> : <_msg>' as formatted | stats by (formatted) count() if (host:='padma' OR service:in('systemd', 'glusterd') OR priority:range[70, Inf]) as CRITICAL, count() if (priority:range[30, 70) AND host:!='padma' AND service:!in('systemd', 'glusterd')) as WARN, count() if (priority:range[0, 30) AND host:!='padma' AND service:!in('systemd', 'glusterd')) as SAFE
+--------------------------------------------------
+
+=== Results ===
+Requests: 53
+p50: 1.127s
+p95: 1.571s
+p99: 1.800s
+max: 1.800s
+--------------------------------------------------
+Throuput(Query Per Second):
+Total duration: 60 seconds
+Throughput: 0.88 QPS
+--------------------------------------------------
+success: 523
+failure: 0
+success rate: 100.00%
+failure rate: 0.00%
+--------------------------------------------------
+avg response size = 120.96 KB
+max response size = 440.59 KB
+--------------------------------------------------
+--------------------------------------------------
+Executed query: * | copy 'Resource.service.name' as service | copy 'Resource.host.name' as host | copy _msg as message | format '<host> | <service> | <message>' as formatted | stats by (formatted) count() as cnt | filter cnt:>0
+--------------------------------------------------
+
+=== Results ===
+Requests: 58
+p50: 0.972s
+p95: 1.467s
+p99: 2.024s
+max: 2.024s
+--------------------------------------------------
+Throuput(Query Per Second):
+Total duration: 60 seconds
+Throughput: 0.97 QPS
+--------------------------------------------------
+success: 523
+failure: 0
+success rate: 100.00%
+failure rate: 0.00%
+--------------------------------------------------
+avg response size = 120.96 KB
+max response size = 440.59 KB
+--------------------------------------------------
+--------------------------------------------------
+Executed query: *| copy 'Resource.service.name' as service | copy 'Resource.host.name' as host | copy 'Attributes.priority' as priority_raw | copy _msg as message | replace('10.1.1.11', 'node-a') | replace('10.1.1.12', 'node-b') | replace('10.1.1.13', 'node-c') | replace('10.1.1.14', 'node-d') | replace('10.1.1.15', 'node-e') | math priority_raw + 0 as priority | format '<host> | <service> | <message>' as formatted | stats by (formatted) count() if (host:='padma' OR service:in('systemd','glusterd') OR priority:range[70, Inf]) as CRITICAL, count() if (priority:range[30,70) AND host:!='padma' AND service:!in('systemd','glusterd')) as WARN, count() if (priority:range[0,30) AND host:!='padma' AND service:!in('systemd','glusterd')) as SAFE | filter CRITICAL:>0 OR WARN:>0
+--------------------------------------------------
+
+=== Results ===
+Requests: 34
+p50: 1.767s
+p95: 2.211s
+p99: 2.486s
+max: 2.486s
+--------------------------------------------------
+Throuput(Query Per Second):
+Total duration: 60 seconds
+Throughput: 0.57 QPS
+--------------------------------------------------
+success: 523
+failure: 0
+success rate: 100.00%
+failure rate: 0.00%
+--------------------------------------------------
+avg response size = 120.96 KB
+max response size = 440.59 KB
+--------------------------------------------------

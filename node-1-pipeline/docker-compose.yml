@@ -16,8 +16,8 @@ services:
     container_name: node-1-generator
     volumes:
       - ./1-generator/generator.py:/scripts/generator.py:ro
-      - ./1-generator/logs-original:/logs-original:ro
-      - ./1-generator/generated-logs:/generated-logs
+      - ./1-generator/logs-original:/scripts/logs-original:ro
+      - ./1-generator/generated-logs:/scripts/generated-logs
     command: python /scripts/generator.py
     restart: unless-stopped
     networks:
@@ -122,13 +122,15 @@ services:
       - "-datasource.url=http://node-9-vmauth:8427"
       - "-datasource.queryStep=30s"
       - "-rule=/etc/alerts/*.yml"
+      - "-rule=/etc/alerts/cross-alerting/*.yml"
       - "-evaluationInterval=30s"
       - "-httpListenAddr=:8880"
       - "-notifier.url=http://node-1-alertmanager:9093"
       - "-datasource.basicAuth.username=read"
       - "-datasource.basicAuth.password=hpc-read-pass"
     volumes:
-      - ./5-vmalert/alerts:/etc/alerts:ro
+      - ./5-vmalert/alerting/vmalert:/etc/alerts:ro
+      - ./5-vmalert/alerting/vmalert/cross-alerting:/etc/alerts/cross-alerting:ro
     ports:
       - "8881:8880"
     depends_on:
@@ -141,7 +143,7 @@ services:
     image: prom/alertmanager:latest
     container_name: node-1-alertmanager
     volumes:
-      - ./5-vmalert/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./5-vmalert/alerting/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--web.listen-address=:9093"
