@@ -15,11 +15,11 @@
       }
     ]
   },
-  "description": "VictoriaLogs internal health & performance — Multinode (vlinsert × 1, vlstorage × 2, vlselect × 1). Datasource: Prometheus scraping all VL component /metrics endpoints via VictoriaMetrics on node-1.",
+  "description": "HPCM Log Pipeline V4 — Multinode (1-2-2 architecture): 1×pipeline, 1×vlinsert, 2×vlstorage, 1×vlselect",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 1,
-  "id": 37,
+  "graphTooltip": 0,
+  "id": 55,
   "links": [],
   "panels": [
     {
@@ -32,139 +32,27 @@
       },
       "id": 100,
       "panels": [],
-      "title": "Cluster Overview",
+      "title": "Overview",
       "type": "row"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
-      "description": "Uptime per component",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "noValue": "—",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "dtdurations"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 14,
-        "x": 0,
-        "y": 1
-      },
-      "id": 1,
-      "options": {
-        "displayMode": "gradient",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "maxVizHeight": 300,
-        "minVizHeight": 10,
-        "minVizWidth": 0,
-        "namePlacement": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color"
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "time() - process_start_time_seconds{job='vlselect'}",
-          "instant": true,
-          "legendFormat": "vlselect",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "editorMode": "code",
-          "expr": "time() - process_start_time_seconds{job='vlinsert'}",
-          "instant": false,
-          "legendFormat": "vlinsert",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "time() - process_start_time_seconds{job='vlstorage-1'}",
-          "instant": true,
-          "legendFormat": "vlstorage-1",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "time() - process_start_time_seconds{job='vlstorage-2'}",
-          "instant": true,
-          "legendFormat": "vlstorage-2",
-          "refId": "D"
-        }
-      ],
-      "title": "Node Uptime",
-      "type": "bargauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
-      },
-      "description": "Cumulative rows ingested",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "semi-dark-blue",
+            "fixedColor": "red",
             "mode": "fixed"
           },
-          "decimals": 0,
           "mappings": [],
-          "noValue": "—",
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
+                "color": "red"
               }
             ]
           },
@@ -173,12 +61,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
-        "w": 5,
-        "x": 14,
+        "h": 5,
+        "w": 6,
+        "x": 0,
         "y": 1
       },
-      "id": 2,
+      "id": 800,
       "options": {
         "colorMode": "background",
         "graphMode": "area",
@@ -196,47 +84,88 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "labels.severity",
+              "text": "severity",
+              "type": "string"
+            },
+            {
+              "selector": "labels.instance",
+              "text": "instance",
+              "type": "string"
+            },
+            {
+              "selector": "labels.job",
+              "text": "job",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "startsAt",
+              "text": "startsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "sum(vl_rows_ingested_total)",
-          "instant": true,
-          "legendFormat": "rows",
-          "refId": "A"
+          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeExpression": "count(state)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
-      "title": "Total Rows Ingested",
+      "title": "Active Alerts",
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
-      "description": "Higher is better",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "semi-dark-green",
+            "fixedColor": "dark-red",
             "mode": "fixed"
           },
-          "decimals": 1,
           "mappings": [],
-          "noValue": "—",
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
+                "color": "dark-red"
               }
             ]
           },
@@ -245,12 +174,125 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
-        "w": 5,
-        "x": 19,
+        "h": 5,
+        "w": 6,
+        "x": 6,
         "y": 1
       },
-      "id": 3,
+      "id": 810,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "labels.severity",
+              "text": "severity",
+              "type": "string"
+            },
+            {
+              "selector": "labels.instance",
+              "text": "instance",
+              "type": "string"
+            },
+            {
+              "selector": "labels.job",
+              "text": "job",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "startsAt",
+              "text": "startsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
+          },
+          "filterExpression": "((severity == 'critical') && ('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeExpression": "count(state)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Critical Alerts",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "orange",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange"
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "id": 812,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -268,1335 +310,852 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "id",
+              "text": "id",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "sum(vl_uncompressed_data_size_bytes) / sum(vl_compressed_data_size_bytes)",
-          "instant": true,
-          "legendFormat": "ratio",
-          "refId": "A"
+          "filterExpression": "state == 'active'",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeExpression": "count(state)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/silences",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
-      "title": "Compression Ratio",
+      "title": "Silenced Alerts",
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
       },
-      "description": "Live ingestion trend",
+      "id": 802,
+      "panels": [],
+      "title": "Alert Insights (Alertmanager + VMAlert)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
             "fixedColor": "blue",
             "mode": "fixed"
           },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
           "mappings": [],
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 1
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 3
               }
             ]
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ServiceRestartDetected"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "KafkaGCPauseSpike"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "KafkaHeapPressure"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HighLogRatePerHost"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "NoLogsIngestion"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "IPMappedLogDetected"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SampleMessageDetected"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5794F2",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 4,
-        "w": 10,
-        "x": 14,
-        "y": 4
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 7
       },
-      "id": 4,
+      "id": 804,
       "options": {
+        "displayMode": "gradient",
         "legend": {
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 0,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "text": {},
+        "valueMode": "color"
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "editorMode": "code",
-          "expr": "rate(vl_rows_ingested_total{job='vlinsert'}[1m])",
-          "instant": false,
-          "legendFormat": "rows/s",
-          "refId": "A"
+          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeBy": "alertname",
+          "summarizeExpression": "count(alertname)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
-      "title": "Ingestion Rate (logs/s)",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 8
-      },
-      "id": 200,
-      "panels": [],
-      "title": "Per-Component Resources",
-      "type": "row"
+      "title": "Active Alerts by Rule",
+      "type": "bargauge"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
-      "description": "Resident memory trend per component",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
             }
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "critical"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "warning"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "info"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5794F2",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "summary"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 7
+      },
+      "id": 805,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "labels.severity",
+              "text": "severity",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
+          },
+          "filterExpression": "((('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')) && (severity != null && severity != '')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeBy": "severity",
+          "summarizeExpression": "count(severity)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Active Alerts by Severity",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "filterable": true,
+            "inspect": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "text"
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "severity"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "applyToRow": false,
+                  "mode": "basic",
+                  "type": "color-background"
+                }
               },
               {
-                "color": "red",
-                "value": 80
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "critical": {
+                        "color": "dark-red",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "warning": {
+                        "color": "orange",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "info": {
+                        "color": "blue",
+                        "index": 2
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 182
               }
             ]
           },
-          "unit": "bytes"
-        },
-        "overrides": []
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "startsAt"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 246
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "alertname"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 256
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "description"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 738
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 9
-      },
-      "id": 202,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "process_resident_memory_bytes{job='vlselect'}",
-          "instant": false,
-          "legendFormat": "vlselect",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "process_resident_memory_bytes{job='vlinsert'}",
-          "instant": false,
-          "legendFormat": "vlinsert",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "process_resident_memory_bytes{job='vlstorage-1'}",
-          "instant": false,
-          "legendFormat": "vlstorage-1",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "process_resident_memory_bytes{job='vlstorage-2'}",
-          "instant": false,
-          "legendFormat": "vlstorage-2",
-          "refId": "D"
-        }
-      ],
-      "title": "Memory Over Time",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
+        "h": 10,
         "w": 24,
         "x": 0,
         "y": 17
       },
-      "id": 300,
+      "id": 811,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "severity"
+          }
+        ]
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "labels.severity",
+              "text": "severity",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "startsAt",
+              "text": "startsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
+          },
+          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Firing Alerts — Full Detail",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "alertstate": true,
+              "instance": true,
+              "job": true
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 814,
       "panels": [],
-      "title": "Storage Health",
+      "title": "Silence Management",
       "type": "row"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
-      "description": "node-3",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 1,
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 5,
-        "x": 0,
-        "y": 18
-      },
-      "id": 301,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": true,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "(1 - (vl_free_disk_space_bytes{job='vlstorage-1',path='/storage'} / vl_total_disk_space_bytes{job='vlstorage-1',path='/storage'})) * 100",
-          "instant": true,
-          "legendFormat": "vlstorage-1",
-          "refId": "A"
-        }
-      ],
-      "title": "Disk Used % — vlstorage-1",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
-      },
-      "description": "node-4",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 85
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 5,
-        "x": 5,
-        "y": 18
-      },
-      "id": 302,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": true,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "(1 - (vl_free_disk_space_bytes{job='vlstorage-2',path='/storage'} / vl_total_disk_space_bytes{job='vlstorage-2',path='/storage'})) * 100",
-          "instant": true,
-          "legendFormat": "vlstorage-2",
-          "refId": "A"
-        }
-      ],
-      "title": "Disk Used % — vlstorage-2",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
-      },
-      "description": "Compressed vs uncompressed per node",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
           "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
             },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "filterable": true,
+            "inspect": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
+                "color": "text"
               }
             ]
-          },
-          "unit": "bytes"
+          }
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 14,
-        "x": 10,
-        "y": 18
-      },
-      "id": 303,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "sum by(type)(vl_uncompressed_data_size_bytes{job='vlstorage-1'})",
-          "instant": false,
-          "legendFormat": "uncompressed — s1 {{type}}",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "sum by(type)(vl_compressed_data_size_bytes{job='vlstorage-1'})",
-          "instant": false,
-          "legendFormat": "compressed — s1 {{type}}",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "sum by(type)(vl_uncompressed_data_size_bytes{job='vlstorage-2'})",
-          "instant": false,
-          "legendFormat": "uncompressed — s2 {{type}}",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "sum by(type)(vl_compressed_data_size_bytes{job='vlstorage-2'})",
-          "instant": false,
-          "legendFormat": "compressed — s2 {{type}}",
-          "refId": "D"
-        }
-      ],
-      "title": "Storage Size Growth",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 25
-      },
-      "id": 400,
-      "panels": [],
-      "title": "Ingestion",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
-      },
-      "description": "Average req/s per job+path",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "state"
             },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
+            "properties": [
               {
-                "color": "green",
-                "value": null
+                "id": "custom.cellOptions",
+                "value": {
+                  "applyToRow": false,
+                  "mode": "basic",
+                  "type": "color-background"
+                }
               },
               {
-                "color": "red",
-                "value": 80
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "active": {
+                        "color": "orange",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "expired": {
+                        "color": "gray",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "pending": {
+                        "color": "blue",
+                        "index": 2
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
               }
             ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 26
-      },
-      "id": 402,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.6,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "orientation": "auto",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "rate(vl_http_requests_total[1m]) > 0",
-          "instant": false,
-          "legendFormat": "{{job}} — {{path}}",
-          "refId": "A"
-        }
-      ],
-      "title": "HTTP Requests by Endpoint",
-      "type": "barchart"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 35
-      },
-      "id": 500,
-      "panels": [],
-      "title": "Latency",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
-      },
-      "description": "p50/p90/p99 elasticsearch bulk",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 36
-      },
-      "id": 501,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "vl_http_request_duration_seconds{job=\"vlinsert\",path=\"/insert/elasticsearch/_bulk\",quantile=\"0.5\"}",
-          "instant": false,
-          "legendFormat": "p50",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "vl_http_request_duration_seconds{job=\"vlinsert\",path=\"/insert/elasticsearch/_bulk\",quantile=\"0.9\"}",
-          "instant": false,
-          "legendFormat": "p90",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "vl_http_request_duration_seconds{job=\"vlinsert\",path=\"/insert/elasticsearch/_bulk\",quantile=\"0.99\"}",
-          "instant": false,
-          "legendFormat": "p99",
-          "refId": "C"
-        }
-      ],
-      "title": "Insert Latency Percentiles (vlinsert)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
-      },
-      "description": "p50/p90/p99 per path",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 36
-      },
-      "id": 502,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "vl_http_request_duration_seconds{job=\"vlselect\",quantile=\"0.5\"}",
-          "instant": false,
-          "legendFormat": "p50 — {{path}}",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "vl_http_request_duration_seconds{job=\"vlselect\",quantile=\"0.9\"}",
-          "instant": false,
-          "legendFormat": "p90 — {{path}}",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "vl_http_request_duration_seconds{job=\"vlselect\",quantile=\"0.99\"}",
-          "instant": false,
-          "legendFormat": "p99 — {{path}}",
-          "refId": "C"
-        }
-      ],
-      "title": "Select Latency Percentiles (vlselect)",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
         "w": 24,
         "x": 0,
-        "y": 44
+        "y": 28
       },
-      "id": 600,
-      "panels": [],
-      "title": "CPU Usage",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_VICTORIALOGS_METRICS}"
-      },
-      "description": "User+sys CPU per component",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percentunit"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 24,
-        "x": 0,
-        "y": 45
-      },
-      "id": 602,
+      "id": 813,
       "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "lastNotNull"
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
           ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
+          "show": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "showHeader": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "rate(process_cpu_seconds_user_total{job='vlselect'}[1m])",
-          "instant": false,
-          "legendFormat": "user — vlselect",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "rate(process_cpu_seconds_user_total{job='vlinsert'}[1m])",
-          "instant": false,
-          "legendFormat": "user — vlinsert",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "rate(process_cpu_seconds_user_total{job='vlstorage-1'}[1m])",
-          "instant": false,
-          "legendFormat": "user — vlstorage-1",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "expr": "rate(process_cpu_seconds_user_total{job='vlstorage-2'}[1m])",
-          "instant": false,
-          "legendFormat": "user — vlstorage-2",
-          "refId": "D"
-        }
-      ],
-      "title": "CPU Usage Over Time",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 52
-      },
-      "id": 700,
-      "panels": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
-          },
-          "description": "Active vs max capacity — vlselect",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "line",
-                "fillOpacity": 12,
-                "gradientMode": "opacity",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "linear",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "short"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "capacity"
-                },
-                "properties": [
-                  {
-                    "id": "custom.lineStyle",
-                    "value": {
-                      "dash": [
-                        8,
-                        4
-                      ],
-                      "fill": "dash"
-                    }
-                  },
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "red",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 14,
-            "x": 0,
-            "y": 53
-          },
-          "id": 701,
-          "options": {
-            "legend": {
-              "calcs": [
-                "lastNotNull",
-                "max"
-              ],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          },
-          "pluginVersion": "11.4.0",
-          "targets": [
+          "columns": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${DS_VICTORIALOGS_METRICS}"
-              },
-              "expr": "vl_concurrent_select_current{job='vlselect'}",
-              "instant": false,
-              "legendFormat": "current",
-              "refId": "A"
+              "selector": "id",
+              "text": "id",
+              "type": "string"
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${DS_VICTORIALOGS_METRICS}"
-              },
-              "expr": "vl_concurrent_select_capacity{job='vlselect'}",
-              "instant": false,
-              "legendFormat": "capacity",
-              "refId": "B"
+              "selector": "matchers",
+              "text": "matchers",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "startsAt",
+              "text": "startsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "endsAt",
+              "text": "endsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "createdBy",
+              "text": "createdBy",
+              "type": "string"
+            },
+            {
+              "selector": "comment",
+              "text": "comment",
+              "type": "string"
             }
           ],
-          "title": "Concurrent SELECT Queries vs Capacity",
-          "type": "timeseries"
-        },
-        {
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_VICTORIALOGS_METRICS}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "description": "Should stay at 0 — any bar = data loss",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 0,
-              "mappings": [],
-              "noValue": "0",
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 1
-                  }
-                ]
-              },
-              "unit": "short"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 7,
-            "w": 10,
-            "x": 14,
-            "y": 53
-          },
-          "id": 702,
-          "options": {
-            "barRadius": 0,
-            "barWidth": 0.5,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "orientation": "auto",
-            "showValue": "auto",
-            "stacking": "none",
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            },
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
-          },
-          "pluginVersion": "11.4.0",
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${DS_VICTORIALOGS_METRICS}"
-              },
-              "expr": "vl_rows_dropped_total{reason=\"too_big_timestamp\"}",
-              "instant": true,
-              "legendFormat": "too_big_timestamp",
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${DS_VICTORIALOGS_METRICS}"
-              },
-              "expr": "vl_rows_dropped_total{reason=\"too_small_timestamp\"}",
-              "instant": true,
-              "legendFormat": "too_small_timestamp",
-              "refId": "B"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "${DS_VICTORIALOGS_METRICS}"
-              },
-              "expr": "vl_rows_dropped_total{reason=\"too_many_fields\"}",
-              "instant": true,
-              "legendFormat": "too_many_fields",
-              "refId": "C"
-            }
-          ],
-          "title": "Rows Dropped by Reason",
-          "type": "barchart"
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/silences",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
-      "title": "Concurrency & Data Quality",
-      "type": "row"
+      "title": "Active Silences",
+      "type": "table"
     }
   ],
   "preload": false,
   "refresh": "30s",
-  "schemaVersion": 40,
+  "schemaVersion": 41,
   "tags": [
     "hpc",
     "victorialogs",
-    "health",
-    "multinode"
+    "kafka",
+    "logstash"
   ],
   "templating": {
     "list": [
+      {
+        "current": {
+          "text": "VictoriaLogs",
+          "value": "PD775F2863313E6C7"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "VictoriaLogs",
+        "name": "DS_VICTORIALOGS",
+        "options": [],
+        "query": "victoriametrics-logs-datasource",
+        "refresh": 1,
+        "type": "datasource"
+      },
       {
         "current": {
           "text": "VictoriaMetrics",
@@ -1604,12 +1163,105 @@
         },
         "hide": 2,
         "includeAll": false,
-        "label": "VictoriaLogs Metrics",
-        "name": "DS_VICTORIALOGS_METRICS",
+        "label": "VictoriaMetrics",
+        "name": "DS_ALERTMANAGER",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
         "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "Infinity-Alertmanager",
+          "value": "infinity-alertmanager"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Infinity-Alertmanager",
+        "name": "DS_INFINITY",
+        "options": [],
+        "query": "yesoreyeram-infinity-datasource",
+        "refresh": 1,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "All"
+        },
+        "description": "Filter all panels by alert severity",
+        "label": "Severity",
+        "name": "severity_filter",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "All"
+          },
+          {
+            "selected": false,
+            "text": "critical",
+            "value": "critical"
+          },
+          {
+            "selected": false,
+            "text": "warning",
+            "value": "warning"
+          },
+          {
+            "selected": false,
+            "text": "info",
+            "value": "info"
+          }
+        ],
+        "query": "All,critical,warning,info",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "All"
+        },
+        "description": "Filter all panels by alert state",
+        "label": "State",
+        "name": "state_filter",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "All"
+          },
+          {
+            "selected": false,
+            "text": "active",
+            "value": "active"
+          },
+          {
+            "selected": false,
+            "text": "suppressed",
+            "value": "suppressed"
+          }
+        ],
+        "query": "All,active,suppressed",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "description": "Search alertname and description (case-insensitive, partial match)",
+        "label": "Search Alerts",
+        "name": "keyword_search",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
       }
     ]
   },
@@ -1617,10 +1269,11 @@
     "from": "now-5m",
     "to": "now"
   },
-  "timepicker": {},
+  "timepicker": {
+    "nowDelay": ""
+  },
   "timezone": "browser",
-  "title": "VictoriaLogs — Health & Performance",
-  "uid": "vl-health",
-  "version": 2,
-  "weekStart": ""
+  "title": "HPCM — Alerting Insights v1",
+  "uid": "hpcm-alerts-v1",
+  "version": 11
 }
