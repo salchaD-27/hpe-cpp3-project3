@@ -14,7 +14,7 @@ services:
     volumes:
       - ./1-generator/logs-generated:/generated-logs:ro
       - ./2-fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
-      - ./2-fluent-bit/parsers.conf:/fluent-bit/etc/parsers/parser.conf:ro
+      - ./2-fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
     ports:
       - "8081:2020"
     depends_on:
@@ -75,7 +75,7 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_USERS_ALLOW_SIGN_UP: "false"
-      # GF_INSTALL_PLUGINS: "https://github.com/VictoriaMetrics/grafana-datasource/releases/download/v0.8.0/victoriametrics-logs-datasource-0.8.0.zip;victoriametrics-logs-datasource"
+      GF_INSTALL_PLUGINS: "victoriametrics-logs-datasource"
     volumes:
       - ./6-grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - grafana-data:/var/lib/grafana
