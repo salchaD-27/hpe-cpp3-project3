@@ -1,27 +1,57 @@
+# =============================================================================
+# Node 1 — Pipeline Node
+# Runs: Simulator, Fluent Bit, Kafka, Logstash, Grafana, VictoriaMetrics,
+#        vmalert, Alertmanager, Kafka UI
+#
+# All services join multi-node-net so they can reach Node 2-5 by container name.
+# =============================================================================
+
 services:
+
+  # ---------------------------------------------------------------------------
+  # Log Simulator
+  # ---------------------------------------------------------------------------
   log-generator:
-    build: ./1-generator
-    container_name: node-1-log-generator
+    image: python:3.12-slim
+    container_name: node-1-generator
     volumes:
-      - ./1-generator/logs-generated:/logs-generated
+      - ./1-generator/simulator.py:/scripts/simulator.py:ro
+      - ./1-generator/logs-original:/logs-original:ro
+      - ./1-generator/generated-logs:/generated-logs
+    command: python /scripts/simulator.py
     restart: unless-stopped
     networks:
       - multi-node-net
+    depends_on:
+      - fluent-bit
+    deploy:
+      resources:
+        limits:
+          memory: 128M
 
+  # ---------------------------------------------------------------------------
+  # Fluent Bit
+  # Tails JSONL files → Kafka topic hpc-logs
+  # ---------------------------------------------------------------------------
   fluent-bit:
     image: cr.fluentbit.io/fluent/fluent-bit:4.0.2
     container_name: node-1-fluent-bit
+    ports:
+      - "2020:2020"
     volumes:
-      - ./1-generator/logs-generated:/generated-logs:ro
       - ./2-fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
       - ./2-fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
-    ports:
-      - "8081:2020"
+      - ./1-generator/generated-logs:/generated-logs
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - multi-node-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   kafka:
     image: apache/kafka:4.2.0
@@ -54,9 +84,9 @@ services:
     image: docker.elastic.co/logstash/logstash:9.3.2
     container_name: node-1-logstash
     volumes:
-      - ./4-logstash/hpc-pipeline.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-      - ./4-logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./1-generator/logs-generated:/logs-generated:ro
+      - ./3-logstash/hpc-pipeline.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./3-logstash/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./1-generator/generated-logs:/generated-logs:ro
     ports:
       - "9601:9600"
     environment:
@@ -69,15 +99,15 @@ services:
       - multi-node-net
 
   grafana:
-    image: grafana/grafana:11.4.0
+    image: grafana/grafana:11.6.15
     container_name: node-1-grafana
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_INSTALL_PLUGINS: "victoriametrics-logs-datasource"
+      GF_INSTALL_PLUGINS: victoriametrics-logs-datasource,yesoreyeram-infinity-datasource
     volumes:
-      - ./6-grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./4-grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - grafana-data:/var/lib/grafana
     ports:
       - "3001:3000"
@@ -91,24 +121,18 @@ services:
     command:
       - "-datasource.url=http://node-9-vmauth:8427"
       - "-datasource.queryStep=30s"
-      - "-rule=/etc/alerts/alerts.yml"
+      - "-rule=/etc/alerts/*.yml"
       - "-evaluationInterval=30s"
       - "-httpListenAddr=:8880"
-      - "-notifier.url=http://alertmanager:9093"
+      - "-notifier.url=http://node-1-alertmanager:9093"
       - "-datasource.basicAuth.username=read"
       - "-datasource.basicAuth.password=hpc-read-pass"
-      # for better integration
-      - "-remoteWrite.url=http://node-1-victoriametrics:8428/api/v1/write"
-      - "-remoteWrite.basicAuth.username="
-      - "-remoteWrite.basicAuth.password="
     volumes:
-      - ./7-vmalert/alerts.yml:/etc/alerts/alerts.yml:ro
-      - ./7-vmalert/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./5-vmalert/alerts:/etc/alerts:ro
     ports:
       - "8881:8880"
     depends_on:
       - alertmanager
-      # - node-7-vmauth
     restart: unless-stopped
     networks:
       - multi-node-net
@@ -117,7 +141,7 @@ services:
     image: prom/alertmanager:latest
     container_name: node-1-alertmanager
     volumes:
-      - ./7-vmalert/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./5-vmalert/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--web.listen-address=:9093"
@@ -127,25 +151,9 @@ services:
     networks:
       - multi-node-net
 
-  victoriametrics:
-    image: victoriametrics/victoria-metrics:latest
-    container_name: node-1-victoriametrics
-    command:
-      - "-storageDataPath=/victoria-metrics-data"
-      - "-httpListenAddr=:8428"
-      - "-retentionPeriod=30d"
-    volumes:
-      - victoriametrics-data:/victoria-metrics-data
-    ports:
-      - "8428:8428"
-    restart: unless-stopped
-    networks:
-      - multi-node-net
-
 volumes:
   kafka-data:
   grafana-data:
-  victoriametrics-data:
 
 networks:
   multi-node-net:
