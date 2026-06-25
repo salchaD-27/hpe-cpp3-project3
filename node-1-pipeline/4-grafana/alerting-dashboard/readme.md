@@ -1,22 +1,22 @@
 # Alerting Dashboard
 
-### 1. Overview — Alert Summary & Insights
+### 1. Overview — Alert Summary 
 
-<img width="1568" height="583" alt="image" src="https://github.com/user-attachments/assets/65438960-02b8-4801-b139-09bb9050ce70" />
+<img width="946" height="145" alt="image" src="https://github.com/user-attachments/assets/0983283d-6a68-4b9b-a611-6cebc89a99af" />
 
 
 ---
 
-### 2. Active Alerts — Rules, Severity & Full Detail
+### 2. Alert Insights
 
-<img width="1568" height="626" alt="image" src="https://github.com/user-attachments/assets/eb1ed651-3c23-4767-b95c-f32fe1d547f2" />
+<img width="941" height="434" alt="image" src="https://github.com/user-attachments/assets/ae6c144b-66d0-4447-bd3b-fd4080342734" />
 
 
 ---
 
 ### 3. Silence Management
 
-<img width="1568" height="358" alt="image" src="https://github.com/user-attachments/assets/13f79c72-f471-4550-aef9-6912cd5d11ba" />
+<img width="940" height="173" alt="image" src="https://github.com/user-attachments/assets/4d08415f-9ed9-4c9a-8ed9-cd0aca714521" />
 
 ---
 
