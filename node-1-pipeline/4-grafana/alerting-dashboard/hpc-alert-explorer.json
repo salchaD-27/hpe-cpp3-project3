@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 20,
+  "id": 55,
   "links": [],
   "panels": [
     {
@@ -37,8 +37,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_ALERTMANAGER}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
       "fieldConfig": {
         "defaults": {
@@ -52,8 +52,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
+                "color": "red"
               }
             ]
           },
@@ -85,16 +84,65 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "labels.severity",
+              "text": "severity",
+              "type": "string"
+            },
+            {
+              "selector": "labels.instance",
+              "text": "instance",
+              "type": "string"
+            },
+            {
+              "selector": "labels.job",
+              "text": "job",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "startsAt",
+              "text": "startsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_ALERTMANAGER}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "count(ALERTS{alertstate='firing'}) or vector(0)",
-          "instant": true,
-          "refId": "A"
+          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeExpression": "count(state)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "Active Alerts",
@@ -102,8 +150,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_ALERTMANAGER}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
       "fieldConfig": {
         "defaults": {
@@ -117,8 +165,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "dark-red",
-                "value": null
+                "color": "dark-red"
               }
             ]
           },
@@ -150,16 +197,65 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "labels.severity",
+              "text": "severity",
+              "type": "string"
+            },
+            {
+              "selector": "labels.instance",
+              "text": "instance",
+              "type": "string"
+            },
+            {
+              "selector": "labels.job",
+              "text": "job",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "startsAt",
+              "text": "startsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_ALERTMANAGER}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "count(ALERTS{alertstate='firing', severity='critical'}) or vector(0)",
-          "instant": true,
-          "refId": "A"
+          "filterExpression": "((severity == 'critical') && ('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeExpression": "count(state)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "Critical Alerts",
@@ -167,8 +263,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_ALERTMANAGER}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
       "fieldConfig": {
         "defaults": {
@@ -182,8 +278,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "orange",
-                "value": null
+                "color": "orange"
               }
             ]
           },
@@ -215,16 +310,40 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "id",
+              "text": "id",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_ALERTMANAGER}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "sum(alertmanager_silences{state='active'}) or vector(0)",
-          "instant": true,
-          "refId": "A"
+          "filterExpression": "state == 'active'",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeExpression": "count(state)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/silences",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "Silenced Alerts",
@@ -245,46 +364,14 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_ALERTMANAGER}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 4,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "fixedColor": "blue",
+            "mode": "fixed"
           },
           "mappings": [],
           "min": 0,
@@ -292,69 +379,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 7
-      },
-      "id": 803,
-      "options": {
-        "legend": {
-          "calcs": [
-            "sum",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_ALERTMANAGER}"
-          },
-          "expr": "sum by (severity) (ALERTS{alertstate='firing'})",
-          "legendFormat": "{{severity}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Alerts Fired Over Time (by severity)",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_ALERTMANAGER}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "continuous-RdYlGr"
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "yellow",
@@ -368,13 +393,119 @@
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ServiceRestartDetected"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "KafkaGCPauseSpike"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "KafkaHeapPressure"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HighLogRatePerHost"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "NoLogsIngestion"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "IPMappedLogDetected"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SampleMessageDetected"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5794F2",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 15
+        "y": 7
       },
       "id": 804,
       "options": {
@@ -402,17 +533,46 @@
         "text": {},
         "valueMode": "color"
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_ALERTMANAGER}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "sort_desc(sum by (alertname) (ALERTS{alertstate='firing'}))",
-          "instant": true,
-          "legendFormat": "{{alertname}}",
-          "refId": "A"
+          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeBy": "alertname",
+          "summarizeExpression": "count(alertname)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "Active Alerts by Rule",
@@ -420,8 +580,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_ALERTMANAGER}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
       "fieldConfig": {
         "defaults": {
@@ -482,6 +642,21 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "summary"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
@@ -489,7 +664,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 15
+        "y": 7
       },
       "id": 805,
       "options": {
@@ -512,24 +687,59 @@
             "lastNotNull"
           ],
           "fields": "",
-          "values": false
+          "values": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "desc"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "labels.severity",
+              "text": "severity",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_ALERTMANAGER}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "sum by (severity) (ALERTS{alertstate='firing'})",
-          "instant": true,
-          "legendFormat": "{{severity}}",
-          "refId": "A"
+          "filterExpression": "((('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')) && (severity != null && severity != '')",
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "summarizeBy": "severity",
+          "summarizeExpression": "count(severity)",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "Active Alerts by Severity",
@@ -537,8 +747,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_ALERTMANAGER}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
       "fieldConfig": {
         "defaults": {
@@ -558,8 +768,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "text",
-                "value": null
+                "color": "text"
               }
             ]
           }
@@ -610,18 +819,46 @@
                     "type": "value"
                   }
                 ]
+              },
+              {
+                "id": "custom.width",
+                "value": 182
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Value"
+              "options": "startsAt"
             },
             "properties": [
               {
-                "id": "displayName",
-                "value": "Firing Count"
+                "id": "custom.width",
+                "value": 246
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "alertname"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 256
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "description"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 738
               }
             ]
           }
@@ -631,7 +868,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 17
       },
       "id": 811,
       "options": {
@@ -652,20 +889,57 @@
           }
         ]
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "labels.alertname",
+              "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "labels.severity",
+              "text": "severity",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "startsAt",
+              "text": "startsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "annotations.description",
+              "text": "description",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_ALERTMANAGER}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "sort_desc(sum by (alertname, severity, instance, job) (ALERTS{alertstate='firing'}))",
+          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filters": [],
           "format": "table",
-          "instant": true,
-          "refId": "A"
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
-      "title": "🔴 Firing Alerts — Full Detail",
+      "title": "Firing Alerts — Full Detail",
       "transformations": [
         {
           "id": "organize",
@@ -673,7 +947,9 @@
             "excludeByName": {
               "Time": true,
               "__name__": true,
-              "alertstate": true
+              "alertstate": true,
+              "instance": true,
+              "job": true
             },
             "renameByName": {}
           }
@@ -687,7 +963,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 35
+        "y": 27
       },
       "id": 814,
       "panels": [],
@@ -696,8 +972,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_ALERTMANAGER}"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_INFINITY}"
       },
       "fieldConfig": {
         "defaults": {
@@ -717,8 +993,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "text",
-                "value": null
+                "color": "text"
               }
             ]
           }
@@ -778,7 +1053,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 28
       },
       "id": 813,
       "options": {
@@ -793,26 +1068,72 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "id",
+              "text": "id",
+              "type": "string"
+            },
+            {
+              "selector": "matchers",
+              "text": "matchers",
+              "type": "string"
+            },
+            {
+              "selector": "status.state",
+              "text": "state",
+              "type": "string"
+            },
+            {
+              "selector": "startsAt",
+              "text": "startsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "endsAt",
+              "text": "endsAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "createdBy",
+              "text": "createdBy",
+              "type": "string"
+            },
+            {
+              "selector": "comment",
+              "text": "comment",
+              "type": "string"
+            }
+          ],
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_ALERTMANAGER}"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_INFINITY}"
           },
-          "expr": "alertmanager_silences",
+          "filters": [],
           "format": "table",
-          "instant": true,
-          "refId": "A"
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "http://node-1-alertmanager:9093/api/v2/silences",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
-      "title": "🔕 Active Silences",
+      "title": "Active Silences",
       "type": "table"
     }
   ],
   "preload": false,
   "refresh": "30s",
-  "schemaVersion": 40,
+  "schemaVersion": 41,
   "tags": [
     "hpc",
     "victorialogs",
@@ -851,12 +1172,87 @@
       },
       {
         "current": {
+          "text": "Infinity-Alertmanager",
+          "value": "infinity-alertmanager"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Infinity-Alertmanager",
+        "name": "DS_INFINITY",
+        "options": [],
+        "query": "yesoreyeram-infinity-datasource",
+        "refresh": 1,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "All"
+        },
+        "description": "Filter all panels by alert severity",
+        "label": "Severity",
+        "name": "severity_filter",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "All"
+          },
+          {
+            "selected": false,
+            "text": "critical",
+            "value": "critical"
+          },
+          {
+            "selected": false,
+            "text": "warning",
+            "value": "warning"
+          },
+          {
+            "selected": false,
+            "text": "info",
+            "value": "info"
+          }
+        ],
+        "query": "All,critical,warning,info",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "All"
+        },
+        "description": "Filter all panels by alert state",
+        "label": "State",
+        "name": "state_filter",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "All"
+          },
+          {
+            "selected": false,
+            "text": "active",
+            "value": "active"
+          },
+          {
+            "selected": false,
+            "text": "suppressed",
+            "value": "suppressed"
+          }
+        ],
+        "query": "All,active,suppressed",
+        "type": "custom"
+      },
+      {
+        "current": {
           "text": "",
           "value": ""
         },
-        "description": "Free-text keyword search applied to all panels",
-        "label": "Search Keyword",
-        "name": "keyword",
+        "description": "Search alertname and description (case-insensitive, partial match)",
+        "label": "Search Alerts",
+        "name": "keyword_search",
         "options": [
           {
             "selected": true,
@@ -866,126 +1262,6 @@
         ],
         "query": "",
         "type": "textbox"
-      },
-      {
-        "allValue": ".*",
-        "current": {
-          "text": "All",
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": {
-          "type": "victoriametrics-logs-datasource",
-          "uid": "${DS_VICTORIALOGS}"
-        },
-        "description": "Select one or more HPC nodes. Hold to multi-select.",
-        "includeAll": true,
-        "label": "Node (Host)",
-        "multi": true,
-        "name": "node",
-        "options": [],
-        "query": {
-          "field": "Resource.host.name",
-          "query": "*",
-          "refId": "StandardVariableQuery",
-          "type": "fieldValue"
-        },
-        "refresh": 2,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "allValue": ".*",
-        "current": {
-          "text": [
-            "$__all"
-          ],
-          "value": [
-            "$__all"
-          ]
-        },
-        "description": "Select one or more log levels. Hold to multi-select.",
-        "includeAll": true,
-        "label": "Log Level",
-        "multi": true,
-        "name": "level",
-        "options": [
-          {
-            "selected": false,
-            "text": "ERROR",
-            "value": "ERROR"
-          },
-          {
-            "selected": false,
-            "text": "FATAL",
-            "value": "FATAL"
-          },
-          {
-            "selected": false,
-            "text": "CRITICAL",
-            "value": "CRITICAL"
-          },
-          {
-            "selected": false,
-            "text": "WARN",
-            "value": "WARN"
-          },
-          {
-            "selected": false,
-            "text": "WARNING",
-            "value": "WARNING"
-          },
-          {
-            "selected": false,
-            "text": "INFO",
-            "value": "INFO"
-          },
-          {
-            "selected": false,
-            "text": "NOTICE",
-            "value": "NOTICE"
-          },
-          {
-            "selected": false,
-            "text": "DEBUG",
-            "value": "DEBUG"
-          },
-          {
-            "selected": false,
-            "text": "TRACE",
-            "value": "TRACE"
-          }
-        ],
-        "query": "ERROR,FATAL,CRITICAL,WARN,WARNING,INFO,NOTICE,DEBUG,TRACE",
-        "type": "custom"
-      },
-      {
-        "allValue": ".*",
-        "current": {
-          "text": "All",
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": {
-          "type": "victoriametrics-logs-datasource",
-          "uid": "${DS_VICTORIALOGS}"
-        },
-        "description": "Select one or more log streams. Hold to multi-select.",
-        "includeAll": true,
-        "label": "Log Stream",
-        "multi": true,
-        "name": "stream",
-        "options": [],
-        "query": {
-          "field": "log_source",
-          "query": "*",
-          "refId": "StandardVariableQuery",
-          "type": "fieldValue"
-        },
-        "refresh": 2,
-        "type": "query"
       }
     ]
   },
@@ -997,8 +1273,7 @@
     "nowDelay": ""
   },
   "timezone": "browser",
-  "title": "HPCM — Alerting Insights",
+  "title": "HPCM — Alerting Insights v1",
   "uid": "hpcm-alerts-v1",
-  "version": 3,
-  "weekStart": ""
+  "version": 11
 }
