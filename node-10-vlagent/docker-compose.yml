@@ -6,7 +6,7 @@ services:
       - "-httpListenAddr=:9429"
       
       # Three destinations in a single flag (comma-separated)
-      - "-remoteWrite.url=http://node-9-vmauth:8427/insert/jsonline?_stream_fields=log_source%2CResource.service.name&_msg_field=_msg&_time_field=@timestamp,http://node-9-vmauth:8427/insert/jsonline?_stream_fields=log_source%2CResource.service.name&_msg_field=_msg&_time_field=@timestamp,http://node-9-vmauth:8427/insert/jsonline?_stream_fields=log_source%2CResource.service.name&_msg_field=_msg&_time_field=@timestamp"
+      - "-remoteWrite.url=http://node-9-vmauth:8427/insert/jsonline?_stream_fields=log_source&_msg_field=_msg&_time_field=@timestamp,http://node-9-vmauth:8427/insert/jsonline?_stream_fields=log_source&_msg_field=_msg&_time_field=@timestamp,http://node-9-vmauth:8427/insert/jsonline?_stream_fields=log_source&_msg_field=_msg&_time_field=@timestamp"
       
       # Corresponding credentials (positional)
       - "-remoteWrite.basicAuth.username=write1,write2,write3"
