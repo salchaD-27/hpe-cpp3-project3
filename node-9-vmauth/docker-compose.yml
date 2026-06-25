@@ -5,7 +5,6 @@ services:
     command:
       - "-auth.config=/etc/vmauth/vmauth.yml"
       - "-httpListenAddr=:8427"
-      # - "-logLevel=INFO"
     volumes:
       - ./vmauth.yml:/etc/vmauth/vmauth.yml:ro
     ports:
