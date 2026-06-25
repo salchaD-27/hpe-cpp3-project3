@@ -26,11 +26,10 @@ node-6-vlstorage-2/storage/
 node-7-vlstorage-3/storage/
 node-10-vlagent/vlagent-data/
 storage/
-node-1-pipeline/1-generator/logs-generated/
 
 # Old Pipeline gitignore
 logs/
 generated-logs/
 victoria_logs/
 kafka/
-generated-logs/
+
