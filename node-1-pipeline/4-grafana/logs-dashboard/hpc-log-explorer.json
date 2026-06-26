@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 6,
   "links": [],
   "panels": [
     {
@@ -204,14 +204,20 @@
           "color": {
             "mode": "palette-classic"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           },
-          "mappings": []
+          "unit": "logs/s"
         },
         "overrides": [
           {
@@ -222,7 +228,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "leader1"
+                "value": "hpcmlog"
               },
               {
                 "id": "color",
@@ -241,7 +247,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "leader2"
+                "value": "syslog"
               },
               {
                 "id": "color",
@@ -260,26 +266,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "leader3"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#FF9830",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "D"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "padma"
+                "value": "monitoring"
               },
               {
                 "id": "color",
@@ -293,39 +280,37 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 5,
         "w": 8,
         "x": 16,
         "y": 1
       },
-      "id": 23,
+      "hideTimeOverride": true,
+      "id": 202,
+      "maxDataPoints": 250,
       "options": {
-        "displayLabels": [
-          "name",
-          "percent"
-        ],
+        "displayMode": "gradient",
         "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true,
-          "values": [
-            "value",
-            "percent"
-          ]
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        "pieType": "donut",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 0,
+        "namePlacement": "left",
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "mean"
           ],
           "fields": "",
           "values": false
         },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "desc"
-        }
+        "showUnfilled": false,
+        "sizing": "auto",
+        "valueMode": "color"
       },
       "pluginVersion": "11.6.15",
       "targets": [
@@ -334,8 +319,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "${DS_VICTORIALOGS}"
           },
-          "expr": "Resource.host.name:leader1 Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
-          "legendFormat": "leader1",
+          "expr": "log_source:hpcmlog Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" ${keyword}",
           "queryType": "hits",
           "refId": "A"
         },
@@ -344,8 +328,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "${DS_VICTORIALOGS}"
           },
-          "expr": "Resource.host.name:leader2 Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
-          "legendFormat": "leader2",
+          "expr": "log_source:syslog Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" ${keyword}",
           "queryType": "hits",
           "refId": "B"
         },
@@ -354,24 +337,14 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "${DS_VICTORIALOGS}"
           },
-          "expr": "Resource.host.name:leader3 Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
-          "legendFormat": "leader3",
+          "expr": "log_source:monitoring Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" ${keyword}",
           "queryType": "hits",
           "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-logs-datasource",
-            "uid": "${DS_VICTORIALOGS}"
-          },
-          "expr": "Resource.host.name:padma Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
-          "legendFormat": "padma",
-          "queryType": "hits",
-          "refId": "D"
         }
       ],
-      "title": "Log Volume by Host",
-      "type": "piechart"
+      "timeFrom": "now-5m",
+      "title": "Log Ingestion Rate by Stream",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -800,6 +773,185 @@
       "type": "piechart"
     },
     {
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "${DS_VICTORIALOGS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "leader1"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "leader2"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5794F2",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "leader3"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#FF9830",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "padma"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#FADE2A",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 6
+      },
+      "id": 23,
+      "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "${DS_VICTORIALOGS}"
+          },
+          "expr": "Resource.host.name:leader1 Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
+          "legendFormat": "leader1",
+          "queryType": "hits",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "${DS_VICTORIALOGS}"
+          },
+          "expr": "Resource.host.name:leader2 Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
+          "legendFormat": "leader2",
+          "queryType": "hits",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "${DS_VICTORIALOGS}"
+          },
+          "expr": "Resource.host.name:leader3 Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
+          "legendFormat": "leader3",
+          "queryType": "hits",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "${DS_VICTORIALOGS}"
+          },
+          "expr": "Resource.host.name:padma Resource.host.name:~\"${node:pipe}\" level:~\"${level:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
+          "legendFormat": "padma",
+          "queryType": "hits",
+          "refId": "D"
+        }
+      ],
+      "title": "Log Volume by Host",
+      "type": "piechart"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -901,7 +1053,8 @@
   "refresh": "30s",
   "schemaVersion": 41,
   "tags": [
-    "victorialogs"
+    "victorialogs",
+    "grafana"
   ],
   "templating": {
     "list": [
@@ -968,7 +1121,9 @@
       {
         "allValue": ".*",
         "current": {
-          "text": "All",
+          "text": [
+            "All"
+          ],
           "value": [
             "$__all"
           ]
@@ -1033,7 +1188,7 @@
     "nowDelay": ""
   },
   "timezone": "browser",
-  "title": "Log Explorer D",
-  "uid": "hpcm-logs-v1-d",
+  "title": " Log Explorer",
+  "uid": "hpcm-logs-v2",
   "version": 3
 }
