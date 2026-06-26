@@ -5,7 +5,7 @@ LOG_DIR="generated-logs"
 LOG_FILE="$LOG_DIR/heartbeat.jsonl"
 
 mkdir -p "$LOG_DIR"
-touch "$LOG_FILE"
+: > "$LOG_FILE"
 
 while true; do
   timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")

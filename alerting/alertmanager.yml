@@ -9,6 +9,10 @@ route:
   receiver: slack
   routes:
     - match:
+        alertname: NodeHeartbeatDetected
+      receiver: heartbeat-recovery-webhook
+      continue: false
+    - match:
         severity: critical
       receiver: slack-critical
       continue: false
@@ -18,6 +22,11 @@ route:
     #   continue: false
 
 receivers:
+  - name: heartbeat-recovery-webhook
+    webhook_configs:
+      - url: "http://alert-resolve-webhook:8085/webhook"
+        send_resolved: true
+
   - name: slack
     slack_configs:
       - api_url: "https://hooks.slack.com/services/XXX/YYY/ZZZ"

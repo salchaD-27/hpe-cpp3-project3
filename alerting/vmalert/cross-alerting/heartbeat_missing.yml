@@ -4,7 +4,7 @@ groups:
 
 - name: heartbeat-demo
   type: vlogs
-  interval: 5m
+  interval: 20s
 
   rules:
   - alert: NodeHeartbeatMissing
@@ -12,7 +12,8 @@ groups:
       _time:15s | {log_source="heartbeat", Resource.service.name="heartbeat_missing"}
       | stats count() as heartbeats
       | filter heartbeats :> 0'
-    for: 10s
+    for: 1s
+    # keep_firing_for: 1m
     labels:
       severity: critical
     annotations:

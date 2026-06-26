@@ -190,6 +190,26 @@ services:
       - "--storage.path=/alertmanager"
     networks:
       - pipeline
+
+  alert-resolve-webhook:
+    image: python:3.12-slim
+    container_name: alert-resolve-webhook
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./scripts/alertmanager_webhook.py:/app/alertmanager_webhook.py:ro
+    environment:
+      ALERTMANAGER_URL: http://alertmanager:9093/api/v2/alerts
+      LISTEN_ADDR: :8085
+      RECOVERY_ALERTNAME: NodeHeartbeatDetected
+      TARGET_ALERTNAME: NodeHeartbeatMissing
+    command: ["python", "/app/alertmanager_webhook.py"]
+    depends_on:
+      - alertmanager
+    restart: unless-stopped
+    networks:
+      - pipeline
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui

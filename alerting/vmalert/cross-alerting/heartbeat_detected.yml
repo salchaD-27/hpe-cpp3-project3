@@ -4,7 +4,7 @@ groups:
 
 - name: heartbeat-demo
   type: vlogs
-  interval: 1s
+  interval: 10s
 
   rules:
   - alert: NodeHeartbeatDetected
@@ -12,10 +12,9 @@ groups:
       _time:15s {log_source="heartbeat",Resource.service.name="heartbeat_detected"}
       | stats count() as heartbeats
       | filter heartbeats :> 0'
-    for: 5s
-    endsAt: 2024-06-05T12:00:00Z
+    for: 1s
     labels:
-      severity: info
+      severity: critical
     annotations:
       summary: "Node node-a heartbeat detected"
       description: "Heartbeat received for node-a. Alert Resolved"

@@ -15,6 +15,8 @@ Both failure and recovery events use identical label sets, ensuring Alertmanager
 
 This method provides precise control over alert lifecycle and closely mimics event-driven state transitions as seen in OpenSearch.
 
+To automate recovery, Alertmanager can route the recovery alert to a local webhook receiver. That receiver then POSTs the matching resolve payload back to `/api/v2/alerts` with `endsAt` set to the current UTC time.
+
 ---
 
 #### 2. vmalert-Based Structural Workaround

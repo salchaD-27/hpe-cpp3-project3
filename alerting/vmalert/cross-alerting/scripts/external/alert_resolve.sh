@@ -9,14 +9,14 @@ curl -X POST "$ALERTMANAGER_URL" \
   -d "[
     {
       \"labels\": {
-        \"alertname\": \"NodeHeartbeat\",
-        \"node\": \"node-a\",
+        \"alertgroup\": \"heartbeat-demo\",
+        \"alertname\": \"NodeHeartbeatDetected\",
+        \"stats_result\": \"heartbeats\",
         \"severity\": \"critical\"
       },
       \"annotations\": {
         \"summary\": \"Heartbeat restored\",
         \"description\": \"Node A heartbeat detected\"
-      },
-      \"endsAt\": \"$NOW\"
+      }
     }
   ]"
