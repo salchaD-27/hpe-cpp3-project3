@@ -162,10 +162,12 @@ services:
       - "-datasource.queryStep=30s"
       - "-notifier.url=http://alertmanager:9093"
       - "-rule=/etc/alerts/*.yml"
+      - "-rule=/etc/alerts/cross-alerting/*.yml"
       - "-evaluationInterval=30s"
       - "-httpListenAddr=:8880"
     volumes:
-      - ./alerting/vmalert/cross-alerting/:/etc/alerts/:ro
+      - ./alerting/vmalert/:/etc/alerts/:ro
+      - ./alerting/vmalert/cross-alerting/:/etc/alerts/cross-alerting/:ro
     depends_on:
       - victorialogs
       - alertmanager

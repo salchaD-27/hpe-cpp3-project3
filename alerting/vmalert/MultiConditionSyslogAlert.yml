@@ -1,7 +1,7 @@
 groups:
   - name: hpc-alerts
     type: vlogs
-    interval: 30s   # how often rules are evaluated
+    interval: 20s   # how often rules are evaluated
 
     rules:
       # Task 1 : multi-condition alerting from one query
@@ -15,10 +15,11 @@ groups:
                 | stats by (formatted)
                     count() if (host:="padma" OR service:in("systemd", "glusterd") OR priority:range[70, Inf]) as CRITICAL,
                     count() if (priority:range[30, 70) AND host:!="padma" AND service:!in("systemd", "glusterd")) as WARN,
-                    count() if (priority:range[0, 30) AND host:!="padma" AND service:!in("systemd", "glusterd")) as SAFE'
+                    count() if (priority:range[0, 30) AND host:!="padma" AND service:!in("systemd", "glusterd")) as SAFE
+                | filter CRITICAL:>10 OR WARN:>10'
           for: 10s
           labels:
-            severity: "{{ if gt $value 0 }}dynamic{{ else }}none{{ end }}"
+            severity: "{{ if gt $value 0.0 }}dynamic{{ else }}none{{ end }}"
           annotations:
             summary: "Multi-condition syslog alert triggered"
             description: "{{ $labels.formatted }}"

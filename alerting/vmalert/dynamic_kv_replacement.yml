@@ -1,7 +1,7 @@
 groups:
   - name: ip-to-host-alerts
     type: vlogs
-    interval: 30s
+    interval: 20s
 
     rules:
       - alert: IPMappedLogDetected
@@ -15,8 +15,8 @@ groups:
           | replace("10.1.1.15", "node-e")
           | format "<_msg>" as formatted
           | stats by (formatted) count() as hits
-          | filter hits :> 0'
-        for: 3s
+          | filter hits :> 10'
+        for: 10s
         labels:
           severity: warning
         annotations:

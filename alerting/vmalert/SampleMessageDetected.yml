@@ -1,7 +1,7 @@
 groups:
   - name: hpc-alerts
     type: vlogs
-    interval: 30s   # how often rules are evaluated
+    interval: 20s   # how often rules are evaluated
     
     rules:
       
@@ -13,8 +13,8 @@ groups:
           | copy _msg as message
           | format "<host> | <service> | <message>" as formatted
           | stats by (formatted) count() as cnt
-          | filter cnt:>0'
-        for: 5s
+          | filter cnt:>10'
+        for: 10s
         labels:
           severity: info
           source: syslog

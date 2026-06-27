@@ -1,7 +1,7 @@
 groups:
   - name: unified-log-alerts
     type: vlogs
-    interval: 30s
+    interval: 20s
 
     rules:
       - alert: UnifiedLogAlert
@@ -22,9 +22,9 @@ groups:
               count() if (host:="padma" OR service:in("systemd","glusterd") OR priority:range[70, Inf]) as CRITICAL,
               count() if (priority:range[30,70) AND host:!="padma" AND service:!in("systemd","glusterd")) as WARN,
               count() if (priority:range[0,30) AND host:!="padma" AND service:!in("systemd","glusterd")) as SAFE
-          | filter CRITICAL:>0 OR WARN:>0'
+          | filter CRITICAL:>10 OR WARN:>10'
 
-        for: 1m
+        for: 10s
 
         labels:
           severity: "{{ $labels.severity_level }}"
