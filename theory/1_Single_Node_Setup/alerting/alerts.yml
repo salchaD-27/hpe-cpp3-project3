@@ -1,0 +1,32 @@
+groups:
+  - name: hpc-alerts
+    interval: 30s
+    type: vlogs
+    rules:
+
+      - alert: HighErrorRate
+        expr: 'level:ERROR | stats count() as total | filter total:>10'
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "More than 10 ERROR logs seen in the last evaluation window ({{ $value }} total)."
+
+      - alert: OOMKillerInvoked
+        expr: 'log_source:hpcmlog AND "OOM killer" | stats count() as total | filter total:>0'
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "OOM killer invoked on HPC node"
+          description: "OOM killer was triggered on a compute node ({{ $value }} occurrence(s))."
+
+      - alert: HighWarnRate
+        expr: 'level:WARN | stats count() as total | filter total:>20'
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High warning rate"
+          description: "More than 20 WARN logs seen in the last evaluation window ({{ $value }} total)."
