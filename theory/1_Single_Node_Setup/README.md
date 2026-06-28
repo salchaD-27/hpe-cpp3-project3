@@ -212,11 +212,11 @@ All services communicate over an isolated Docker bridge network named `pipeline`
 
 ## Grafana Dashboard
 
-<img width="1569" height="915" alt="image" src="https://github.com/user-attachments/assets/da99339a-de98-40a2-8527-de75263f35b1" />
+<img width="940" height="347" alt="image" src="https://github.com/user-attachments/assets/e1ac559e-5b04-44fd-891c-dec45352e763" />
 
-<img width="1581" height="905" alt="image" src="https://github.com/user-attachments/assets/4c6d27e8-c115-4fa1-9560-14fd742b901e" />
+<img width="944" height="318" alt="image" src="https://github.com/user-attachments/assets/0b2c27ce-3937-4d1f-8f45-ac0883750c63" />
 
-<img width="1574" height="913" alt="image" src="https://github.com/user-attachments/assets/b6105870-0d63-4a0a-a283-5e1ab4feacad" />
+<img width="937" height="345" alt="image" src="https://github.com/user-attachments/assets/cef2e206-7e14-4882-bd35-89204538b2f2" />
 
 <img width="820" height="111" alt="image" src="https://github.com/user-attachments/assets/51843548-a5f7-4a70-81bf-7b690ca27866" /> added the filter and search options
 
