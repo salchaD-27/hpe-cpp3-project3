@@ -1,4 +1,4 @@
-# Alerting Dashboard — Approach History
+<img width="941" height="283" alt="image" src="https://github.com/user-attachments/assets/82d77cbe-8514-4f3f-9881-1b756441e6a6" /># Alerting Dashboard — Approach History
 
 ## 1. Previous Approach
 
@@ -308,9 +308,10 @@ annotations" rather than just a count.
 ## 3. Screenshots
 
 ### Previous dashboard
-
-<!-- PASTE SCREENSHOT(S) OF THE OLD DASHBOARD HERE -->
+<img width="941" height="283" alt="image" src="https://github.com/user-attachments/assets/a696c267-ab2a-4eae-9eb7-db5afaf4b703" />
+<img width="940" height="324" alt="image" src="https://github.com/user-attachments/assets/3fe3ea4e-5339-428f-bc36-5084aa9128e6" />
 
 ### Current dashboard
+<img width="944" height="354" alt="image" src="https://github.com/user-attachments/assets/e120d4bd-a15d-45bb-9dc2-ea72c530c2eb" />
+<img width="940" height="364" alt="image" src="https://github.com/user-attachments/assets/7ebf652b-60c9-4492-89fb-be0157b923e3" />
 
-<!-- PASTE SCREENSHOT(S) OF THE NEW DASHBOARD HERE -->
