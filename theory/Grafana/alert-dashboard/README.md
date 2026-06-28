@@ -1,4 +1,4 @@
-<img width="941" height="283" alt="image" src="https://github.com/user-attachments/assets/82d77cbe-8514-4f3f-9881-1b756441e6a6" /># Alerting Dashboard — Approach History
+# Alerting Dashboard — Approach History
 
 ## 1. Previous Approach
 
