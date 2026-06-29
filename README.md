@@ -1,236 +1,158 @@
-# HPC Log Pipeline
+# HPC Log Pipeline — Multi-Node HA
 
-A single-node observability pipeline for HPC (High Performance Computing) logs. Streams structured JSON logs through a collect → buffer → transform → store → visualize → alert stack, all running locally via Docker Compose.
+10-node observability stack for HPC logs, replicated **3x across independent VictoriaLogs storage nodes**. Kill any one storage node — no data loss.
 
----
-
-## Pipeline Architecture
+## Architecture
 
 ```
-Simulator → Fluent Bit → Kafka → Logstash → VictoriaLogs → Grafana
-                                                  ↓
-                                             vmalert → Alertmanager
+Simulator → Fluent Bit → Kafka → Logstash → vlagent → vmauth → 3× vlinsert → 3× vlstorage
+                                                                                    ↑
+                                                         Grafana / vmalert → vmauth (read)
 ```
 
-| Stage | Tool | Role |
+vlagent fans out every write to all 3 replicas. vmauth handles auth + routing for both paths. vlselect can merge/dedup reads across replicas as an alternative to round-robin.
+
+## Nodes
+
+| # | Dir | Role |
 |---|---|---|
-| Generate | Log Simulator (Python 3.12) | Replays original JSON logs as JSONL at a configurable rate |
-| Collect | Fluent Bit 4.0.2 | Tails JSONL files, parses, and forwards to Kafka |
-| Buffer | Apache Kafka 4.0.2 | Decouples ingestion from processing; durable message queue |
-| Transform | Logstash 9.2.8 | Consumes from Kafka, enriches/filters, ships to VictoriaLogs |
-| Store | VictoriaLogs v1.49.0 | High-performance log storage with 1-year retention |
-| Visualize | Grafana 11.4.0 | Dashboards powered by the VictoriaMetrics Logs datasource plugin |
-| Alert | vmalert (latest) | Evaluates LogsQL alert rules against VictoriaLogs every 30s |
-| Route | Alertmanager v0.31.1 | Routes fired alerts to Slack, email, or webhook |
+| 1 | `node-1-pipeline/` | Simulator, Fluent Bit, Kafka, Logstash, Grafana, vmalert, Alertmanager |
+| 2-4 | `node-2/3/4-vlinsert-*` | Write gateway, one per replica |
+| 5-7 | `node-5/6/7-vlstorage-*` | Storage replica (365d retention) |
+| 8 | `node-8-vlselect/` | Fan-out query across all 3 replicas |
+| 9 | `node-9-vmauth/` | Auth + routing (`vmauth.yml`) |
+| 10 | `node-10-vlagent/` | Replicates writes to all 3 paths |
 
----
+Each is its own `docker-compose.yml` on the shared external network `multi-node-net`.
 
-## Service Reference
+## Versions
 
-| Service | Image | Port | Purpose |
-|---|---|---|---|
-| Fluent Bit | `cr.fluentbit.io/fluent/fluent-bit:4.0.2` | 2020 | HTTP metrics endpoint |
-| Kafka | `apache/kafka:4.0.2` | 9092 | Broker (KRaft mode, no ZooKeeper) |
-| Kafka UI | `provectuslabs/kafka-ui:latest` | 8080 | Web UI for topic/consumer inspection |
-| Logstash | `docker.elastic.co/logstash/logstash:9.2.8` | 9600 | Pipeline monitoring API |
-| VictoriaLogs | `victoriametrics/victoria-logs:v1.49.0` | 9428 | HTTP API + built-in query UI |
-| Grafana | `grafana/grafana:11.4.0` | 3000 | Dashboards (admin / admin) |
-| vmalert | `victoriametrics/vmalert:latest` | 8880 | Alert rule evaluation UI |
-| Alertmanager | `prom/alertmanager:v0.31.1` | 9093 | Alert management UI |
-
----
-
-## Kafka Configuration
-
-Kafka runs in **KRaft mode** (no ZooKeeper dependency) as a combined broker + controller on a single node.
-
-| Setting | Value |
+| Component | Version |
 |---|---|
-| Mode | KRaft (broker + controller) |
-| Partitions | 6 |
-| Replication factor | 1 (single node) |
-| Log retention | 24 hours |
-| Auto-create topics | Enabled |
-| Listener | `PLAINTEXT://kafka:9092` |
-| Controller quorum | `1@kafka:9093` |
-
----
-
-## VictoriaLogs Configuration
-
-| Setting | Value |
-|---|---|
-| Listen address | `:9428` |
-| Storage path | `/storage` (Docker volume) |
-| Retention period | 1 year |
-
----
-
-## Grafana Configuration
-
-| Setting | Value |
-|---|---|
-| Admin credentials | `admin / admin` |
-| Datasource plugin | `victoriametrics-logs-datasource` (auto-installed) |
-| Dashboard | `grafana/hpc-dashboard-v14.json` (provisioned) |
-| Datasource provisioning | `grafana/provisioning/datasources/` |
-| Sign-up | Disabled |
-
----
-
-## Alerting
-
-**vmalert** evaluates rules from `alerting/alerts*.yml` against VictoriaLogs using LogsQL every **30 seconds** (`-evaluationInterval=30s`, `-datasource.queryStep=30s`).
-
-You can split rules across multiple files such as `alerting/alerts.yml`, `alerting/alerts-syslog.yml`, and `alerting/alerts-monitoring.yml`.
-
-Fired alerts are forwarded to **Alertmanager** at `http://alertmanager:9093`, which routes them to configured receivers (Slack, email, webhook) defined in `alerting/alertmanager.yml`.
-
----
-
-## Logstash Dead Letter Queue (DLQ)
-
-Events that fail processing are written to a Dead Letter Queue at `data/logstash-dlq/` (bind-mounted). This prevents data loss on transformation errors and allows replaying failed events.
-
----
-
-## Log Sources
-
-The simulator reads seed files from `scripts/logs-original/` and streams them as JSONL into `generated-logs/` at a configurable replay rate. Fluent Bit tails those files using the config in `configs/fluent-bit/fluent-bit.conf` with custom parsers in `parsers.conf`.
-
-Three log types are supported:
-
-| Log type | Seed file | Generated file |
-|---|---|---|
-| HPC Manager | `hpcmlog.json` | `hpcmlog.jsonl` |
-| Monitoring Service | `monitoring_service.json` | `monitoring_service.jsonl` |
-| Syslog | `syslog.json` | `syslog.jsonl` |
-
----
-
-## File Structure
-
-```
-hpc-log-pipeline/
-├── docker-compose.yml
-├── .env
-├── alerting/
-│   ├── alerts.yml              # vmalert rule definitions
-│   ├── alerts-*.yml            # optional extra vmalert rule files
-│   └── alertmanager.yml        # alert routing config
-├── configs/
-│   ├── fluent-bit/
-│   │   ├── fluent-bit.conf     # input/filter/output config
-│   │   └── parsers.conf        # custom JSONL parser
-│   └── logstash/
-│       ├── hpc-pipeline.conf   # Kafka input → filter → VictoriaLogs output
-│       └── logstash.yml        # Logstash node settings
-├── grafana/
-│   ├── hpc-dashboard.json  # provisioned dashboard
-│   └── provisioning/
-│       └── datasources/        # auto-configured VictoriaLogs datasource
-├── scripts/
-│   ├── simulator.py            # log replay simulator
-│   └── logs-original/
-│       ├── hpcmlog.json
-│       ├── monitoring_service.json
-│       └── syslog.json
-├── data/
-│   └── logstash-dlq/           # dead letter queue (runtime, git-ignored)
-└── generated-logs/             # simulator output (runtime, git-ignored)
-```
-
----
+| VictoriaLogs (vlinsert/vlstorage/vlselect) | v1.49.0 |
+| vlagent | v1.50.0 |
+| vmauth | latest |
+| vmalert | latest |
+| Apache Kafka | 4.2.0 |
+| Logstash | 9.3.2 |
+| Fluent Bit | 4.0.2 |
+| Grafana | 11.6.15 |
+| Alertmanager | latest |
+| Python (simulator) | 3.12 |
 
 ## Quick Start
 
-**Prerequisites:** Docker Engine with Compose V2.
-
 ```bash
-# Start all services
-docker compose up -d
-
-# Check service health
-docker compose ps
-
-# Stream logs from any service
-docker compose logs -f logstash
+./2-start.sh      # start all nodes, dependency order
+./1-stop.sh       # stop all nodes
+./3-test.sh       # integration test suite
+./4-ha-test.sh    # kill/restore storage nodes mid-stream, verify no data loss
 ```
 
-| UI | URL | Credentials |
+| UI | URL | Auth |
 |---|---|---|
-| Grafana | http://localhost:3000 | admin / admin |
-| Kafka UI | http://localhost:8080 | — |
-| VictoriaLogs | http://localhost:9428 | — |
-| vmalert | http://localhost:8880 | — |
-| Alertmanager | http://localhost:9093 | — |
-| Fluent Bit metrics | http://localhost:2020 | — |
-| Logstash monitoring | http://localhost:9600 | — |
+| Grafana | http://localhost:3001 | admin/admin |
+| vmauth | http://localhost:8427 | see below |
+| vmalert | http://localhost:8881 | — |
+| Alertmanager | http://localhost:9095 | — |
+| vlstorage 1/2/3 (direct) | :8002 / :8003 / :8004 | — |
+
+## Auth (vmauth.yml)
+
+| User | Pass | Routes to |
+|---|---|---|
+| write1/2/3 | `hpc-write-pass-{1,2,3}` | vlinsert-1/2/3 |
+| read | `hpc-read-pass` | all 3 storage nodes (or vlselect) |
 
 ```bash
-# Stop and remove containers (keep volumes)
-docker compose down
+curl -u write1:hpc-write-pass-1 -X POST "http://localhost:8427/insert/jsonline" \
+  -d '{"_time":"2026-06-29T00:00:00Z","level":"INFO","_msg":"hello"}'
 
-# Full teardown including volumes
-docker compose down -v
+curl -u read:hpc-read-pass "http://localhost:8427/select/logsql/query?query=hello"
 ```
 
----
+## Alerting
 
-## Volumes
+vmalert evaluates LogsQL rules every 30s from `node-1-pipeline/5-vmalert/alerting/vmalert/*.yml`, routes fired alerts to Alertmanager → Slack. Heartbeat rules (`cross-alerting/`) simulate fire/resolve lifecycle via asymmetric eval intervals — see `Cross-Alerting.md`.
 
-| Volume | Used by | Purpose |
-|---|---|---|
-| `kafka-data` | Kafka | Topic and partition data |
-| `victorialogs-data` | VictoriaLogs | Log storage |
-| `grafana-data` | Grafana | Dashboards, users, settings |
-| `logstash-dlq` | Logstash | Dead letter queue (bind mount) |
+## Repository Layout
 
-All services communicate over an isolated Docker bridge network named `pipeline`.
+```
+.
+├── node-1-pipeline/
+│   ├── 1-generator/
+│   │   ├── generator.py
+│   │   ├── heartbeat.sh
+│   │   ├── no_heartbeat.sh
+│   │   ├── generated-logs/
+│   │   └── logs-original/
+│   │       ├── hpcmlog.json
+│   │       ├── monitoring_service.json
+│   │       ├── syslog.json
+│   │       ├── sample_alerting_task3.json
+│   │       └── dynamic_kv_ip_logs.json
+│   ├── 2-fluent-bit/
+│   │   ├── fluent-bit.conf
+│   │   └── parsers.conf
+│   ├── 3-logstash/
+│   │   ├── hpc-pipeline.conf
+│   │   └── logstash.yml
+│   ├── 4-grafana/
+│   │   ├── alerting-dashboard/
+│   │   │   ├── hpc-alert-explorer.json
+│   │   │   └── readme.md
+│   │   ├── logs-dashboard/
+│   │   │   ├── hpc-log-explorer.json
+│   │   │   └── readme.md
+│   │   └── provisioning/datasources/datasources.yml
+│   ├── 5-vmalert/
+│   │   ├── Cross-Alerting.md
+│   │   └── alerting/
+│   │       ├── alertmanager.yml
+│   │       └── vmalert/
+│   │           ├── alerts.yml
+│   │           ├── MultiConditionSyslogAlert.yml
+│   │           ├── SampleMessageDetected.yml
+│   │           ├── UnifiedAlerts.yml
+│   │           ├── dynamic_kv_replacement.yml
+│   │           └── cross-alerting/
+│   │               ├── heartbeat_detected.yml
+│   │               ├── heartbeat_missing.yml
+│   │               └── scripts/external/
+│   │                   ├── alert_fire.sh
+│   │                   └── alert_resolve.sh
+│   └── docker-compose.yml
+├── node-2-vlinsert-1/
+│   └── docker-compose.yml          # write gateway → vlstorage-1
+├── node-3-vlinsert-2/
+│   └── docker-compose.yml          # write gateway → vlstorage-2
+├── node-4-vlinsert-3/
+│   └── docker-compose.yml          # write gateway → vlstorage-3
+├── node-5-vlstorage-1/
+│   ├── docker-compose.yml
+│   └── storage/                    # storage replica 1 (gitignored)
+├── node-6-vlstorage-2/
+│   ├── docker-compose.yml
+│   └── storage/                    # storage replica 2 (gitignored)
+├── node-7-vlstorage-3/
+│   ├── docker-compose.yml
+│   └── storage/                    # storage replica 3 (gitignored)
+├── node-8-vlselect/
+│   └── docker-compose.yml          # fan-out query across replicas
+├── node-9-vmauth/
+│   ├── docker-compose.yml
+│   └── vmauth.yml                  # auth + routing rules
+├── node-10-vlagent/
+│   ├── docker-compose.yml
+│   └── vlagent-data/                # replication buffer (gitignored)
+├── theory/                          # research notes, benchmarks, single-node reference (not deployed)
+├── 1-stop.sh
+├── 2-start.sh
+├── 3-test.sh
+├── 4-ha-test.sh
+└── README.md
+```
 
-## Logs in FluentBit
+## `theory/`
 
-<img width="1919" height="1199" alt="image" src="https://github.com/user-attachments/assets/00819d19-4c53-4c4a-8532-4647b7dbfffc" />
-
-## Logs in Kafka
-
-<img width="1919" height="1199" alt="image" src="https://github.com/user-attachments/assets/68c98a36-fa35-49f7-b06e-34e7dae9ba82" />
-
-<img width="1915" height="1138" alt="image" src="https://github.com/user-attachments/assets/a5bafae8-8bb9-47b8-9d66-5694072f4556" />
-
-## Logs in Logstash
-
-<img width="1917" height="1199" alt="image" src="https://github.com/user-attachments/assets/2e1ba9bb-50a4-4999-b17e-3ab52f22b627" />
-
-<img width="1919" height="1199" alt="image" src="https://github.com/user-attachments/assets/ce0d9536-4cb3-4a65-ab08-b87547dc999e" />
-
-## Logs in Victoria Logs
-
-<img width="1919" height="995" alt="image" src="https://github.com/user-attachments/assets/feb82bce-ddaa-4c04-81d5-12fb9ad21893" />
-
-<img width="569" height="296" alt="image" src="https://github.com/user-attachments/assets/06e54112-0a15-48d4-ae3e-97c9f6f785fc" />
-
-## Grafana Dashboard
-
-<img width="1569" height="915" alt="image" src="https://github.com/user-attachments/assets/da99339a-de98-40a2-8527-de75263f35b1" />
-
-<img width="1581" height="905" alt="image" src="https://github.com/user-attachments/assets/4c6d27e8-c115-4fa1-9560-14fd742b901e" />
-
-<img width="1574" height="913" alt="image" src="https://github.com/user-attachments/assets/b6105870-0d63-4a0a-a283-5e1ab4feacad" />
-
-<img width="820" height="111" alt="image" src="https://github.com/user-attachments/assets/51843548-a5f7-4a70-81bf-7b690ca27866" /> added the filter and search options
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Research notes, benchmarks, and an earlier single-node reference setup. Not deployed by `2-start.sh`. Explains *why* the design uses vlagent fan-out instead of native VictoriaLogs clustering.
