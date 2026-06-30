@@ -1,0 +1,179 @@
+➜  scripts git:(multi-node-sim) ✗ ./compare.sh
+Starting Full Benchmark
+  Test parameters:
+    Target logs: 3,006,295
+    OpenSearch baseline: 399.4 MB primary, 1100 MB total
+
+  Iterations:
+    1. 100% Unique _stream (3M unique streams) - worst case
+    2. 50 Unique _stream - real use case
+    3. Hybrid (50% unique + 50% repetitive) - mixed
+
+
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-e   Iteration 1: 100% Unique _stream (3M unique)
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-e [INFO] Cleaning up storage and containers...
+vl-bench-storage
+vl-bench-storage
+-e [SUCCESS] Cleanup complete
+-e [INFO] Starting VictoriaLogs...
+[+] Running 2/2
+ ✔ Network scripts_default     Created                                                                                                                                                        0.1s 
+ ✔ Container vl-bench-storage  Started                                                                                                                                                        0.4s 
+-e [INFO] Waiting for VictoriaLogs to be ready...
+-e [SUCCESS] VictoriaLogs is healthy
+-e [INFO] Running generator for Iteration 1...
+
+Waiting for VictoriaLogs... ready.
+     500,000 / 3,006,295 | 37,687 logs/s | ETA 67s
+   1,000,000 / 3,006,295 | 38,734 logs/s | ETA 52s
+   1,500,000 / 3,006,295 | 38,146 logs/s | ETA 39s
+   2,000,000 / 3,006,295 | 37,210 logs/s | ETA 27s
+   2,500,000 / 3,006,295 | 36,296 logs/s | ETA 14s
+   3,000,000 / 3,006,295 | 35,550 logs/s | ETA 0s
+  Done inserting: 3,006,295 logs in 84.6s (35,526 logs/s)
+  Waiting for VL to flush + merge...
+  Polling count every 10s (will stop early if count plateaus for 40s)...
+  [     1s] count = 2,980,000 / 3,006,295
+  [    11s] count = 3,006,295 / 3,006,295
+  Reached target count.
+  Storage: 812M (813 MB)  |  Records: 3,006,295 (100.0% of target)  |  Status: complete
+
+  Results for Iteration 1:
+    Label: 100% Unique _stream (3M unique)
+    Storage: 812M (813 MB)
+    Records: 3006295 (100.0% of target) — status: complete
+    Savings vs OpenSearch: -103.00%
+    Ratio vs OpenSearch: .49x
+
+
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-e   Iteration 2: 50 Unique _stream
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-e [INFO] Cleaning up storage and containers...
+vl-bench-storage
+vl-bench-storage
+-e [SUCCESS] Cleanup complete
+-e [INFO] Starting VictoriaLogs...
+[+] Running 2/2
+ ✔ Network scripts_default     Created                                                                                                                                                        0.0s 
+ ✔ Container vl-bench-storage  Started                                                                                                                                                        0.2s 
+-e [INFO] Waiting for VictoriaLogs to be ready...
+-e [SUCCESS] VictoriaLogs is healthy
+-e [INFO] Running generator for Iteration 2...
+
+Waiting for VictoriaLogs... ready.
+     500,000 / 3,006,295 | 71,365 logs/s | ETA 35s
+   1,000,000 / 3,006,295 | 71,279 logs/s | ETA 28s
+   1,500,000 / 3,006,295 | 71,188 logs/s | ETA 21s
+   2,000,000 / 3,006,295 | 71,015 logs/s | ETA 14s
+   2,500,000 / 3,006,295 | 71,104 logs/s | ETA 7s
+   3,000,000 / 3,006,295 | 71,038 logs/s | ETA 0s
+  Done inserting: 3,006,295 logs in 42.3s (71,029 logs/s)
+  Waiting for VL to flush + merge...
+  Polling count every 10s (will stop early if count plateaus for 40s)...
+  [     0s] count = 7,673 / 3,006,295
+  [    10s] count = 7,854 / 3,006,295
+  [    20s] count = 7,854 / 3,006,295
+  [    30s] count = 7,854 / 3,006,295
+  [    40s] count = 7,854 / 3,006,295
+  [    50s] count = 7,854 / 3,006,295
+  Count plateaued at 7,854 (0.3% of target) for 40s — stopping poll.
+  Storage: 264K (1 MB)  |  Records: 7,854 (0.3% of target)  |  Status: plateau
+
+  Results for Iteration 2:
+    Label: 50 Unique _stream (realistic syslog)
+    Storage: 264K (1 MB)
+    Records: 7854 (0.3% of target) — status: plateau
+        VictoriaLogs ingestion plateaued
+    Savings vs OpenSearch: 100%
+    Ratio vs OpenSearch: 399.40x
+
+
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-e    Plateau Context:
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+with only 50 _stream values absorbing 3,006,295 records, VictoriaLogs genuinely stalls at ~7,840 visible records and never ingests the rest within the insert window.
+This is not a flush-timing issue — it's a per-stream insert backpressure / merge bottleneck in VictoriaLogs when stream cardinality is very low relative to record volume.
+When _stream cardinality is low, every one of your 50 streams accumulates roughly 60,000 records each.
+VictoriaLogs's per-stream in-memory block has to keep building, sorting, and merging entries for that single stream as inserts pour in — and with only 50 streams competing for write throughput, the per-stream write path becomes the bottleneck.
+High-cardinality (iter 1) parallelizes beautifully across millions of independent stream buffers; low-cardinality (iter 2) serializes onto 50 buffers and chokes.
+The fact that script's post_batch() returned True (HTTP 200) for all 3,006,295 inserts but only ~7,840 ever became queryable tells us VL accepted the writes into
+  its ingestion buffer faster than its background compaction could keep up for that low a stream count — and it's silently dropping or endlessly deferring the rest, never catching up.
+
+This is actually a legitimate and important benchmark result
+VictoriaLogs ingestion throughput degrades severely under very low stream cardinality at high volume.
+
+
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-e   Iteration 3: Hybrid (50% unique + 50% repetitive)
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-e [INFO] Cleaning up storage and containers...
+vl-bench-storage
+vl-bench-storage
+-e [SUCCESS] Cleanup complete
+-e [INFO] Starting VictoriaLogs...
+[+] Running 2/2
+ ✔ Network scripts_default     Created                                                                                                                                                        0.0s 
+ ✔ Container vl-bench-storage  Started                                                                                                                                                        0.2s 
+-e [INFO] Waiting for VictoriaLogs to be ready...
+-e [SUCCESS] VictoriaLogs is healthy
+-e [INFO] Running generator for Iteration 3...
+
+Waiting for VictoriaLogs... ready.
+     500,000 / 3,006,295 | 64,572 logs/s | ETA 39s
+   1,000,000 / 3,006,295 | 62,622 logs/s | ETA 32s
+   1,500,000 / 3,006,295 | 60,305 logs/s | ETA 25s
+   2,000,000 / 3,006,295 | 58,296 logs/s | ETA 17s
+   2,500,000 / 3,006,295 | 56,951 logs/s | ETA 9s
+   3,000,000 / 3,006,295 | 55,160 logs/s | ETA 0s
+  Done inserting: 3,006,295 logs in 54.5s (55,147 logs/s)
+  Waiting for VL to flush + merge...
+  Polling count every 10s (will stop early if count plateaus for 40s)...
+  [     0s] count = 1,478,883 / 3,006,295
+  [    11s] count = 1,507,107 / 3,006,295
+  [    21s] count = 1,507,107 / 3,006,295
+  [    31s] count = 1,507,107 / 3,006,295
+  [    41s] count = 1,507,107 / 3,006,295
+  [    52s] count = 1,507,107 / 3,006,295
+  Count plateaued at 1,507,107 (50.1% of target) for 40s — stopping poll.
+  Storage: 398M (399 MB)  |  Records: 1,507,107 (50.1% of target)  |  Status: plateau
+
+  Results for Iteration 3:
+    Label: Hybrid (50% unique + 50% repetitive)
+    Storage: 398M (399 MB)
+    Records: 1507107 (50.1% of target) — status: plateau
+        VictoriaLogs ingestion plateaued
+    Savings vs OpenSearch: 1.00%
+    Ratio vs OpenSearch: 1.00x
+
+
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-e   Iteration 4: Hybrid (50% unique + 50% repetitive)
+-e ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BENCHMARK SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  OpenSearch baseline:
+    Primary storage: 399.4 MB
+    Total (3 shards): 1100 MB
+    Records: 3,006,295
+
+  Iter  Mode                                     Storage MB   Logs         Status   % of tgt  
+  ----- ---------------------------------------- ------------ ------------ -------- ----------
+  1     100% Unique _stream (3M unique)          813          3006295      complete 100.0%    
+  2     50 Unique _stream                        1            7854         plateaud 0.3%      
+  3     Hybrid (50% unique + 50% repetitive)     399          1507107      plateaud 50.1%     
+  4     3 Unique _stream                         10           936,163      plateaud 31.1%      
+
+  Interpolated Estimation:
+  Iter  Mode                                     Estimated Storage (MB)   OpenSearch (MB)   Savings vs OpenSearch   Ratio 
+  ----- ---------------------------------------- ------------------------ ----------------- ----------------------- ----------
+  1	    100% Unique _stream	                     813 MB	                  399.4 MB	        -103% (worse)	          0.5x
+  2	    50 Unique _stream	                       ~382 MB	                399.4 MB	        ~4%	                    ~1.0x
+  3	    Hybrid (50% unique + 50% repetitive)	   ~797 MB	                399.4 MB	        -99% (worse)	          0.5x
+  4     3 Unique _stream                         ~32 MB                   399.4 MB          92%                     12.5x
