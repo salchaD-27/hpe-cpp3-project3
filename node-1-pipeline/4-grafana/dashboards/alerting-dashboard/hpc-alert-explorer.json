@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "HPCM Log Pipeline V4 — Multinode (1-2-2 architecture): 1×pipeline, 1×vlinsert, 2×vlstorage, 1×vlselect",
+  "description": "HPCM Alerting Insights — Multinode: live alert state via Alertmanager REST API · severity · silence management",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -359,7 +359,7 @@
       },
       "id": 802,
       "panels": [],
-      "title": "Alert Insights (Alertmanager + VMAlert)",
+      "title": "Alert Insights",
       "type": "row"
     },
     {
@@ -822,7 +822,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 182
+                "value": 216
               }
             ]
           },
@@ -834,7 +834,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 246
+                "value": 285
               }
             ]
           },
@@ -858,7 +858,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 738
+                "value": 927
               }
             ]
           }
@@ -1144,34 +1144,6 @@
     "list": [
       {
         "current": {
-          "text": "VictoriaLogs",
-          "value": "PD775F2863313E6C7"
-        },
-        "hide": 2,
-        "includeAll": false,
-        "label": "VictoriaLogs",
-        "name": "DS_VICTORIALOGS",
-        "options": [],
-        "query": "victoriametrics-logs-datasource",
-        "refresh": 1,
-        "type": "datasource"
-      },
-      {
-        "current": {
-          "text": "VictoriaMetrics",
-          "value": "P4169E866C3094E38"
-        },
-        "hide": 2,
-        "includeAll": false,
-        "label": "VictoriaMetrics",
-        "name": "DS_ALERTMANAGER",
-        "options": [],
-        "query": "prometheus",
-        "refresh": 1,
-        "type": "datasource"
-      },
-      {
-        "current": {
           "text": "Infinity-Alertmanager",
           "value": "infinity-alertmanager"
         },
@@ -1273,7 +1245,7 @@
     "nowDelay": ""
   },
   "timezone": "browser",
-  "title": "HPCM — Alerting Insights v1",
-  "uid": "hpcm-alerts-v1",
-  "version": 11
+  "title": "HPCM — Alerting Insights",
+  "uid": "hpcm-alerts-v12",
+  "version": 15
 }
