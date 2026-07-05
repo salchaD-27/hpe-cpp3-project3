@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
+  "id": 10,
   "links": [],
   "panels": [
     {
@@ -1026,7 +1026,7 @@
         "enableInfiniteScrolling": false,
         "enableLogDetails": true,
         "prettifyLogMessage": false,
-        "showCommonLabels": true,
+        "showCommonLabels": false,
         "showLabels": true,
         "showTime": true,
         "sortOrder": "Descending",
@@ -1040,7 +1040,7 @@
             "uid": "${DS_VICTORIALOGS}"
           },
           "editorMode": "code",
-          "expr": "level:(ERROR OR FATAL OR CRITICAL) Resource.host.name:~\"${node:pipe}\" log_source:~\"${stream:pipe}\" ${keyword}",
+          "expr": "level:ERROR log_source:hpcmlog",
           "queryType": "instant",
           "refId": "A"
         }
@@ -1188,7 +1188,7 @@
     "nowDelay": ""
   },
   "timezone": "browser",
-  "title": " Log Explorer",
+  "title": "Log Explorer",
   "uid": "hpcm-logs-v2",
   "version": 3
 }

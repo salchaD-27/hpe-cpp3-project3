@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 55,
+  "id": 78,
   "links": [],
   "panels": [
     {
@@ -128,7 +128,7 @@
             "type": "yesoreyeram-infinity-datasource",
             "uid": "${DS_INFINITY}"
           },
-          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filterExpression": "(('${state_filter:pipe}' == 'All') || (state != null && state != '' && state =~ '^(${state_filter:pipe})$')) && (('${severity_filter:pipe}' == 'All') || (severity != null && severity != '' && severity =~ '^(${severity_filter:pipe})$')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
           "filters": [],
           "format": "table",
           "global_query_id": "",
@@ -241,7 +241,7 @@
             "type": "yesoreyeram-infinity-datasource",
             "uid": "${DS_INFINITY}"
           },
-          "filterExpression": "((severity == 'critical') && ('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filterExpression": "((severity == 'critical') && (('${state_filter:pipe}' == 'All') || (state != null && state != '' && state =~ '^(${state_filter:pipe})$')) && (('${severity_filter:pipe}' == 'All') || (severity != null && severity != '' && severity =~ '^(${severity_filter:pipe})$'))) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
           "filters": [],
           "format": "table",
           "global_query_id": "",
@@ -370,24 +370,35 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "blue",
-            "mode": "fixed"
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 90,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 3
               }
             ]
           },
@@ -397,14 +408,45 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ServiceRestartDetected"
+              "options": "severity"
             },
             "properties": [
               {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "critical": {
+                        "color": "dark-red",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "warning": {
+                        "color": "semi-dark-orange",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "info": {
+                        "color": "#5794F2",
+                        "index": 2
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
+                  "mode": "thresholds"
                 }
               }
             ]
@@ -412,90 +454,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "KafkaGCPauseSpike"
+              "options": "count"
             },
             "properties": [
               {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "KafkaHeapPressure"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "HighLogRatePerHost"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "NoLogsIngestion"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "IPMappedLogDetected"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "SampleMessageDetected"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#5794F2",
-                  "mode": "fixed"
-                }
+                "id": "displayName",
+                "value": "Active Alerts"
               }
             ]
           }
@@ -509,29 +473,27 @@
       },
       "id": 804,
       "options": {
-        "displayMode": "gradient",
+        "barRadius": 0.15,
+        "barWidth": 0.7,
+        "colorByField": "severity",
+        "fullHighlight": false,
+        "groupWidth": 0.7,
         "legend": {
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": false
         },
-        "maxVizHeight": 300,
-        "minVizHeight": 16,
-        "minVizWidth": 0,
-        "namePlacement": "auto",
         "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": true
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
         },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "text": {},
-        "valueMode": "color"
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
       },
       "pluginVersion": "11.6.15",
       "targets": [
@@ -540,6 +502,11 @@
             {
               "selector": "labels.alertname",
               "text": "alertname",
+              "type": "string"
+            },
+            {
+              "selector": "labels.severity",
+              "text": "severity",
               "type": "string"
             },
             {
@@ -557,7 +524,7 @@
             "type": "yesoreyeram-infinity-datasource",
             "uid": "${DS_INFINITY}"
           },
-          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filterExpression": "(('${state_filter:pipe}' == 'All') || (state != null && state != '' && state =~ '^(${state_filter:pipe})$')) && (('${severity_filter:pipe}' == 'All') || (severity != null && severity != '' && severity =~ '^(${severity_filter:pipe})$')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
           "filters": [],
           "format": "table",
           "global_query_id": "",
@@ -565,8 +532,6 @@
           "refId": "A",
           "root_selector": "$",
           "source": "url",
-          "summarizeBy": "alertname",
-          "summarizeExpression": "count(alertname)",
           "type": "json",
           "url": "http://node-1-alertmanager:9093/api/v2/alerts",
           "url_options": {
@@ -576,7 +541,62 @@
         }
       ],
       "title": "Active Alerts by Rule",
-      "type": "bargauge"
+      "transformations": [
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "alertname": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "description": {
+                "aggregations": []
+              },
+              "severity": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "state": {
+                "aggregations": [
+                  "count"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "alertname": 0,
+              "severity (first)": 1,
+              "state (count)": 2
+            },
+            "renameByName": {
+              "severity (first)": "severity",
+              "state (count)": "count"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "count"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "barchart"
     },
     {
       "datasource": {
@@ -622,7 +642,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
+                  "fixedColor": "semi-dark-orange",
                   "mode": "fixed"
                 }
               }
@@ -724,7 +744,7 @@
             "type": "yesoreyeram-infinity-datasource",
             "uid": "${DS_INFINITY}"
           },
-          "filterExpression": "((('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')) && (severity != null && severity != '')",
+          "filterExpression": "(((('${state_filter:pipe}' == 'All') || (state != null && state != '' && state =~ '^(${state_filter:pipe})$')) && (('${severity_filter:pipe}' == 'All') || (severity != null && severity != '' && severity =~ '^(${severity_filter:pipe})$'))) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')) && (severity != null && severity != '')",
           "filters": [],
           "format": "table",
           "global_query_id": "",
@@ -803,7 +823,7 @@
                   {
                     "options": {
                       "warning": {
-                        "color": "orange",
+                        "color": "semi-dark-orange",
                         "index": 1
                       }
                     },
@@ -923,7 +943,7 @@
             "type": "yesoreyeram-infinity-datasource",
             "uid": "${DS_INFINITY}"
           },
-          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
+          "filterExpression": "((('${state_filter:pipe}' == 'All') || (state != null && state != '' && state =~ '^(${state_filter:pipe})$')) && (('${severity_filter:pipe}' == 'All') || (severity != null && severity != '' && severity =~ '^(${severity_filter:pipe})$'))) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
           "filters": [],
           "format": "table",
           "global_query_id": "",
@@ -1019,7 +1039,7 @@
                   {
                     "options": {
                       "active": {
-                        "color": "orange",
+                        "color": "semi-dark-orange",
                         "index": 0
                       }
                     },
@@ -1046,18 +1066,178 @@
                 ]
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "severity"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "applyToRow": false,
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "critical": {
+                        "color": "dark-red",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "warning": {
+                        "color": "semi-dark-orange",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "info": {
+                        "color": "blue",
+                        "index": 2
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 110
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "alertname"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 220
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "state"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "startsAt"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 190
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "endsAt"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 190
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "updatedAt"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 190
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "createdBy"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "comment"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 220
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "matched on"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 220
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "match values"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 240
+              }
+            ]
           }
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 24,
         "x": 0,
         "y": 28
       },
       "id": 813,
       "options": {
-        "cellHeight": "sm",
+        "cellHeight": "md",
         "footer": {
           "countRows": false,
           "fields": "",
@@ -1066,20 +1246,30 @@
           ],
           "show": false
         },
-        "showHeader": true
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "state"
+          },
+          {
+            "desc": true,
+            "displayName": "endsAt"
+          }
+        ]
       },
       "pluginVersion": "11.6.15",
       "targets": [
         {
           "columns": [
             {
-              "selector": "id",
-              "text": "id",
+              "selector": "matchers.#(name==\"alertname\").value",
+              "text": "alertname",
               "type": "string"
             },
             {
-              "selector": "matchers",
-              "text": "matchers",
+              "selector": "matchers.#(name==\"severity\").value",
+              "text": "severity",
               "type": "string"
             },
             {
@@ -1106,6 +1296,26 @@
               "selector": "comment",
               "text": "comment",
               "type": "string"
+            },
+            {
+              "selector": "id",
+              "text": "id",
+              "type": "string"
+            },
+            {
+              "selector": "updatedAt",
+              "text": "updatedAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "matchers.#.name",
+              "text": "matched_labels",
+              "type": "string"
+            },
+            {
+              "selector": "matchers.#.value",
+              "text": "matched_values",
+              "type": "string"
             }
           ],
           "datasource": {
@@ -1128,6 +1338,31 @@
         }
       ],
       "title": "Active Silences",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "alertname": 0,
+              "comment": 7,
+              "createdBy": 6,
+              "endsAt": 4,
+              "id": 10,
+              "matched_labels": 8,
+              "matched_values": 9,
+              "severity": 1,
+              "startsAt": 3,
+              "state": 2,
+              "updatedAt": 5
+            },
+            "renameByName": {
+              "matched_labels": "matched on",
+              "matched_values": "match values"
+            }
+          }
+        }
+      ],
       "type": "table"
     }
   ],
@@ -1158,11 +1393,16 @@
       },
       {
         "current": {
-          "text": "All",
-          "value": "All"
+          "text": [
+            "All"
+          ],
+          "value": [
+            "All"
+          ]
         },
-        "description": "Filter all panels by alert severity",
+        "description": "Filter all panels by alert severity. Select one or more; choosing All overrides other selections.",
         "label": "Severity",
+        "multi": true,
         "name": "severity_filter",
         "options": [
           {
@@ -1191,11 +1431,16 @@
       },
       {
         "current": {
-          "text": "All",
-          "value": "All"
+          "text": [
+            "All"
+          ],
+          "value": [
+            "All"
+          ]
         },
-        "description": "Filter all panels by alert state",
+        "description": "Filter all panels by alert state. Select one or more; choosing All overrides other selections.",
         "label": "State",
+        "multi": true,
         "name": "state_filter",
         "options": [
           {
@@ -1246,6 +1491,6 @@
   },
   "timezone": "browser",
   "title": "HPCM — Alerting Insights",
-  "uid": "hpcm-alerts-v12",
-  "version": 15
+  "uid": "hpcm-alerts-v1",
+  "version": 10
 }
