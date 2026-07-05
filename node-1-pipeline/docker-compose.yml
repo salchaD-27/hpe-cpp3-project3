@@ -1,9 +1,6 @@
 # =============================================================================
 # Node 1 — Pipeline Node
-# Runs: Simulator, Fluent Bit, Kafka, Logstash, Grafana, VictoriaMetrics,
-#        vmalert, Alertmanager, Kafka UI
-#
-# All services join multi-node-net so they can reach Node 2-5 by container name.
+# Runs: Simulator, Fluent Bit, Kafka, Logstash, Grafana, vmalert, Alertmanager
 # =============================================================================
 
 services:

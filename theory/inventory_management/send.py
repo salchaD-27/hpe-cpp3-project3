@@ -28,7 +28,7 @@ from datetime import datetime, timezone
 # =============================================================================
 # CONFIG — change these if needed
 # =============================================================================
-VLINSERT_URL   = "http://localhost:8001"
+VLINSERT_URL   = "http://localhost:9429/insert/jsonline"
 INVENTORY_FILE = "inventory-data-bardpeak001.json"
 SENT_FILE      = "sent_types.txt"
 NODE_NAME      = "bardpeak001"
@@ -101,7 +101,7 @@ def send(records, dry_run=False):
     """POST records to VictoriaLogs."""
     ndjson = "\n".join(json.dumps(r) for r in records) + "\n"
     url = (
-        f"{VLINSERT_URL}/insert/jsonline"
+        f"{VLINSERT_URL}"
         f"?_stream_fields=log_source"
         f"&_msg_field=_msg"
         f"&_time_field=_time"
