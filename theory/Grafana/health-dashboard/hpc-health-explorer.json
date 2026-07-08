@@ -15,11 +15,11 @@
       }
     ]
   },
-  "description": "HPCM Log Pipeline V4 — Multinode (1-2-2 architecture): 1×pipeline, 1×vlinsert, 2×vlstorage, 1×vlselect",
+  "description": "VictoriaLogs Multi-node cluster health ",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
-  "id": 55,
+  "graphTooltip": 1,
+  "id": 11,
   "links": [],
   "panels": [
     {
@@ -32,349 +32,218 @@
       },
       "id": 100,
       "panels": [],
-      "title": "Overview",
+      "title": "Cluster Overview",
       "type": "row"
     },
     {
       "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${DS_INFINITY}"
+        "type": "prometheus",
+        "uid": "victoriametrics"
       },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "red",
-            "mode": "fixed"
-          },
-          "mappings": [],
-          "noValue": "0",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red"
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 0,
-        "y": 1
-      },
-      "id": 800,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.6.15",
-      "targets": [
-        {
-          "columns": [
-            {
-              "selector": "labels.alertname",
-              "text": "alertname",
-              "type": "string"
-            },
-            {
-              "selector": "labels.severity",
-              "text": "severity",
-              "type": "string"
-            },
-            {
-              "selector": "labels.instance",
-              "text": "instance",
-              "type": "string"
-            },
-            {
-              "selector": "labels.job",
-              "text": "job",
-              "type": "string"
-            },
-            {
-              "selector": "status.state",
-              "text": "state",
-              "type": "string"
-            },
-            {
-              "selector": "startsAt",
-              "text": "startsAt",
-              "type": "timestamp"
-            },
-            {
-              "selector": "annotations.description",
-              "text": "description",
-              "type": "string"
-            }
-          ],
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_INFINITY}"
-          },
-          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
-          "filters": [],
-          "format": "table",
-          "global_query_id": "",
-          "parser": "backend",
-          "refId": "A",
-          "root_selector": "$",
-          "source": "url",
-          "summarizeExpression": "count(state)",
-          "type": "json",
-          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
-          "url_options": {
-            "data": "",
-            "method": "GET"
-          }
-        }
-      ],
-      "title": "Active Alerts",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${DS_INFINITY}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "dark-red",
-            "mode": "fixed"
-          },
-          "mappings": [],
-          "noValue": "0",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "dark-red"
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 6,
-        "y": 1
-      },
-      "id": 810,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.6.15",
-      "targets": [
-        {
-          "columns": [
-            {
-              "selector": "labels.alertname",
-              "text": "alertname",
-              "type": "string"
-            },
-            {
-              "selector": "labels.severity",
-              "text": "severity",
-              "type": "string"
-            },
-            {
-              "selector": "labels.instance",
-              "text": "instance",
-              "type": "string"
-            },
-            {
-              "selector": "labels.job",
-              "text": "job",
-              "type": "string"
-            },
-            {
-              "selector": "status.state",
-              "text": "state",
-              "type": "string"
-            },
-            {
-              "selector": "startsAt",
-              "text": "startsAt",
-              "type": "timestamp"
-            },
-            {
-              "selector": "annotations.description",
-              "text": "description",
-              "type": "string"
-            }
-          ],
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_INFINITY}"
-          },
-          "filterExpression": "((severity == 'critical') && ('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
-          "filters": [],
-          "format": "table",
-          "global_query_id": "",
-          "parser": "backend",
-          "refId": "A",
-          "root_selector": "$",
-          "source": "url",
-          "summarizeExpression": "count(state)",
-          "type": "json",
-          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
-          "url_options": {
-            "data": "",
-            "method": "GET"
-          }
-        }
-      ],
-      "title": "Critical Alerts",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${DS_INFINITY}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "orange",
-            "mode": "fixed"
-          },
-          "mappings": [],
-          "noValue": "0",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "orange"
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 12,
-        "y": 1
-      },
-      "id": 812,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.6.15",
-      "targets": [
-        {
-          "columns": [
-            {
-              "selector": "id",
-              "text": "id",
-              "type": "string"
-            },
-            {
-              "selector": "status.state",
-              "text": "state",
-              "type": "string"
-            }
-          ],
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_INFINITY}"
-          },
-          "filterExpression": "state == 'active'",
-          "filters": [],
-          "format": "table",
-          "global_query_id": "",
-          "parser": "backend",
-          "refId": "A",
-          "root_selector": "$",
-          "source": "url",
-          "summarizeExpression": "count(state)",
-          "type": "json",
-          "url": "http://node-1-alertmanager:9093/api/v2/silences",
-          "url_options": {
-            "data": "",
-            "method": "GET"
-          }
-        }
-      ],
-      "title": "Silenced Alerts",
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 6
-      },
-      "id": 802,
-      "panels": [],
-      "title": "Alert Insights (Alertmanager + VMAlert)",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${DS_INFINITY}"
-      },
+      "description": "Rows/sec ingested across all vlinsert nodes",
       "fieldConfig": {
         "defaults": {
           "color": {
             "fixedColor": "blue",
             "mode": "fixed"
           },
+          "decimals": 1,
           "mappings": [],
-          "min": 0,
+          "noValue": "—",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "rows/s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 9,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rate(vl_rows_ingested_total{job=\"vlinsert\"}[1m])",
+          "instant": true,
+          "legendFormat": "{{instance}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Ingestion Rate — by vlinsert Node",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Cumulative rows ingested cluster-wide since the vlinsert nodes started",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "semi-dark-blue",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "—",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 9,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "sum(vl_rows_ingested_total{job=\"vlinsert\"})",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Total Rows Ingested",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Uncompressed:compressed ratio across all vlstorage nodes",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "mappings": [],
+          "noValue": "—",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 14,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "sum(vl_uncompressed_data_size_bytes{job=~\"vlstorage.*\"}) / sum(vl_compressed_data_size_bytes{job=~\"vlstorage.*\"})",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Compression Ratio",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Current per-second drop rate cluster-wide.",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 3,
+          "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -382,132 +251,83 @@
                 "color": "green"
               },
               {
-                "color": "yellow",
-                "value": 1
-              },
-              {
                 "color": "red",
-                "value": 3
+                "value": 0.001
               }
             ]
           },
           "unit": "short"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "ServiceRestartDetected"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "KafkaGCPauseSpike"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "KafkaHeapPressure"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "HighLogRatePerHost"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "NoLogsIngestion"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "IPMappedLogDetected"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "SampleMessageDetected"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#5794F2",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 0,
-        "y": 7
+        "h": 5,
+        "w": 5,
+        "x": 19,
+        "y": 1
       },
-      "id": 804,
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "sum(rate(vl_rows_dropped_total[5m]))",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Rows Dropped (rate, now)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Seconds since process start, per component",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "noValue": "—",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "dtdurations"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 6,
       "options": {
         "displayMode": "gradient",
         "legend": {
@@ -517,8 +337,8 @@
           "showLegend": false
         },
         "maxVizHeight": 300,
-        "minVizHeight": 16,
-        "minVizWidth": 0,
+        "minVizHeight": 10,
+        "minVizWidth": 8,
         "namePlacement": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
@@ -526,436 +346,29 @@
             "lastNotNull"
           ],
           "fields": "",
-          "values": true
+          "values": false
         },
-        "showUnfilled": true,
+        "showUnfilled": false,
         "sizing": "auto",
-        "text": {},
         "valueMode": "color"
       },
       "pluginVersion": "11.6.15",
       "targets": [
         {
-          "columns": [
-            {
-              "selector": "labels.alertname",
-              "text": "alertname",
-              "type": "string"
-            },
-            {
-              "selector": "status.state",
-              "text": "state",
-              "type": "string"
-            },
-            {
-              "selector": "annotations.description",
-              "text": "description",
-              "type": "string"
-            }
-          ],
           "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_INFINITY}"
+            "type": "prometheus",
+            "uid": "victoriametrics"
           },
-          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
-          "filters": [],
-          "format": "table",
-          "global_query_id": "",
-          "parser": "backend",
-          "refId": "A",
-          "root_selector": "$",
-          "source": "url",
-          "summarizeBy": "alertname",
-          "summarizeExpression": "count(alertname)",
-          "type": "json",
-          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
-          "url_options": {
-            "data": "",
-            "method": "GET"
-          }
+          "editorMode": "code",
+          "expr": "time() - process_start_time_seconds{job=~\"$component\"}",
+          "instant": false,
+          "legendFormat": "{{job}} {{instance}}",
+          "range": true,
+          "refId": "A"
         }
       ],
-      "title": "Active Alerts by Rule",
+      "title": "Node Uptime — All Components",
       "type": "bargauge"
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${DS_INFINITY}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "critical"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "warning"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "info"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#5794F2",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "summary"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 12,
-        "y": 7
-      },
-      "id": 805,
-      "options": {
-        "displayLabels": [
-          "name",
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true,
-          "values": [
-            "value",
-            "percent"
-          ]
-        },
-        "pieType": "donut",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "11.6.15",
-      "targets": [
-        {
-          "columns": [
-            {
-              "selector": "labels.severity",
-              "text": "severity",
-              "type": "string"
-            },
-            {
-              "selector": "status.state",
-              "text": "state",
-              "type": "string"
-            },
-            {
-              "selector": "labels.alertname",
-              "text": "alertname",
-              "type": "string"
-            },
-            {
-              "selector": "annotations.description",
-              "text": "description",
-              "type": "string"
-            }
-          ],
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_INFINITY}"
-          },
-          "filterExpression": "((('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')) && (severity != null && severity != '')",
-          "filters": [],
-          "format": "table",
-          "global_query_id": "",
-          "parser": "backend",
-          "refId": "A",
-          "root_selector": "$",
-          "source": "url",
-          "summarizeBy": "severity",
-          "summarizeExpression": "count(severity)",
-          "type": "json",
-          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
-          "url_options": {
-            "data": "",
-            "method": "GET"
-          }
-        }
-      ],
-      "title": "Active Alerts by Severity",
-      "type": "piechart"
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${DS_INFINITY}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "color-text"
-            },
-            "filterable": true,
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text"
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "severity"
-            },
-            "properties": [
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "applyToRow": false,
-                  "mode": "basic",
-                  "type": "color-background"
-                }
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "critical": {
-                        "color": "dark-red",
-                        "index": 0
-                      }
-                    },
-                    "type": "value"
-                  },
-                  {
-                    "options": {
-                      "warning": {
-                        "color": "orange",
-                        "index": 1
-                      }
-                    },
-                    "type": "value"
-                  },
-                  {
-                    "options": {
-                      "info": {
-                        "color": "blue",
-                        "index": 2
-                      }
-                    },
-                    "type": "value"
-                  }
-                ]
-              },
-              {
-                "id": "custom.width",
-                "value": 182
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "startsAt"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 246
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "alertname"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 256
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "description"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 738
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 17
-      },
-      "id": 811,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "severity"
-          }
-        ]
-      },
-      "pluginVersion": "11.6.15",
-      "targets": [
-        {
-          "columns": [
-            {
-              "selector": "labels.alertname",
-              "text": "alertname",
-              "type": "string"
-            },
-            {
-              "selector": "labels.severity",
-              "text": "severity",
-              "type": "string"
-            },
-            {
-              "selector": "status.state",
-              "text": "state",
-              "type": "string"
-            },
-            {
-              "selector": "startsAt",
-              "text": "startsAt",
-              "type": "timestamp"
-            },
-            {
-              "selector": "annotations.description",
-              "text": "description",
-              "type": "string"
-            }
-          ],
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_INFINITY}"
-          },
-          "filterExpression": "(('${state_filter}' == 'All' || state == '${state_filter}') && ('${severity_filter}' == 'All' || severity == '${severity_filter}')) && ('${keyword_search}' == '' || alertname =~ '${keyword_search}' || description =~ '${keyword_search}')",
-          "filters": [],
-          "format": "table",
-          "global_query_id": "",
-          "parser": "backend",
-          "refId": "A",
-          "root_selector": "$",
-          "source": "url",
-          "type": "json",
-          "url": "http://node-1-alertmanager:9093/api/v2/alerts",
-          "url_options": {
-            "data": "",
-            "method": "GET"
-          }
-        }
-      ],
-      "title": "Firing Alerts — Full Detail",
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "__name__": true,
-              "alertstate": true,
-              "instance": true,
-              "job": true
-            },
-            "renameByName": {}
-          }
-        }
-      ],
-      "type": "table"
     },
     {
       "collapsed": false,
@@ -963,305 +376,650 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 27
+        "y": 18
       },
-      "id": 814,
+      "id": 200,
       "panels": [],
-      "title": "Silence Management",
+      "title": "Ingestion & Data Quality",
       "type": "row"
     },
     {
       "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${DS_INFINITY}"
+        "type": "prometheus",
+        "uid": "victoriametrics"
       },
+      "description": "Rows/sec ingested, per vlinsert instance",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
           "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             },
-            "filterable": true,
-            "inspect": false
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "text"
+                "color": "green"
               }
             ]
-          }
+          },
+          "unit": "rows/s"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "state"
-            },
-            "properties": [
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "applyToRow": false,
-                  "mode": "basic",
-                  "type": "color-background"
-                }
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "active": {
-                        "color": "orange",
-                        "index": 0
-                      }
-                    },
-                    "type": "value"
-                  },
-                  {
-                    "options": {
-                      "expired": {
-                        "color": "gray",
-                        "index": 1
-                      }
-                    },
-                    "type": "value"
-                  },
-                  {
-                    "options": {
-                      "pending": {
-                        "color": "blue",
-                        "index": 2
-                      }
-                    },
-                    "type": "value"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 24,
+        "h": 11,
+        "w": 13,
         "x": 0,
-        "y": 28
+        "y": 19
       },
-      "id": 813,
+      "id": 201,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
           ],
-          "show": false
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
-        "showHeader": true
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "pluginVersion": "11.6.15",
       "targets": [
         {
-          "columns": [
-            {
-              "selector": "id",
-              "text": "id",
-              "type": "string"
-            },
-            {
-              "selector": "matchers",
-              "text": "matchers",
-              "type": "string"
-            },
-            {
-              "selector": "status.state",
-              "text": "state",
-              "type": "string"
-            },
-            {
-              "selector": "startsAt",
-              "text": "startsAt",
-              "type": "timestamp"
-            },
-            {
-              "selector": "endsAt",
-              "text": "endsAt",
-              "type": "timestamp"
-            },
-            {
-              "selector": "createdBy",
-              "text": "createdBy",
-              "type": "string"
-            },
-            {
-              "selector": "comment",
-              "text": "comment",
-              "type": "string"
-            }
-          ],
           "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_INFINITY}"
+            "type": "prometheus",
+            "uid": "victoriametrics"
           },
-          "filters": [],
-          "format": "table",
-          "global_query_id": "",
-          "parser": "backend",
-          "refId": "A",
-          "root_selector": "$",
-          "source": "url",
-          "type": "json",
-          "url": "http://node-1-alertmanager:9093/api/v2/silences",
-          "url_options": {
-            "data": "",
-            "method": "GET"
-          }
+          "expr": "sum(rate(vl_rows_ingested_total{job=\"vlinsert\"}[1m])) by (instance)",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
         }
       ],
-      "title": "Active Silences",
-      "type": "table"
+      "title": "Ingestion Rate by vlinsert Node",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Percentage of disk used, per storage node",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 301,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "(1 - (vl_free_disk_space_bytes{job=~\"$storage_job\", path=\"/storage\"} / vl_total_disk_space_bytes{job=~\"$storage_job\", path=\"/storage\"})) * 100",
+          "instant": true,
+          "legendFormat": "{{job}} {{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Disk Used % — $storage_job",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Requests/sec by path, across selected components",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 41
+      },
+      "id": 203,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "sum(rate(vl_http_requests_total{job=~\"$component\"}[1m])) by (job, path)",
+          "legendFormat": "{{job}} {{path}}",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP Request Rate by Endpoint",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "id": 300,
+      "panels": [],
+      "title": "Storage Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Uncompressed vs compressed data size across vlstorage nodes",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 52
+      },
+      "id": 302,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "sum(vl_uncompressed_data_size_bytes{job=~\"$storage_job\"}) by (job, type)",
+          "legendFormat": "{{job}} uncompressed {{type}}",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "sum(vl_compressed_data_size_bytes{job=~\"$storage_job\"}) by (job, type)",
+          "legendFormat": "{{job}} compressed {{type}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Storage Size Growth — All Storage Nodes",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 66
+      },
+      "id": 400,
+      "panels": [],
+      "title": "Resource Usage",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Resident memory, per component",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 12,
+        "x": 0,
+        "y": 67
+      },
+      "id": 501,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "process_resident_memory_bytes{job=~\"$component\"}",
+          "legendFormat": "{{job}} {{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Memory by Component",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Total CPU time (user + system), per component",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 12,
+        "x": 12,
+        "y": 67
+      },
+      "id": 502,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "expr": "sum(rate(process_cpu_seconds_total{job=~\"$component\"}[1m])) by (job, instance)",
+          "legendFormat": "{{job}} {{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Usage by Component",
+      "type": "timeseries"
     }
   ],
   "preload": false,
   "refresh": "30s",
   "schemaVersion": 41,
   "tags": [
-    "hpc",
     "victorialogs",
-    "kafka",
-    "logstash"
+    "victoriametrics"
   ],
   "templating": {
     "list": [
       {
         "current": {
-          "text": "VictoriaLogs",
-          "value": "PD775F2863313E6C7"
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
         },
-        "hide": 2,
-        "includeAll": false,
-        "label": "VictoriaLogs",
-        "name": "DS_VICTORIALOGS",
-        "options": [],
-        "query": "victoriametrics-logs-datasource",
-        "refresh": 1,
-        "type": "datasource"
-      },
-      {
-        "current": {
-          "text": "VictoriaMetrics",
-          "value": "P4169E866C3094E38"
+        "datasource": {
+          "type": "prometheus",
+          "uid": "victoriametrics"
         },
-        "hide": 2,
-        "includeAll": false,
-        "label": "VictoriaMetrics",
-        "name": "DS_ALERTMANAGER",
+        "includeAll": true,
+        "label": "Component",
+        "multi": true,
+        "name": "component",
         "options": [],
-        "query": "prometheus",
-        "refresh": 1,
-        "type": "datasource"
-      },
-      {
-        "current": {
-          "text": "Infinity-Alertmanager",
-          "value": "infinity-alertmanager"
-        },
-        "hide": 2,
-        "includeAll": false,
-        "label": "Infinity-Alertmanager",
-        "name": "DS_INFINITY",
-        "options": [],
-        "query": "yesoreyeram-infinity-datasource",
-        "refresh": 1,
-        "type": "datasource"
+        "query": "label_values(process_start_time_seconds, job)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       },
       {
         "current": {
           "text": "All",
-          "value": "All"
+          "value": [
+            "$__all"
+          ]
         },
-        "description": "Filter all panels by alert severity",
-        "label": "Severity",
-        "name": "severity_filter",
-        "options": [
-          {
-            "selected": true,
-            "text": "All",
-            "value": "All"
-          },
-          {
-            "selected": false,
-            "text": "critical",
-            "value": "critical"
-          },
-          {
-            "selected": false,
-            "text": "warning",
-            "value": "warning"
-          },
-          {
-            "selected": false,
-            "text": "info",
-            "value": "info"
-          }
-        ],
-        "query": "All,critical,warning,info",
-        "type": "custom"
-      },
-      {
-        "current": {
-          "text": "All",
-          "value": "All"
+        "datasource": {
+          "type": "prometheus",
+          "uid": "victoriametrics"
         },
-        "description": "Filter all panels by alert state",
-        "label": "State",
-        "name": "state_filter",
-        "options": [
-          {
-            "selected": true,
-            "text": "All",
-            "value": "All"
-          },
-          {
-            "selected": false,
-            "text": "active",
-            "value": "active"
-          },
-          {
-            "selected": false,
-            "text": "suppressed",
-            "value": "suppressed"
-          }
-        ],
-        "query": "All,active,suppressed",
-        "type": "custom"
-      },
-      {
-        "current": {
-          "text": "",
-          "value": ""
-        },
-        "description": "Search alertname and description (case-insensitive, partial match)",
-        "label": "Search Alerts",
-        "name": "keyword_search",
-        "options": [
-          {
-            "selected": true,
-            "text": "",
-            "value": ""
-          }
-        ],
-        "query": "",
-        "type": "textbox"
+        "includeAll": true,
+        "label": "Storage Node",
+        "multi": true,
+        "name": "storage_job",
+        "options": [],
+        "query": "label_values(vl_total_disk_space_bytes, job)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
@@ -1269,11 +1027,9 @@
     "from": "now-5m",
     "to": "now"
   },
-  "timepicker": {
-    "nowDelay": ""
-  },
+  "timepicker": {},
   "timezone": "browser",
-  "title": "HPCM — Alerting Insights v1",
-  "uid": "hpcm-alerts-v1",
-  "version": 11
+  "title": "Health Dashboard",
+  "uid": "victorialogs-cluster-health",
+  "version": 4
 }
